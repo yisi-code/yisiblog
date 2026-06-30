@@ -1,0 +1,401 @@
+.article-comments {
+  position: relative;
+}
+
+.article-comments__glow {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: -2.5rem;
+  z-index: 0;
+  height: 8rem;
+  width: 75%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--color-bg-article-comments-glow);
+  filter: blur(48px);
+}
+
+.article-comments__container {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--pm-size-normal-150);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--pm-size-normal-150);
+}
+
+.article-comments__fallback {
+  border: 1px dashed var(--color-border-article-comment);
+  border-radius: 1rem;
+  background: var(--color-bg-soft);
+  padding: var(--pm-size-normal);
+}
+
+.article-comments__title {
+  color: var(--color-text-normal);
+  font-size: var(--font-size-normal);
+  font-weight: 900;
+}
+
+.article-comments__desc {
+  margin-top: var(--pm-size-normal-25);
+  color: var(--color-text-accent-strong);
+  font-size: var(--font-size-normal);
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.gitalk-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border-article-comment);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(135deg, var(--color-bg-article-comment-field-focus), transparent 42%),
+    var(--color-bg-soft);
+  box-shadow: inset 0 1px 8px var(--color-shadow-panel);
+  padding: clamp(var(--pm-size-normal), 3vw, var(--pm-size-normal-150));
+  backdrop-filter: blur(16px);
+}
+
+.gitalk-panel::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 12% 0, var(--color-bg-article-comments-glow), transparent 18rem),
+    linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 38%);
+  opacity: 0.72;
+}
+
+.gitalk-panel__head,
+.gitalk-panel__loader,
+.gitalk-panel__guest-card,
+.gitalk-panel__body {
+  position: relative;
+  z-index: 1;
+}
+
+.gitalk-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: var(--pm-size-normal);
+}
+
+.gitalk-panel__eyebrow {
+  color: var(--color-text-accent-strong);
+    font-size: var(--font-size-normal-75);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.gitalk-panel__title {
+  margin-top: var(--pm-size-normal-25);
+  color: var(--color-text-normal);
+  font-size: var(--font-size-normal-1185);
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.gitalk-panel__status {
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-control-pill);
+  border-radius: 999px;
+  background: var(--color-bg-panel-strong);
+  color: var(--color-text-accent-strong);
+  padding: var(--pm-size-normal-25) var(--pm-size-normal-75);
+  font-size: var(--font-size-normal-75);
+  font-weight: 900;
+  box-shadow: 0 8px 18px var(--color-shadow-panel);
+}
+
+.gitalk-panel__body {
+  position: relative;
+  min-height: fit-content;
+}
+
+.gitalk-panel__mount {
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gitalk-panel--ready .gitalk-panel__mount {
+  height: fit-content;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.gitalk-panel__state-card {
+  padding: var(--pm-size-normal);
+}
+
+.gitalk-panel__loader {
+  min-height: max-content;
+  padding: var(--pm-size-normal) 0 var(--pm-size-normal-50) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  color: var(--color-text-normal);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 12px 30px var(--color-shadow-panel);
+  pointer-events: none;
+}
+
+.gitalk-panel__loader-ring {
+  position: relative;
+  display: grid;
+  width: 3.4rem;
+  height: 3.4rem;
+  place-items: center;
+}
+
+.gitalk-panel__empty-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.24rem;
+  text-align: center;
+}
+
+.gitalk-panel__loader-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0.55rem;
+  border-radius: 999px;
+  background: var(--color-control-hover-bg);
+  box-shadow: 0 0 28px var(--color-shadow-accent);
+}
+
+.gitalk-panel__loader-ring i {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-top-color: var(--color-control-hover-bg);
+  border-right-color: var(--color-text-stat-tertiary);
+  border-radius: 999px;
+  animation: gitalk-loader-spin 1.1s linear infinite;
+}
+
+.gitalk-panel__loader-ring i:nth-child(2) {
+  inset: 0.45rem;
+  border-top-color: var(--color-status-cyan);
+  border-right-color: transparent;
+  animation-duration: 1.7s;
+  animation-direction: reverse;
+}
+
+.gitalk-panel__loader strong,
+.gitalk-panel__guest-copy strong,
+.gitalk-panel__empty-card strong {
+  color: var(--color-text-normal);
+  font-size: var(--font-size-normal);
+  font-weight: 950;
+}
+
+.gitalk-panel__loader small,
+.gitalk-panel__empty-card span {
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal);
+  font-weight: 800;
+}
+
+.gitalk-panel--ready .gitalk-panel__loader {
+  display: none;
+}
+
+.gitalk-panel__guest-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: var(--pm-size-normal);
+}
+
+.gitalk-panel__guest-mark {
+  display: grid;
+  width: 2.65rem;
+  height: 2.65rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 0.85rem;
+  background: var(--color-control-hover-bg);
+  color: var(--color-text-inverse);
+    font-size: var(--font-size-normal);
+  font-weight: 950;
+  box-shadow: 0 10px 24px var(--color-shadow-accent-soft);
+}
+
+.gitalk-panel__guest-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.gitalk-panel__guest-copy span {
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal);
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.gitalk-panel__login-button {
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  background: var(--color-control-hover-bg);
+  color: var(--color-text-inverse);
+  padding: var(--pm-size-normal-50) var(--pm-size-normal);
+  font-size: var(--font-size-normal);
+  font-weight: 950;
+  box-shadow: 0 10px 24px var(--color-shadow-accent-soft);
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gitalk-panel__login-button:hover {
+  background: var(--color-control-hover-bg-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px var(--color-shadow-accent);
+}
+
+.gitalk-panel--guest .gt-header-textarea,
+.gitalk-panel--guest .gt-btn-preview,
+.gitalk-panel--guest .gt-comment-like,
+.gitalk-panel--guest .gt-comment-edit,
+.gitalk-panel--guest .gt-comment-reply,
+.gitalk-panel--guest .gt-btn-loadmore {
+  cursor: not-allowed !important;
+}
+
+.gitalk-panel--guest .gt-avatar-github,
+.gitalk-panel--guest .gt-user {
+  display: none !important;
+}
+
+.gitalk-panel--guest .gt-header-comment {
+  margin-left: 0 !important;
+}
+
+.gitalk-panel--guest .gt-header,
+.gitalk-panel--guest .gt-comments-null,
+.gitalk-panel--guest .gt-no-init {
+  display: none !important;
+}
+
+.gitalk-panel--empty .gt-comments {
+  display: none !important;
+}
+
+.gitalk-panel .gt-container {
+  padding: 0 !important;
+}
+
+.gitalk-panel .gt-meta {
+  margin: 0 0 var(--pm-size-normal) !important;
+  border-bottom: 1px solid var(--color-border-light) !important;
+  padding: 0 0 var(--pm-size-normal) !important;
+}
+
+.gitalk-panel .gt-counts,
+.gitalk-panel .gt-user-name {
+  color: var(--color-text-accent-strong) !important;
+  font-weight: 850 !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-header-textarea {
+  border: 1px solid var(--color-border-article-comment) !important;
+  border-radius: 0.95rem !important;
+  background: var(--color-bg-article-comment-field) !important;
+  color: var(--color-text-normal) !important;
+  min-height: 7.5rem !important;
+  padding: var(--pm-size-normal) var(--pm-size-normal) !important;
+  font-size: var(--font-size-normal) !important;
+  line-height: 1.65 !important;
+  box-shadow: inset 0 1px 5px var(--color-shadow-panel) !important;
+  backdrop-filter: blur(12px) !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-header-textarea:focus {
+  border-color: var(--color-control-hover-bg) !important;
+  background: var(--color-bg-article-comment-field-focus) !important;
+  box-shadow: 0 0 15px var(--color-shadow-accent-soft) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-btn {
+  border: 0 !important;
+  border-radius: 0.7rem !important;
+  background: var(--color-control-hover-bg) !important;
+  color: var(--color-text-inverse) !important;
+  box-shadow: 0 4px 15px var(--color-shadow-accent) !important;
+  font-weight: 900 !important;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-btn:hover {
+  background: var(--color-control-hover-bg-strong) !important;
+  transform: translateY(-1px);
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-content {
+  border: 1px solid var(--color-border-article-comment) !important;
+  border-radius: 0.95rem !important;
+  background: var(--color-bg-article-comment-field) !important;
+  box-shadow: 0 10px 26px var(--color-shadow-panel) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-content:hover {
+  border-color: var(--color-border-control-pill) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-admin .gt-comment-content {
+  border-color: var(--color-border-control-pill) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-avatar img,
+.custom-gitalk-glass .gt-container .gt-header-avatar img {
+  border-radius: 0.7rem !important;
+  box-shadow: 0 8px 18px var(--color-shadow-panel) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-avatar-github {
+  border-radius: 0.7rem !important;
+  background: var(--color-bg-panel-strong) !important;
+  box-shadow: 0 8px 18px var(--color-shadow-panel) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-username,
+.custom-gitalk-glass .gt-container .gt-comment-text {
+  color: var(--color-text-normal) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-body {
+  color: var(--color-text-normal) !important;
+  font-size: var(--font-size-normal) !important;
+  line-height: 1.78 !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-comment-body p {
+  color: inherit !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-header-controls {
+  margin-top: var(--pm-size-normal) !important;
+  color: var(--color-text-accent-strong) !important;
+}
+
+.custom-gitalk-glass .gt-container .gt-header-controls-tip {
+  color: var(--color-text-accent-strong) !important;
+}
+
+.custom-gitalk-glass .gt-container a {
+  color: var(--color-text-accent-strong) !important;
+}

@@ -1,0 +1,58 @@
+.chatter-card {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.chatter-detail-shell {
+  border-radius: 2.25rem;
+}
+
+
+.chatter-calendar__head {
+  margin-bottom: var(--pm-size-normal);
+}
+
+.chatter-calendar__head h3 {
+  color: var(--color-text-normal);
+  font-size: var(--font-size-normal-1125);
+  font-weight: 950;
+}
+
+.chatter-calendar__week,
+.chatter-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  text-align: center;
+}
+
+.chatter-calendar__week {
+  margin-bottom: var(--pm-size-normal);
+  gap: 0.25rem;
+}
+
+.chatter-calendar__week span {
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal-625);
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.chatter-calendar__grid {
+  gap: 0.45rem 0.25rem;
+}
+
+.chatter-calendar__day {
+  display: grid;
+  min-height: 2rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal-75);
+  font-weight: 900;
+}
+
+.chatter-calendar__day--active {
+  background: var(--color-control-hover-bg);
+  color: var(--color-text-inverse);
+  box-shadow: 0 10px 22px var(--color-shadow-accent);
+  transform: scale(1.08);
+}

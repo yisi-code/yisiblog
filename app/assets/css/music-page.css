@@ -1,0 +1,37 @@
+.music-disc-sheen {
+  background: var(--color-effect-disc-sheen);
+}
+
+.lyric-line:hover .lyric-text,
+.lyric-text--active {
+  color: var(--color-text-hover);
+}
+
+.dark .lyric-line:hover .lyric-text,
+.dark .lyric-text--active {
+  color: var(--color-text-hover-dark);
+}
+
+.lyric-translation {
+  color: var(--color-text-second);
+}
+
+.lyric-line:hover .lyric-translation,
+.lyric-translation--active {
+  color: var(--color-text-hover);
+}
+
+.dark .lyric-line:hover .lyric-translation,
+.dark .lyric-translation--active {
+  color: var(--color-text-hover-dark);
+}
+
+.lyric-mask {
+  scrollbar-width: none;
+  -webkit-mask-image: var(--color-effect-lyric-mask);
+  mask-image: var(--color-effect-lyric-mask);
+}
+
+.lyric-mask::-webkit-scrollbar {
+  display: none;
+}

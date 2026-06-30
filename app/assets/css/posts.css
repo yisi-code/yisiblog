@@ -1,0 +1,7 @@
+.post-timeline__columns {
+  --content-layout-gap: 5rem;
+}
+
+.post-timeline__column {
+  --content-layout-gap: 3rem;
+}

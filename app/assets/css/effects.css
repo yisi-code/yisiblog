@@ -1,0 +1,255 @@
+﻿.background-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.background-canvas__mode {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.8s ease;
+}
+
+.background-canvas__mode--light {
+  opacity: 1;
+}
+
+.background-canvas__mode--dark {
+  opacity: 0;
+}
+
+.dark .background-canvas__mode--light {
+  opacity: 0;
+}
+
+.dark .background-canvas__mode--dark {
+  opacity: 1;
+}
+
+.background-canvas__light-gradient,
+.background-canvas__night-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.background-canvas__light-gradient {
+  background: var(--color-background-light-gradient);
+}
+
+.background-canvas__light-glow {
+  position: absolute;
+  width: min(28rem, 48vw);
+  height: min(28rem, 48vw);
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.72;
+  transform: translateZ(0);
+}
+
+.background-canvas__light-glow--primary {
+  left: -8rem;
+  top: -8rem;
+  background: var(--color-background-light-glow-primary);
+}
+
+.background-canvas__light-glow--secondary {
+  right: -7rem;
+  bottom: -8rem;
+  background: var(--color-background-light-glow-secondary);
+}
+
+.background-canvas__night-sky {
+  background: var(--color-background-dark-sky);
+}
+
+.background-canvas__night-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-background-dark-scrim);
+}
+
+.background-canvas__moon {
+  position: absolute;
+  right: clamp(3rem, 10vw, 8rem);
+  top: clamp(5rem, 12vh, 8rem);
+  z-index: 1;
+  width: clamp(4rem, 9vw, 7.5rem);
+  height: clamp(4rem, 9vw, 7.5rem);
+  border-radius: 999px;
+  background: var(--color-background-moon);
+  box-shadow:
+    0 0 24px var(--color-background-moon-glow),
+    0 0 70px var(--color-background-moon-glow);
+  opacity: 0.82;
+}
+
+.background-canvas__moon::after {
+  content: "";
+  position: absolute;
+  right: -0.8rem;
+  top: -0.55rem;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-background-moon-mask);
+}
+
+.background-canvas__static-star {
+  position: absolute;
+  z-index: 1;
+  border-radius: 999px;
+  background: var(--color-background-static-star);
+  animation: background-static-star-twinkle var(--background-static-star-duration) ease-in-out var(--background-static-star-delay) infinite;
+  box-shadow: 0 0 10px var(--color-background-static-star-glow);
+  will-change: opacity, transform;
+}
+
+.background-canvas__stardust-orbit {
+  position: absolute;
+  z-index: 1;
+  animation-duration: var(--background-stardust-float-duration);
+  animation-delay: var(--background-stardust-float-delay);
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.background-canvas__stardust-core {
+  display: block;
+  border-radius: 999px;
+  background: var(--color-background-stardust-core);
+  animation: background-stardust-breathe var(--background-stardust-breathe-duration) ease-in-out var(--background-stardust-breathe-delay) infinite;
+  box-shadow:
+    0 0 6px 1px var(--color-background-stardust-glow),
+    0 0 14px 3px var(--color-background-stardust-glow-strong);
+  will-change: opacity, transform;
+}
+
+.background-canvas__stardust-orbit--1 {
+  animation-name: background-stardust-float-1;
+}
+
+.background-canvas__stardust-orbit--2 {
+  animation-name: background-stardust-float-2;
+}
+
+.background-canvas__stardust-orbit--3 {
+  animation-name: background-stardust-float-3;
+}
+
+.background-canvas__stardust-orbit--4 {
+  animation-name: background-stardust-float-4;
+}
+
+@keyframes background-static-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.78);
+  }
+
+  50% {
+    opacity: 0.72;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes background-stardust-breathe {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: scale(0.35);
+  }
+
+  45% {
+    opacity: 0.92;
+    transform: scale(1.35);
+  }
+
+  70% {
+    opacity: 0.42;
+    transform: scale(0.78);
+  }
+}
+
+@keyframes background-stardust-float-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(10vw, -15vh, 0);
+  }
+
+  66% {
+    transform: translate3d(-5vw, -20vh, 0);
+  }
+}
+
+@keyframes background-stardust-float-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(-12vw, 10vh, 0);
+  }
+
+  66% {
+    transform: translate3d(8vw, 15vh, 0);
+  }
+}
+
+@keyframes background-stardust-float-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(15vw, 15vh, 0);
+  }
+
+  66% {
+    transform: translate3d(-10vw, 5vh, 0);
+  }
+}
+
+@keyframes background-stardust-float-4 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(-15vw, -10vh, 0);
+  }
+
+  66% {
+    transform: translate3d(10vw, -15vh, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .background-canvas__mode {
+    transition: none;
+  }
+
+  .background-canvas__static-star,
+  .background-canvas__stardust-orbit,
+  .background-canvas__stardust-core {
+    animation: none;
+  }
+
+  .background-canvas__stardust-core {
+    opacity: 0.32;
+    transform: scale(0.85);
+  }
+}
+

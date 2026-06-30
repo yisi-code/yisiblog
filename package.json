@@ -1,0 +1,41 @@
+{
+  "name": "yisiblog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.21.0",
+    "@nuxt/content": "^3.7.1",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@pinia/nuxt": "^0.11.2",
+    "@tailwindcss/vite": "^4.1.17",
+    "@vueuse/core": "^14.1.0",
+    "better-sqlite3": "^12.11.1",
+    "gitalk": "^1.8.0",
+    "h3": "1.15.11",
+    "katex": "^0.17.0",
+    "nuxt": "^4.2.2",
+    "pinia": "^3.0.4",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
+    "vue": "^3.5.25"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.11.0",
+    "@types/node": "^26.0.1",
+    "eslint": "^9.39.2",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.1.8"
+  },
+  "overrides": {
+    "h3": "1.15.11"
+  }
+}

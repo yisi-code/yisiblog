@@ -1,0 +1,396 @@
+:root {
+  --font-family-global: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-normal-50: 0.5rem;
+  --font-size-normal-625: 0.625rem;
+  --font-size-normal-75: 0.75rem;
+  --font-size-normal: 1rem;
+  --font-size-normal-1125: 1.125rem;
+  --font-size-normal-1185: 1.185rem;
+  --font-size-normal-125: 1.25rem;
+  --font-size-normal-150: 1.5rem;
+  --font-size-normal-1625: 1.625rem;
+  --font-size-normal-175: 1.75rem;
+  --font-size-normal-200: 2rem;
+  --font-size-normal-2125: 2.125rem;
+  --font-size-normal-225: 2.25rem;
+  --font-size-normal-250: 2.5rem;
+  --font-size-normal-275: 2.75rem;
+  --font-size-normal-2875: 2.875rem;
+  --font-size-normal-300: 3rem;
+
+  --font-size-caption: var(--font-size-normal-75);
+  --font-size-body: var(--font-size-normal);
+  --font-size-inline-code: var(--font-size-normal);
+  --font-size-title: var(--font-size-normal-125);
+  --font-size-title-large: var(--font-size-normal-175);
+
+  --pm-size-normal-25: 0.25rem;
+  --pm-size-normal-50: 0.5rem;
+  --pm-size-normal-75: 0.75rem;
+  --pm-size-normal: 1rem;
+  --pm-size-normal-125: 1.25rem;
+  --pm-size-normal-150: 1.5rem;
+  --pm-size-normal-175: 1.75rem;
+  --pm-size-normal-200: 2rem;
+  --pm-size-normal-225: 2.25rem;
+  --pm-size-normal-250: 2.5rem;
+  --pm-size-normal-275: 2.75rem;
+  --pm-size-normal-300: 3rem;
+  --pm-size-normal-325: 3.25rem;
+  --pm-size-normal-350: 3.5rem;
+  --pm-size-normal-375: 3.75rem;
+  --pm-size-normal-400: 4rem;
+  --pm-size-normal-425: 4.25rem;
+  --pm-size-normal-450: 4.5rem;
+  --pm-size-normal-475: 4.75rem;
+  --pm-size-normal-500: 5rem;
+  --pm-size-normal-525: 5.25rem;
+  --pm-size-normal-550: 5.5rem;
+  --pm-size-normal-575: 5.75rem;
+  --pm-size-normal-600: 6rem;
+  --pm-size-normal-625: 6.25rem;
+  --pm-size-normal-650: 6.5rem;
+  --pm-size-normal-675: 6.75rem;
+  --pm-size-normal-700: 7rem;
+
+  --color-red-luoxiahong: #cf4813;
+  --color-brand-gandie: #2c2f3b;
+  --color-white-yuese: #f8f7f0;
+
+  color-scheme: light;
+  --color-bg-page: #eef4ff;
+  --color-bg-page-start: #f8fbff;
+  --color-bg-page-end: #f7f3ff;
+  --color-bg-accent-cyan: rgb(14 165 233 / 0.16);
+  --color-bg-accent-pink: rgb(244 114 182 / 0.14);
+  --color-bg-panel: rgb(255 255 255 / 0.68);
+  --color-bg-soft: rgb(255 255 255 / 0.5);
+  --color-bg-muted: rgb(241 245 249);
+  --color-bg-panel-strong: rgb(255 255 255 / 0.9);
+  --color-bg-field: rgb(255 255 255 / 0.35);
+  --color-bg-disc: rgb(255 255 255 / 0.9);
+  --color-bg-media-scrim: rgb(255 255 255 / 0.4);
+  --color-bg-mark: rgb(253 224 71);
+  --color-bg-tag: color-mix(in srgb, var(--color-red-luoxiahong) 14%, transparent);
+  --color-bg-tag-placeholder: color-mix(in srgb, var(--color-red-luoxiahong) 15%, transparent);
+  --color-bg-search-hover: color-mix(in srgb, var(--color-red-luoxiahong) 10%, #ffffff);
+  --color-bg-overlay-subtle: rgb(0 0 0 / 0.1);
+  --color-bg-overlay-strong: rgb(0 0 0 / 0.65);
+  --color-bg-overlay-chip: rgb(0 0 0 / 0.35);
+  --color-bg-inverse: #ffffff;
+  --color-bg-article-code: #282c34;
+  --color-bg-article-inline-code: color-mix(in srgb, var(--color-red-luoxiahong) 10%, transparent);
+  --color-bg-article-quote: color-mix(in srgb, var(--color-red-luoxiahong) 5%, transparent);
+  --color-bg-article-comments-glow: color-mix(in srgb, var(--color-red-luoxiahong) 14%, transparent);
+  --color-bg-article-comment-field: rgb(255 255 255 / 0.12);
+  --color-bg-article-comment-field-focus: rgb(255 255 255 / 0.24);
+  --color-bg-chatter-chip: color-mix(in srgb, var(--color-red-luoxiahong) 8%, transparent);
+  --color-bg-chatter-cover-mood: rgb(255 255 255 / 0.2);
+  --color-bg-detail-meta: rgb(207 72 19 / 0.11);
+  --color-bg-detail-meta-mood: rgb(244 114 182 / 0.12);
+  --color-bg-moment-comment: rgb(248 250 252 / 0.72);
+  --color-bg-moment-image: rgb(226 232 240 / 0.35);
+  --color-bg-moment-location: color-mix(in srgb, var(--color-red-luoxiahong) 10%, transparent);
+  --color-bg-moment-preview-button: rgb(255 255 255 / 0.1);
+  --color-bg-moment-preview-button-hover: rgb(255 255 255 / 0.2);
+  --color-bg-project-glow: color-mix(in srgb, var(--color-red-luoxiahong) 12%, transparent);
+  --color-bg-project-glow-hover: color-mix(in srgb, var(--color-red-luoxiahong) 22%, transparent);
+  --color-bg-album-paper: #ffffff;
+  --color-bg-album-paper-muted: rgb(226 232 240);
+  --color-bg-album-paper-soft: rgb(241 245 249);
+  --color-bg-album-preview: rgb(0 0 0 / 0.94);
+  --color-bg-album-preview-chip: rgb(255 255 255 / 0.12);
+
+  --color-text-normal: #172033;
+  --color-text-second: #64748b;
+  --color-text-link: var(--color-red-luoxiahong);
+  --color-text-link-dark: color-mix(in srgb, var(--color-red-luoxiahong) 68%, #ffffff);
+  --color-text-hover: var(--color-red-luoxiahong);
+  --color-text-hover-dark: color-mix(in srgb, var(--color-red-luoxiahong) 62%, #ffffff);
+  --color-text-inverse: #ffffff;
+  --color-text-control: #334155;
+  --color-text-control-muted: #475569;
+  --color-text-accent: var(--color-red-luoxiahong);
+  --color-text-accent-strong: var(--color-red-luoxiahong);
+  --color-text-accent-soft: color-mix(in srgb, var(--color-red-luoxiahong) 50%, transparent);
+  --color-text-stat-primary: var(--color-red-luoxiahong);
+  --color-text-stat-secondary: color-mix(in srgb, var(--color-red-luoxiahong) 82%, #7f1d1d);
+  --color-text-stat-tertiary: color-mix(in srgb, var(--color-red-luoxiahong) 72%, #f97316);
+  --color-text-article-code: #abb2bf;
+  --color-text-article-inline-code: var(--color-red-luoxiahong);
+  --color-text-article-quote: #64748b;
+  --color-text-article-token-comment: #5c6370;
+  --color-text-article-token-keyword: #c678dd;
+  --color-text-article-token-name: #e06c75;
+  --color-text-article-token-literal: #56b6c2;
+  --color-text-article-token-string: #98c379;
+  --color-text-article-token-class: #e6c07b;
+  --color-text-article-token-number: #d19a66;
+  --color-text-article-token-title: #61aeee;
+  --color-text-chatter-mood: var(--color-red-luoxiahong);
+  --color-text-moment-author: #576b95;
+  --color-text-moment-location: var(--color-red-luoxiahong);
+
+  --color-text-card-title: #ffffff;
+  --color-text-card-desc: #f8f7f0;
+
+  --color-text-card-overlay-strong: rgb(0 0 0 / 0.78);
+  --color-text-card-overlay-soft: rgb(0 0 0 / 0.24);
+
+  --color-border-soft: rgb(0 0 0 / 0.1);
+  --color-border-light: rgb(19 23 15 / 0.1);
+  --color-border-subtle: rgb(241 245 249 / 0.5);
+  --color-border-disc: rgb(209 213 219);
+  --color-border-disc-outer: rgb(255 255 255 / 0.5);
+  --color-border-player: rgb(255 255 255 / 0.5);
+  --color-border-panel: rgb(0 0 0 / 0.1);
+  --color-border-article-comment: rgb(255 255 255 / 0.18);
+  --color-border-chatter-chip: color-mix(in srgb, var(--color-red-luoxiahong) 12%, transparent);
+  --color-border-control-pill: color-mix(in srgb, var(--color-red-luoxiahong) 42%, transparent);
+  --color-border-detail-meta: rgb(207 72 19 / 0.25);
+  --color-border-detail-meta-mood: rgb(244 114 182 / 0.28);
+  --color-border-moment-comment: rgb(226 232 240 / 0.6);
+  --color-border-moment-image: rgb(226 232 240 / 0.55);
+  --color-border-moment-location: color-mix(in srgb, var(--color-red-luoxiahong) 12%, transparent);
+  --color-border-moment-preview-button: rgb(255 255 255 / 0.1);
+  --color-border-album-paper: rgb(255 255 255);
+  --color-border-album-preview: rgb(255 255 255 / 0.14);
+
+  --color-slider-track: rgb(148 163 184 / 0.28);
+  --color-slider-fill: linear-gradient(90deg, var(--color-red-luoxiahong), color-mix(in srgb, var(--color-red-luoxiahong) 68%, #ffffff));
+  --color-slider-thumb: #ffffff;
+  --color-slider-thumb-ring: color-mix(in srgb, var(--color-red-luoxiahong) 35%, transparent);
+  --color-slider-thumb-shadow: rgb(15 23 42 / 0.18);
+
+  --color-carousel-arrow-bg: rgb(255 255 255 / 0.14);
+  --color-carousel-arrow-bg-hover: rgb(255 255 255 / 0.28);
+  --color-carousel-arrow-icon: #ffffff;
+
+  --color-effect-disc-sheen: conic-gradient(from 0deg, transparent, rgb(255 255 255 / 0.4), transparent, rgb(255 255 255 / 0.4), transparent);
+  --color-effect-lyric-mask: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+
+  --color-bg-friend-apply-card: rgb(255 255 255 / 0.42);
+  --color-border-friend-apply-card: rgb(255 255 255 / 0.52);
+  --color-bg-segmented-control: rgb(255 255 255 / 0.52);
+  --color-bg-about-activity: rgb(248 250 252 / 0.54);
+  --color-bg-about-timeline-card: rgb(255 255 255 / 0.62);
+  --color-bg-heatmap-0: rgb(241 245 249);
+  --color-bg-heatmap-1: rgb(134 239 172);
+  --color-bg-heatmap-2: rgb(74 222 128);
+  --color-bg-heatmap-3: rgb(34 197 94);
+  --color-bg-heatmap-4: rgb(22 163 74);
+
+  --color-theme-toggle-day-start: rgb(125 211 252);
+  --color-theme-toggle-day-end: rgb(254 240 138);
+  --color-theme-toggle-night-start: rgb(49 46 129);
+  --color-theme-toggle-night-end: rgb(30 41 59);
+  --color-theme-toggle-sun: rgb(234 179 8);
+  --color-theme-toggle-moon: rgb(199 210 254);
+
+  --color-shadow-accent: color-mix(in srgb, var(--color-red-luoxiahong) 40%, transparent);
+  --color-shadow-accent-soft: color-mix(in srgb, var(--color-red-luoxiahong) 20%, transparent);
+  --color-shadow-panel: rgb(15 23 42 / 0.14);
+  --color-shadow-card-hover: rgb(207 72 19 / 0.2);
+  --color-shadow-article-code: rgb(0 0 0 / 0.3);
+  --color-shadow-article-image: rgb(0 0 0 / 0.12);
+  --color-shadow-album-hover: var(--color-shadow-card-hover);
+
+  --color-border-card-hover: color-mix(in srgb, var(--color-red-luoxiahong) 62%, transparent);
+  --color-shadow-card-outline-hover: color-mix(in srgb, var(--color-red-luoxiahong) 24%, transparent);
+  --shadow-card-hover: 0 24px 60px var(--color-shadow-card-hover), 0 0 0 1px var(--color-shadow-card-outline-hover);
+
+  --color-ring-accent-soft: color-mix(in srgb, var(--color-red-luoxiahong) 40%, transparent);
+
+  --color-control-hover-bg: var(--color-red-luoxiahong);
+  --color-control-hover-bg-strong: color-mix(in srgb, var(--color-red-luoxiahong) 82%, #7f1d1d);
+  --color-control-hover-text: #ffffff;
+
+  --color-accent-gradient-start: var(--color-red-luoxiahong);
+  --color-accent-gradient-end: color-mix(in srgb, var(--color-red-luoxiahong) 72%, #f97316);
+
+  --color-status-success: #22c55e;
+  --color-status-success-soft: #4ade80;
+  --color-status-info: var(--color-red-luoxiahong);
+  --color-status-info-soft: color-mix(in srgb, var(--color-red-luoxiahong) 58%, #ffffff);
+  --color-status-warning: #f59e0b;
+  --color-status-warning-soft: #fbbf24;
+  --color-status-error: #ef4444;
+  --color-status-error-soft: #f87171;
+  --color-status-emerald: color-mix(in srgb, var(--color-red-luoxiahong) 72%, #f97316);
+  --color-status-cyan: color-mix(in srgb, var(--color-red-luoxiahong) 58%, #ffffff);
+  --color-background-page-solid: #eef4ff;
+  --color-background-light-gradient:
+    radial-gradient(circle at 20% 15%, var(--color-bg-accent-cyan), transparent 28rem),
+    radial-gradient(circle at 85% 25%, var(--color-bg-accent-pink), transparent 24rem),
+    linear-gradient(135deg, var(--color-bg-page-start) 0%, var(--color-bg-page) 48%, var(--color-bg-page-end) 100%);
+  --color-background-light-glow-primary: rgb(14 165 233 / 0.16);
+  --color-background-light-glow-secondary: rgb(244 114 182 / 0.14);
+  --color-background-dark-solid: #070d1a;
+  --color-background-dark-sky:
+    radial-gradient(circle at 20% 15%, rgb(99 102 241 / 0.2), transparent 26rem),
+    radial-gradient(circle at 82% 18%, rgb(244 114 182 / 0.12), transparent 24rem),
+    radial-gradient(circle at 50% 110%, rgb(14 165 233 / 0.12), transparent 26rem),
+    linear-gradient(135deg, #070d1a 0%, #111827 48%, #20172c 100%);
+  --color-background-dark-scrim: rgb(3 7 18 / 0.12);
+  --color-background-moon: rgb(248 250 252 / 0.92);
+  --color-background-moon-mask: #111827;
+  --color-background-moon-glow: rgb(199 210 254 / 0.28);
+  --color-background-static-star: rgb(255 255 255 / 0.86);
+  --color-background-static-star-glow: rgb(255 255 255 / 0.42);
+  --color-background-stardust-core: rgb(205 231 255 / 0.92);
+  --color-background-stardust-glow: rgb(129 140 248 / 0.32);
+  --color-background-stardust-glow-strong: rgb(199 210 254 / 0.44);
+
+  --color-carousel-dot-active: #ffffff;
+  --color-carousel-dot: rgb(255 255 255 / 0.45);
+  --color-carousel-dot-hover: rgb(255 255 255 / 0.75);
+
+  --color-bg-cyber-cat-panel: rgb(255 255 255 / 0.9);
+  --color-bg-cyber-cat-action: rgb(255 255 255 / 0.9);
+  --color-bg-cyber-cat-field: rgb(255 255 255 / 0.72);
+  --color-bg-cyber-cat-submit: var(--color-control-hover-bg);
+  --color-bg-cyber-cat-submit-disabled: rgb(203 213 225);
+  --color-border-cyber-cat: rgb(226 232 240 / 0.7);
+  --color-text-cyber-cat-action: var(--color-text-accent-strong);
+  --color-text-cyber-cat-submit-disabled: rgb(100 116 139);
+}
+
+@theme {
+  --font-sans: var(--font-family-global);
+  --font-mono: var(--font-family-global);
+  --font-serif: var(--font-family-global);
+  --text-size-helper-note: var(--font-size-normal-625);
+  --text-size-meta-label: var(--font-size-caption);
+  --text-size-content-body: var(--font-size-body);
+  --text-size-content-lead: var(--font-size-normal-1125);
+  --text-size-card-title: var(--font-size-title);
+  --text-size-card-title-lg: var(--font-size-normal-150);
+  --text-size-section-heading: var(--font-size-title-large);
+  --text-size-section-heading-xl: var(--font-size-normal-225);
+
+  --spacing-toolbar-offset: var(--pm-size-normal-300);
+  --spacing-section-offset: var(--pm-size-normal-200);
+  --spacing-stack-lg: var(--pm-size-normal-150);
+  --spacing-stack-md: var(--pm-size-normal);
+  --spacing-stack-xs: var(--pm-size-normal-50);
+  --spacing-inline-gap-2xs: var(--pm-size-normal-25);
+  --spacing-media-gap: var(--pm-size-normal);
+  --spacing-player-sticky-offset: var(--pm-size-normal-700);
+  --spacing-panel-inset-loose: var(--pm-size-normal-250);
+  --spacing-profile-card-inset: var(--pm-size-normal-200);
+  --spacing-card-inset: var(--pm-size-normal-150);
+  --spacing-control-inset-compact: var(--pm-size-normal-25);
+  --spacing-content-inset: var(--pm-size-normal);
+  --spacing-page-bottom-loose: var(--pm-size-normal-250);
+  --spacing-panel-bottom: var(--pm-size-normal-200);
+  --spacing-page-bottom: var(--pm-size-normal-150);
+  --spacing-code-panel-inline: var(--pm-size-normal);
+  --spacing-code-panel-action: var(--pm-size-normal-350);
+  --spacing-scrollbar-gutter: var(--pm-size-normal-50);
+  --spacing-action-inline: var(--pm-size-normal);
+  --spacing-page-top: var(--pm-size-normal-700);
+  --spacing-card-footer: var(--pm-size-normal-150);
+  --spacing-panel-top: var(--pm-size-normal);
+  --spacing-layout-gutter: var(--pm-size-normal-250);
+  --spacing-panel-inline-loose: var(--pm-size-normal-200);
+  --spacing-panel-inline: var(--pm-size-normal-150);
+  --spacing-chip-inline: var(--pm-size-normal-50);
+  --spacing-content-inline: var(--pm-size-normal);
+  --spacing-search-empty: var(--pm-size-normal-300);
+  --spacing-empty-state: var(--pm-size-normal-250);
+  --spacing-control-block-compact: var(--pm-size-normal-25);
+  --spacing-content-block: var(--pm-size-normal);
+}
+
+.dark {
+  color-scheme: dark;
+  --color-bg-page: #111827;
+  --color-bg-page-start: #111827;
+  --color-bg-page-end: #20172c;
+  --color-bg-accent-cyan: rgb(14 165 233 / 0.14);
+  --color-bg-accent-pink: rgb(244 114 182 / 0.12);
+  --color-bg-panel: rgb(15 23 42 / 0.78);
+  --color-bg-soft: rgb(51 65 85 / 0.7);
+  --color-bg-muted: rgb(30 41 59);
+  --color-bg-panel-strong: rgb(15 23 42 / 0.95);
+  --color-bg-field: rgb(15 23 42 / 0.6);
+  --color-bg-disc: rgb(30 41 59 / 0.9);
+  --color-bg-media-scrim: rgb(0 0 0 / 0.4);
+  --color-bg-mark: rgb(234 179 8 / 0.8);
+  --color-bg-search-hover: color-mix(in srgb, var(--color-red-luoxiahong) 15%, transparent);
+  --color-bg-article-inline-code: color-mix(in srgb, var(--color-red-luoxiahong) 20%, transparent);
+  --color-bg-article-quote: color-mix(in srgb, var(--color-red-luoxiahong) 10%, transparent);
+  --color-bg-article-comments-glow: color-mix(in srgb, var(--color-red-luoxiahong) 24%, transparent);
+  --color-bg-article-comment-field: rgb(15 23 42 / 0.45);
+  --color-bg-article-comment-field-focus: rgb(15 23 42 / 0.65);
+  --color-bg-chatter-chip: color-mix(in srgb, var(--color-red-luoxiahong) 12%, transparent);
+  --color-bg-detail-meta: rgb(207 72 19 / 0.18);
+  --color-bg-detail-meta-mood: rgb(244 114 182 / 0.14);
+  --color-bg-moment-comment: rgb(15 23 42 / 0.55);
+  --color-bg-moment-image: rgb(51 65 85 / 0.35);
+  --color-bg-moment-location: color-mix(in srgb, var(--color-red-luoxiahong) 12%, transparent);
+  --color-bg-album-paper: rgb(226 232 240);
+  --color-bg-album-paper-muted: rgb(51 65 85);
+  --color-bg-album-paper-soft: rgb(71 85 105);
+  --color-bg-friend-apply-card: rgb(15 23 42 / 0.42);
+  --color-border-friend-apply-card: rgb(255 255 255 / 0.1);
+  --color-bg-segmented-control: rgb(15 23 42 / 0.56);
+  --color-bg-about-activity: rgb(15 23 42 / 0.34);
+  --color-bg-about-timeline-card: rgb(15 23 42 / 0.62);
+  --color-bg-heatmap-0: rgb(30 41 59 / 0.72);
+  --color-bg-heatmap-1: rgb(20 83 45 / 0.82);
+  --color-bg-heatmap-2: rgb(21 128 61 / 0.82);
+  --color-bg-heatmap-3: rgb(22 163 74 / 0.88);
+  --color-bg-heatmap-4: rgb(34 197 94 / 0.9);
+
+  --color-border-panel-inset: rgb(255 255 255 / 0.08);
+  --color-border-panel: rgb(255 255 255 / 0.55);
+  --color-border-article-comment: rgb(255 255 255 / 0.12);
+  --color-border-chatter-chip: color-mix(in srgb, var(--color-red-luoxiahong) 16%, transparent);
+  --color-border-control-pill: color-mix(in srgb, var(--color-red-luoxiahong) 28%, transparent);
+  --color-border-detail-meta: rgb(207 72 19 / 0.35);
+  --color-border-detail-meta-mood: rgb(244 114 182 / 0.3);
+  --color-border-moment-comment: rgb(255 255 255 / 0.1);
+  --color-border-moment-image: rgb(255 255 255 / 0.1);
+  --color-border-moment-location: color-mix(in srgb, var(--color-red-luoxiahong) 16%, transparent);
+  --color-border-album-paper: rgb(226 232 240);
+
+  --color-shadow-panel: rgb(0 0 0 / 0.34);
+  --color-shadow-card-hover: rgb(207 72 19 / 0.24);
+
+
+  --color-text-normal: #f8f7f0;
+  --color-text-second: #FFFFFFBF;
+
+  --color-border-soft: rgb(255 255 255 / 0.55);
+  --color-border-light: rgb(226 232 240 / 0.55);
+
+  --color-text-control: #ffffff;
+  --color-text-control-muted: #ffffff;
+  --color-text-accent: color-mix(in srgb, var(--color-red-luoxiahong) 62%, #ffffff);
+  --color-text-accent-strong: color-mix(in srgb, var(--color-red-luoxiahong) 70%, #ffffff);
+  --color-text-article-inline-code: color-mix(in srgb, var(--color-red-luoxiahong) 64%, #ffffff);
+  --color-text-article-quote: #94a3b8;
+  --color-text-chatter-mood: color-mix(in srgb, var(--color-red-luoxiahong) 66%, #ffffff);
+  --color-text-moment-author: #7f99cc;
+  --color-text-moment-location: color-mix(in srgb, var(--color-red-luoxiahong) 70%, #ffffff);
+  --color-text-stat-primary: color-mix(in srgb, var(--color-red-luoxiahong) 64%, #ffffff);
+  --color-text-stat-secondary: color-mix(in srgb, var(--color-red-luoxiahong) 58%, #f97316);
+  --color-text-stat-tertiary: color-mix(in srgb, var(--color-red-luoxiahong) 72%, #ffffff);
+
+  --color-border-disc: rgb(51 65 85);
+  --color-border-player: rgb(203 213 225 / 0.6);
+
+  --color-control-hover-bg-strong: color-mix(in srgb, var(--color-red-luoxiahong) 82%, #7f1d1d);
+
+  --color-ring-accent-soft: color-mix(in srgb, var(--color-red-luoxiahong) 40%, transparent);
+  --color-background-page-solid: #070d1a;
+
+  --color-bg-cyber-cat-panel: rgb(15 23 42 / 0.9);
+  --color-bg-cyber-cat-action: rgb(51 65 85 / 0.9);
+  --color-bg-cyber-cat-field: rgb(15 23 42 / 0.78);
+  --color-bg-cyber-cat-submit-disabled: rgb(71 85 105);
+  --color-border-cyber-cat: rgb(255 255 255 / 0.12);
+  --color-text-cyber-cat-submit-disabled: rgb(148 163 184);
+}
+
