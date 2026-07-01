@@ -20,7 +20,6 @@
     "@pinia/nuxt": "^0.11.2",
     "@tailwindcss/vite": "^4.1.17",
     "@vueuse/core": "^14.1.0",
-    "better-sqlite3": "^12.11.1",
     "gitalk": "^1.8.0",
     "h3": "1.15.11",
     "katex": "^0.17.0",
