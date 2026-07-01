@@ -212,6 +212,14 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         adminToken: process.env.ADMIN_TOKEN || '',
+        github: {
+            token: process.env.GITHUB_TOKEN || '',
+            owner: process.env.GITHUB_OWNER || '',
+            repo: process.env.GITHUB_REPO || '',
+            branch: process.env.GITHUB_BRANCH || 'main',
+            committerName: process.env.GITHUB_COMMITTER_NAME || 'yisiblog-bot',
+            committerEmail: process.env.GITHUB_COMMITTER_EMAIL || 'yisiblog-bot@example.com'
+        },
         ai: {
             provider: process.env.AI_PROVIDER || 'deepseek',
             apiKey: process.env.AI_API_KEY || '',

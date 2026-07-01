@@ -1,5 +1,5 @@
 import { assertAdminSession } from '#server/services/adminAuth'
-import { saveAdminRecord } from '#server/services/adminContentStorage'
+import { saveAdminRecord } from '#server/services/adminContentService'
 import { adminRecordTypes, type AdminMutationResponse, type AdminSaveRecordPayload } from '~~/shared/adminData'
 
 export default defineEventHandler(async (event): Promise<AdminMutationResponse> => {
@@ -12,13 +12,10 @@ export default defineEventHandler(async (event): Promise<AdminMutationResponse> 
     throw createError({ statusCode: 400, statusMessage: '记录 ID 或类型无效' })
   }
 
-  return {
-    ok: true,
-    record: await saveAdminRecord({
-      originalId: body.originalId,
-      record,
-      content: body.content,
-      lrc: body.lrc
-    })
-  }
+  return saveAdminRecord({
+    originalId: body.originalId,
+    record,
+    content: body.content,
+    lrc: body.lrc
+  })
 })

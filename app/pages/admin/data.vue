@@ -169,8 +169,11 @@
                 <input v-model="draft.cover" class="admin-data-input" placeholder="https://... 或 /images/cover.jpg">
                 <label class="admin-data-button">
                   选择图片
-                  <input class="admin-data-file" type="file" accept="image/*"
-                         @change="handleMediaSelected($event, 'image', 'cover')">
+                  <input
+                      class="admin-data-file"
+                      type="file"
+                      accept="image/*"
+                      @change="handleMediaSelected($event, 'image', 'cover')">
                 </label>
               </div>
               <img v-if="draft.cover" class="admin-data-preview-image" :src="draft.cover" alt="封面预览">
@@ -179,12 +182,17 @@
             <label v-if="showUrlField" class="admin-data-field admin-data-field--wide">
               <span>{{ draft.type === 'music' ? '音频' : '链接' }}</span>
               <div class="admin-data-media-row">
-                <input v-model="draft.url" class="admin-data-input"
-                       :placeholder="draft.type === 'music' ? '/music/song.m4a' : 'https://...'">
+                <input
+                    v-model="draft.url"
+                    class="admin-data-input"
+                    :placeholder="draft.type === 'music' ? '/music/song.m4a' : 'https://...'">
                 <label v-if="draft.type === 'music'" class="admin-data-button">
                   选择音乐
-                  <input class="admin-data-file" type="file" accept="audio/*"
-                         @change="handleMediaSelected($event, 'music', 'url')">
+                  <input
+                      class="admin-data-file"
+                      type="file"
+                      accept="audio/*"
+                      @change="handleMediaSelected($event, 'music', 'url')">
                 </label>
               </div>
               <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio" :src="draft.url" controls/>
@@ -211,8 +219,12 @@
                   <textarea v-model="imagesText" class="admin-data-textarea" placeholder="每行一个图片地址"/>
                   <label class="admin-data-button">
                     选择图片
-                    <input class="admin-data-file" type="file" accept="image/*" multiple
-                           @change="handleMomentImagesSelected">
+                    <input
+                        class="admin-data-file"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        @change="handleMomentImagesSelected">
                   </label>
                 </div>
                 <div v-if="momentImages.length" class="admin-data-image-grid">
@@ -236,12 +248,18 @@
               <label class="admin-data-field admin-data-field--wide">
                 <span>照片</span>
                 <div class="admin-data-media-row">
-                  <textarea v-model="photosText" class="admin-data-textarea admin-data-textarea--code"
-                            placeholder='[{"url":"https://...","caption":"说明"}]'/>
+                  <textarea
+                      v-model="photosText"
+                      class="admin-data-textarea admin-data-textarea--code"
+                      placeholder='[{"url":"https://...","caption":"说明"}]'/>
                   <label class="admin-data-button">
                     选择图片
-                    <input class="admin-data-file" type="file" accept="image/*" multiple
-                           @change="handleAlbumImagesSelected">
+                    <input
+                        class="admin-data-file"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        @change="handleAlbumImagesSelected">
                   </label>
                 </div>
                 <div v-if="albumPhotos.length" class="admin-data-image-grid">
@@ -260,19 +278,27 @@
 
             <label v-if="needsMarkdown" class="admin-data-field admin-data-field--wide">
               <span>Markdown 正文</span>
-              <textarea v-model="contentText" class="admin-data-textarea admin-data-textarea--code"
-                        placeholder="正文内容，不需要 frontmatter"/>
+              <textarea
+                  v-model="contentText"
+                  class="admin-data-textarea admin-data-textarea--code"
+                  placeholder="正文内容，不需要 frontmatter"/>
             </label>
 
             <label v-if="showLrcField" class="admin-data-field admin-data-field--wide">
               <span>LRC 歌词</span>
-              <div class="admin-data-media-row">
-                <textarea v-model="lrcText" class="admin-data-textarea admin-data-textarea--code"
-                          placeholder="[00:00.000]歌词"/>
+              <div
+                  class="admin-data-media-row">
+                <textarea
+                    v-model="lrcText"
+                    class="admin-data-textarea admin-data-textarea--code"
+                    placeholder="[00:00.000]歌词"/>
                 <label class="admin-data-button">
                   选择歌词
-                  <input class="admin-data-file" type="file" accept=".lrc,.txt"
-                         @change="handleMediaSelected($event, 'lyric', 'lrc')">
+                  <input
+                      class="admin-data-file"
+                      type="file"
+                      accept=".lrc,.txt"
+                      @change="handleMediaSelected($event, 'lyric', 'lrc')">
                 </label>
               </div>
               <div v-if="parsedLyrics.length" class="admin-data-lyrics">
@@ -316,6 +342,7 @@ import {
   adminRecordTypes,
   type AdminDataRecord,
   type AdminManagedRecord,
+  type AdminMutationResponse,
   type AdminPhoto,
   type AdminRecordType,
   type AdminRecordsResponse
@@ -702,7 +729,7 @@ async function saveRecord() {
   isSaving.value = true
   try {
     const record = buildRecordPayload()
-    await $fetch('/api/admin/records/save', {
+    const response = await $fetch<AdminMutationResponse>('/api/admin/records/save', {
       method: 'POST',
       headers: requestHeaders(),
       body: {
@@ -712,8 +739,9 @@ async function saveRecord() {
         lrc: record.type === 'music' ? lrcText.value : undefined
       }
     })
-    setStatus('保存成功，已写入记录和关联文件', 'success')
-    await loadRecords()
+    if (response.records) records.value = response.records
+    else await loadRecords()
+    setStatus('保存成功，已提交 GitHub，正在尝试写入本地文件', 'success')
     const savedRecord = records.value.find((item) => item.type === record.type && item.id === record.id)
     if (savedRecord) editRecord(savedRecord)
   } catch (error) {
@@ -727,7 +755,7 @@ async function deleteRecord(deleteAssociatedFiles: boolean) {
   if (!selectedRecordKey.value || draft.type === 'about') return
   isSaving.value = true
   try {
-    await $fetch('/api/admin/records/delete', {
+    const response = await $fetch<AdminMutationResponse>('/api/admin/records/delete', {
       method: 'POST',
       headers: requestHeaders(),
       body: {
@@ -736,8 +764,12 @@ async function deleteRecord(deleteAssociatedFiles: boolean) {
         deleteAssociatedFiles
       }
     })
-    records.value = records.value.filter((record) => !(record.type === draft.type && record.id === originalId.value))
-    setStatus('记录已删除，关联文件默认保留', 'success')
+    if (response.records) {
+      records.value = response.records
+    } else {
+      records.value = records.value.filter((record) => !(record.type === draft.type && record.id === originalId.value))
+    }
+    setStatus('记录已提交 GitHub 删除，正在尝试同步本地文件', 'success')
     clearEditorDraft(selectedType.value)
   } catch (error) {
     setStatus(error instanceof Error ? error.message : '删除失败', 'error')

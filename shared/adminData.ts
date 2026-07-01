@@ -127,6 +127,10 @@ export type AdminMutationResponse = {
   ok: true
   record?: AdminManagedRecord
   records?: AdminManagedRecord[]
+  sync?: {
+    local?: 'pending' | 'synced' | 'failed' | 'skipped'
+    github?: 'pending' | 'synced' | 'failed' | 'skipped'
+  }
 }
 
 export function adminRecordNeedsMarkdown(type: AdminRecordType) {

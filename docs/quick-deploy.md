@@ -4,7 +4,7 @@
 
 ## 部署前准备
 
-- Node.js 20 或更高版本
+- Node.js 22
 - npm
 - 已复制并配置 `.env`
 - 如果需要 Gitalk、AI 聊天或管理页面，先准备对应密钥和仓库配置
@@ -21,15 +21,23 @@ NUXT_PUBLIC_SITE_URL=https://你的域名
 ADMIN_TOKEN=替换为强令牌
 AI_API_KEY=
 GITALK_CLIENT_SECRET=
+GITHUB_TOKEN=
+GITHUB_OWNER=yisi-code
+GITHUB_REPO=yisiblog
+GITHUB_BRANCH=main
+GITHUB_COMMITTER_NAME=Yisi Blog Bot
+GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
 ```
 
 只展示给浏览器的配置使用 `NUXT_PUBLIC_*`。真实密钥只放在服务端变量中，不要提交到仓库。
+
+管理页面保存/删除内容需要 GitHub 同步变量。`GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。
 
 `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 都已加入 Git 忽略。服务器部署时通常只需要源码、配置和构建产物，不需要提交这些本地目录。
 
 ## 方式一：Node 服务端部署
 
-适合需要 AI 接口、Gitalk 代理、管理页面写文件等服务端能力的部署方式。
+适合需要 AI 接口、Gitalk 代理、管理页面提交 GitHub 等服务端能力的部署方式。
 
 ### 1. 构建
 
@@ -47,7 +55,7 @@ npm run build
 .output/
 .env
 public/        # 如果服务器运行目录需要保留本地静态资源
-content/       # 如果需要在服务器维护 Markdown / LRC
+content/       # 公开页面构建期读取的 Markdown / LRC
 app/data/source/records.json
 ```
 
@@ -116,7 +124,7 @@ npm run generate
 
 限制：
 
-- 不能在线使用管理页面写入 `records.json`、Markdown、LRC 或媒体文件。
+- 不能直接在线使用管理页面，因为管理页面依赖 Nitro 服务端 API。
 - 依赖服务端 API 的功能不可用或需要单独部署 API。
 - 内容更新后需要重新执行 `npm run generate` 并重新上传。
 
@@ -132,10 +140,13 @@ npm run generate
 
 使用 `/admin/data` 更新内容：
 
-1. 确认已配置 `ADMIN_TOKEN`。
-2. 在 Node 服务端环境打开 `/admin/data`。
-3. 保存内容后检查 Git diff 或文件变更。
-4. 重新构建并部署。
+1. 确认已配置 `ADMIN_TOKEN` 和 GitHub 同步变量。
+2. 在 SSR / Node 服务端环境打开 `/admin/data`。
+3. 保存内容后，服务端会提交 GitHub commit，并把最新 records 返回给管理页。
+4. GitHub commit 触发 Vercel 或其他平台重新部署。
+5. 新部署完成后，公开页面读取新的构建期内容。
+
+如果是在本地开发环境保存，服务端还会尽力同步写入本地 `app/data/source/records.json`、`content/` 和 `content/lyrics/`。本地镜像失败不影响 GitHub commit，但公开首页本地预览是否立即更新取决于本地文件是否同步成功。
 
 ## 部署后检查
 
@@ -163,4 +174,8 @@ npm run generate
 
 ### 静态部署后管理页面不能保存
 
-这是纯静态部署的限制。管理页面写文件需要 Node 服务端环境，本地维护后重新生成静态产物即可。
+这是纯静态部署的限制。管理页面保存需要 Nitro 服务端接口提交 GitHub。可以在本地或 SSR 环境使用管理页提交 GitHub，然后重新生成并发布静态产物。
+
+### 管理页面已保存，但首页没有立即更新
+
+管理页面保存成功只代表 GitHub commit 已完成，并且管理页拿到了最新 records。公开页面读取的是当前部署的构建期内容，需要等待 Vercel 或其他平台重新部署完成后才会显示新内容。本地开发时，公开页面读取本地文件；如果本地镜像没有写入成功，需要拉取 GitHub 最新提交或手动同步文件。
