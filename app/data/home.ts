@@ -23,6 +23,7 @@ export type HomeStatItem = {
   label: string
   value: number
   color: string
+  path: string
 }
 
 export type HomeMomentCard = {
@@ -152,10 +153,10 @@ export function buildHomeStats(params: {
   projects: Project[]
 }) {
   return [
-    { label: '博文', value: params.postsCount, color: 'var(--color-text-stat-primary)' },
-    {label: '相册', value: params.albums.length, color: 'var(--color-text-stat-tertiary)'},
-    { label: '杂谈', value: params.chattersCount, color: 'var(--color-text-stat-secondary)' },
-    { label: '动态', value: params.momentCount, color: 'var(--color-red-luoxiahong)' },
-    { label: '项目', value: params.projects.length, color: 'var(--color-red-luoxiahong)' },
+    { label: '博文', value: params.postsCount, color: 'var(--color-text-stat-primary)', path: '/posts' },
+    { label: '相册', value: params.albums.length, color: 'var(--color-text-stat-tertiary)', path: '/albums' },
+    { label: '杂谈', value: params.chattersCount, color: 'var(--color-text-stat-secondary)', path: '/chatter' },
+    { label: '动态', value: params.momentCount, color: 'var(--color-red-luoxiahong)', path: '/moments' },
+    { label: '项目', value: params.projects.length, color: 'var(--color-red-luoxiahong)', path: '/projects' },
   ] satisfies HomeStatItem[]
 }

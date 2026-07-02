@@ -163,6 +163,10 @@
   padding: 0;
 }
 
+.content-prose pre code span {
+  color: var(--shiki-dark, var(--shiki-dark-text, var(--color-text-article-code))) !important;
+}
+
 .content-prose p code,
 .content-prose li code {
   border-radius: 0.25rem;

@@ -33,8 +33,11 @@
           <Trash2 :size="17" aria-hidden="true"/>
           删除
         </button>
-        <button class="admin-data-button admin-data-button--primary" type="button" :disabled="!canSave"
-                @click="saveDraftChange()">
+        <button
+            class="admin-data-button admin-data-button--primary"
+            type="button"
+            :disabled="!canSave"
+            @click="saveDraftChange()">
           <Save :size="17" aria-hidden="true"/>
           保存草稿
         </button>
@@ -45,8 +48,10 @@
           {{ statusMessage || '准备就绪' }}
         </div>
 
-        <div class="segmented-control admin-data-sidebar-tabs"
-             :class="{ 'segmented-control--right': sidebarView === 'sync' }">
+        <div
+            class="segmented-control admin-data-sidebar-tabs"
+            :class="{ 'segmented-control--right':
+             sidebarView === 'sync' }">
           <button
               class="segmented-control__button admin-data-sidebar-tab"
               :class="{ 'segmented-control__button--active': sidebarView === 'records' }"

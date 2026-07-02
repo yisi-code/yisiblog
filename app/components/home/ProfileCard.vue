@@ -26,8 +26,12 @@
               @click="navigateTo('/about')"
           />
           <div class="relative flex w-fit gap-2 mt-stack-xs">
-            <div v-for="(stat, index) in stats" :key="stat.label" class="contents cursor-pointer">
-              <div class="w-fit group/stat px-chip-inline text-center">
+            <div v-for="(stat, index) in stats" :key="stat.label" class="contents">
+              <NuxtLink
+                  :to="stat.path"
+                  class="group/stat block w-fit rounded-2xl px-chip-inline text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ring-accent-soft)]"
+                  :aria-label="`查看${stat.label}`"
+              >
                 <div class="text-size-card-title-lg font-black group-hover/stat:scale-110" :style="`color: ${stat.color}`">
                   {{ stat.value }}
                 </div>
@@ -35,7 +39,7 @@
                     class="text-secondary mt-stack-xs text-size-helper-note font-black group-hover/stat:scale-110">
                   {{ stat.label }}
                 </div>
-              </div>
+              </NuxtLink>
               <div v-if="index < stats.length - 1" class="divider-line block h-10 w-px"/>
             </div>
           </div>
@@ -79,9 +83,10 @@
 
 <script setup lang="ts">
 import {siteConfig} from '~/data'
+import type { HomeStatItem } from '~/data/home'
 
 defineProps<{
-  stats: Array<{ label: string; value: number; color: string }>
+  stats: HomeStatItem[]
 }>()
 
 const copied = ref('')

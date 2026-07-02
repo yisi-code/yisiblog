@@ -229,7 +229,11 @@ export const useMusicStore = defineStore('music', () => {
 
   // ---------- Actions ----------
   async function load() {
-    if (loaded.value) return
+    if (loaded.value) {
+      restorePlaybackState()
+      await syncLyrics()
+      return
+    }
     const songItems = useSongsData()
     songsList.value = songItems.value
         .filter((song) => !song.error && song.url)

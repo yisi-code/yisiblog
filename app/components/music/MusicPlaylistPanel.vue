@@ -17,8 +17,8 @@
         :key="song.id || song.url"
         type="button"
         class="group flex items-center justify-between rounded-2xl text-left cursor-pointer p-content-inset hover:bg-(--color-bg-album-paper-muted)"
-        :class="{ 'bg-(--color-bg-album-paper-muted)': song.id === currentSong?.id }"
-        @click="music.play(song.index)"
+        :class="{ 'bg-(--color-bg-album-paper-muted)': isClientReady && song.id === currentSong?.id }"
+        @click="playSong(song.index)"
       >
         <span class="w-full flex min-w-0 items-center gap-4">
           <span class="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl shadow-sm">
@@ -33,7 +33,7 @@
           <span class="min-w-0">
             <span
               class="text-title block truncate text-size-content-body font-black"
-              :style="song.id === currentSong?.id ? 'color: var(--color-text-hover)' : ''"
+              :style="isClientReady && song.id === currentSong?.id ? 'color: var(--color-text-hover)' : ''"
             >
               <template
                 v-for="(part, index) in highlightParts(song.title || '')"
@@ -76,14 +76,23 @@
 </template>
 
 <script setup lang="ts">
+import type { Song } from '~/data'
 import { highlightSearchParts } from '~/utils/searchHighlight'
+
+const props = defineProps<{
+  songs: Song[]
+}>()
 
 const music = useMusicStore()
 const searchQuery = ref('')
+const isClientReady = ref(false)
 const currentSong = computed(() => music.currentSong)
+const playableSongs = computed(() => {
+  return props.songs.filter((song) => !song.error && song.url)
+})
 const filteredSongs = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
-  return music.songs
+  return playableSongs.value
     .map((song, index) => ({ ...song, index }))
     .filter((song) => {
       if (!query) return true
@@ -97,8 +106,17 @@ function highlightParts(value: string) {
   return highlightSearchParts(value, searchQuery.value)
 }
 
+async function playSong(index: number) {
+  await music.load()
+  await music.play(index)
+}
+
 function playFirstFilteredSong() {
   const first = filteredSongs.value[0]
-  if (first) music.play(first.index)
+  if (first) void playSong(first.index)
 }
+
+onMounted(() => {
+  isClientReady.value = true
+})
 </script>

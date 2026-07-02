@@ -23,22 +23,38 @@
     </div>
 
     <div class="relative mt-stack-xs flex flex-1 flex-col overflow-hidden">
-      <MusicLyricsPanel v-if="activeTab === 'lyrics'" />
-      <MusicPlaylistPanel v-else />
+      <ClientOnly v-if="activeTab === 'lyrics'">
+        <MusicLyricsPanel />
+        <template #fallback>
+          <div class="absolute inset-0 flex items-center justify-center px-panel-inline text-center">
+            <p class="text-secondary text-size-content-body font-black">歌词将在播放器连接后显示。</p>
+          </div>
+        </template>
+      </ClientOnly>
+      <MusicPlaylistPanel v-else :songs="songs" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import type { Song } from '~/data'
+
 type MusicPanel = 'lyrics' | 'playlist'
 
+defineProps<{
+  songs: Song[]
+}>()
+
 const activeTabCookie = useCookie<MusicPanel>('xhblogs-music-active-panel', {
-  default: () => 'lyrics'
+  default: () => 'playlist'
 })
-const activeTab = computed<MusicPanel>({
-  get: () => activeTabCookie.value === 'playlist' ? 'playlist' : 'lyrics',
-  set: (value) => {
-    activeTabCookie.value = value
-  }
+const activeTab = ref<MusicPanel>('playlist')
+
+onMounted(() => {
+  activeTab.value = activeTabCookie.value === 'lyrics' ? 'lyrics' : 'playlist'
+})
+
+watch(activeTab, (value) => {
+  activeTabCookie.value = value
 })
 </script>
