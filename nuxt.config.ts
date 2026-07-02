@@ -2,6 +2,118 @@ import tailwindcss from '@tailwindcss/vite'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
+export default defineNuxtConfig({
+    compatibilityDate: '2026-06-22',
+    devtools: {enabled: true},
+    modules: ['@nuxt/content', '@pinia/nuxt', '@nuxtjs/color-mode', '@nuxt/eslint'],
+    components: [
+        {
+            path: '~/components',
+            pathPrefix: false
+        }
+    ],
+    css: ['katex/dist/katex.min.css', '~/assets/css/main.css'],
+    vite: {
+        plugins: [tailwindcss()],
+        optimizeDeps: {
+            include: [
+                '@vue/devtools-core',
+                '@vue/devtools-kit'
+            ]
+        }
+    },
+    colorMode: {
+        classSuffix: '',
+        preference: 'system',
+        fallback: 'dark'
+    },
+    content: {
+        experimental: {
+            sqliteConnector: 'native'
+        },
+        build: {
+            markdown: {
+                remarkPlugins: {
+                    'remark-math': {
+                        instance: remarkMath
+                    },
+                    'remark-preserve-blank-lines': {
+                        instance: remarkPreserveBlankLines
+                    }
+                },
+                rehypePlugins: {
+                    'rehype-katex': {
+                        instance: rehypeKatex,
+                        options: {
+                            throwOnError: false
+                        }
+                    }
+                },
+                highlight: {
+                    theme: {
+                        default: 'github-dark',
+                        dark: 'github-dark'
+                    }
+                }
+            }
+        }
+    },
+    hooks: {
+        'content:file:beforeParse': ({file}) => {
+            if (file.extension === '.md' && typeof file.body === 'string') {
+                file.body = normalizeDisplayMathDelimiters(file.body)
+            }
+        },
+        'content:file:afterParse': ({content}) => {
+            addImageLoadingAttrs(contentBodyValue(content))
+        }
+    },
+    runtimeConfig: {
+        adminToken: process.env.ADMIN_TOKEN || '',
+        github: {
+            token: process.env.GITHUB_TOKEN || '',
+            owner: process.env.GITHUB_OWNER || '',
+            repo: process.env.GITHUB_REPO || '',
+            branch: process.env.GITHUB_BRANCH || 'main',
+            committerName: process.env.GITHUB_COMMITTER_NAME || 'yisiblog-bot',
+            committerEmail: process.env.GITHUB_COMMITTER_EMAIL || 'yisiblog-bot@example.com'
+        },
+        ai: {
+            provider: process.env.AI_PROVIDER || 'deepseek',
+            apiKey: process.env.AI_API_KEY || '',
+            baseUrl: process.env.AI_BASE_URL || '',
+            model: process.env.AI_MODEL || '',
+            maxOutputTokens: process.env.AI_MAX_OUTPUT_TOKENS || '150',
+            temperature: process.env.AI_TEMPERATURE || '0.85'
+        },
+        gitalk: {
+            clientSecret: process.env.GITALK_CLIENT_SECRET || ''
+        },
+        public: {
+            siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+            gitalk: {
+                clientID: process.env.NUXT_PUBLIC_GITALK_CLIENT_ID || '',
+                clientSecretConfigured: Boolean(process.env.GITALK_CLIENT_SECRET),
+                repo: process.env.NUXT_PUBLIC_GITALK_REPO || '',
+                owner: process.env.NUXT_PUBLIC_GITALK_OWNER || '',
+                admin: (process.env.NUXT_PUBLIC_GITALK_ADMIN || '').split(',').map((item) => item.trim()).filter(Boolean)
+            }
+        }
+    },
+    routeRules: {
+        '/timeline': {redirect: '/posts'},
+        '/__nuxt_content/**': {prerender: false}
+    },
+    nitro: {
+        prerender: {
+            crawlLinks: false,
+            failOnError: false,
+            ignore: ['/__nuxt_content/**']
+        }
+    }
+})
+
+
 type MarkdownNode = {
     type?: string
     value?: string
@@ -144,113 +256,3 @@ function contentBodyValue(content: unknown) {
     return Array.isArray(body.value) ? body.value as ContentBodyNode[] : undefined
 }
 
-export default defineNuxtConfig({
-    compatibilityDate: '2026-06-22',
-    devtools: {enabled: true},
-    modules: ['@nuxt/content', '@pinia/nuxt', '@nuxtjs/color-mode', '@nuxt/eslint'],
-    components: [
-        {
-            path: '~/components',
-            pathPrefix: false
-        }
-    ],
-    css: ['katex/dist/katex.min.css', '~/assets/css/main.css'],
-    vite: {
-        plugins: [tailwindcss()],
-        optimizeDeps: {
-            include: [
-                '@vue/devtools-core',
-                '@vue/devtools-kit'
-            ]
-        }
-    },
-    colorMode: {
-        classSuffix: '',
-        preference: 'system',
-        fallback: 'light'
-    },
-    content: {
-        experimental: {
-            sqliteConnector: 'native'
-        },
-        build: {
-            markdown: {
-                remarkPlugins: {
-                    'remark-math': {
-                        instance: remarkMath
-                    },
-                    'remark-preserve-blank-lines': {
-                        instance: remarkPreserveBlankLines
-                    }
-                },
-                rehypePlugins: {
-                    'rehype-katex': {
-                        instance: rehypeKatex,
-                        options: {
-                            throwOnError: false
-                        }
-                    }
-                },
-                highlight: {
-                    theme: {
-                        default: 'github-dark',
-                        dark: 'github-dark'
-                    }
-                }
-            }
-        }
-    },
-    hooks: {
-        'content:file:beforeParse': ({file}) => {
-            if (file.extension === '.md' && typeof file.body === 'string') {
-                file.body = normalizeDisplayMathDelimiters(file.body)
-            }
-        },
-        'content:file:afterParse': ({content}) => {
-            addImageLoadingAttrs(contentBodyValue(content))
-        }
-    },
-    runtimeConfig: {
-        adminToken: process.env.ADMIN_TOKEN || '',
-        github: {
-            token: process.env.GITHUB_TOKEN || '',
-            owner: process.env.GITHUB_OWNER || '',
-            repo: process.env.GITHUB_REPO || '',
-            branch: process.env.GITHUB_BRANCH || 'main',
-            committerName: process.env.GITHUB_COMMITTER_NAME || 'yisiblog-bot',
-            committerEmail: process.env.GITHUB_COMMITTER_EMAIL || 'yisiblog-bot@example.com'
-        },
-        ai: {
-            provider: process.env.AI_PROVIDER || 'deepseek',
-            apiKey: process.env.AI_API_KEY || '',
-            baseUrl: process.env.AI_BASE_URL || '',
-            model: process.env.AI_MODEL || '',
-            maxOutputTokens: process.env.AI_MAX_OUTPUT_TOKENS || '150',
-            temperature: process.env.AI_TEMPERATURE || '0.85'
-        },
-        gitalk: {
-            clientSecret: process.env.GITALK_CLIENT_SECRET || ''
-        },
-        public: {
-            siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-            gitalk: {
-                clientID: process.env.NUXT_PUBLIC_GITALK_CLIENT_ID || '',
-                clientSecretConfigured: Boolean(process.env.GITALK_CLIENT_SECRET),
-                repo: process.env.NUXT_PUBLIC_GITALK_REPO || '',
-                owner: process.env.NUXT_PUBLIC_GITALK_OWNER || '',
-                admin: (process.env.NUXT_PUBLIC_GITALK_ADMIN || '').split(',').map((item) => item.trim()).filter(Boolean)
-            }
-        }
-    },
-    routeRules: {
-        '/timeline': {redirect: '/posts'},
-        '/__nuxt_content/**': {prerender: false}
-    },
-    nitro: {
-        prerender: {
-            crawlLinks: false,
-            failOnError: false,
-            ignore: ['/__nuxt_content/**']
-        }
-    }
-})
