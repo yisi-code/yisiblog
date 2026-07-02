@@ -69,6 +69,11 @@ function lyricFileName(song: PlayerSong) {
   return lyricFileNameFromSongUrl(song.url, song.title)
 }
 
+function songPlaybackKey(song: PlayerSong | null) {
+  if (!song) return ''
+  return song.id || song.url || song.title || ''
+}
+
 export const useMusicStore = defineStore('music', () => {
   // ---------- State ----------
   const songsList = ref<PlayerSong[]>([])
@@ -89,6 +94,7 @@ export const useMusicStore = defineStore('music', () => {
   const isEnded = ref(false)
   const lyricCache = ref<Record<string, LyricLine[]>>({})
   const hasRestoredPlayback = ref(false)
+  const restoredSongKey = ref('')
 
   // ---------- Getters (computed) ----------
   const currentSong = computed(() => {
@@ -170,6 +176,7 @@ export const useMusicStore = defineStore('music', () => {
       if (!songsList.value[nextIndex]) return
 
       currentIndex.value = nextIndex
+      restoredSongKey.value = songPlaybackKey(songsList.value[nextIndex] || null)
       currentTime.value = Math.max(0, Number(state.currentTime) || 0)
       duration.value = Math.max(0, Number(state.duration) || 0)
       progress.value = duration.value > 0
@@ -238,6 +245,7 @@ export const useMusicStore = defineStore('music', () => {
   async function play(index?: number) {
     if (typeof index === 'number' && songsList.value[index]) {
       currentIndex.value = index
+      restoredSongKey.value = ''
       resetPlaybackPosition()
     }
     await syncLyrics()
@@ -271,6 +279,7 @@ export const useMusicStore = defineStore('music', () => {
     } else {
       currentIndex.value = (currentIndex.value + 1) % songsList.value.length
     }
+    restoredSongKey.value = ''
     resetPlaybackPosition()
     await syncLyrics()
   }
@@ -282,6 +291,7 @@ export const useMusicStore = defineStore('music', () => {
       return
     }
     currentIndex.value = (currentIndex.value - 1 + songsList.value.length) % songsList.value.length
+    restoredSongKey.value = ''
     resetPlaybackPosition()
     await syncLyrics()
   }
@@ -335,6 +345,7 @@ export const useMusicStore = defineStore('music', () => {
   }
 
   function handleEnded() {
+    restoredSongKey.value = ''
     if (playMode.value === 'single') {
       resetPlaybackPosition()
       isPlaying.value = true
@@ -418,6 +429,8 @@ export const useMusicStore = defineStore('music', () => {
     handleEnded,
     syncLyrics,
     resetPlaybackPosition,
+    restoredSongKey,
+    songPlaybackKey,
     // 辅助函数（如果外部需要可导出，目前保持私有）
   }
 })

@@ -110,26 +110,39 @@ export type AdminRecordsResponse = {
   records: AdminManagedRecord[]
 }
 
-export type AdminSaveRecordPayload = {
+export type AdminMusicFilePayload = {
+  fileName: string
+  path: string
+  size?: number
+  mimeType?: string
+}
+
+export type AdminPendingChange = {
+  action: 'save' | 'delete'
+  key: string
   originalId?: string
-  record: AdminDataRecord
+  record?: AdminDataRecord
   content?: string
   lrc?: string
-}
-
-export type AdminDeleteRecordPayload = {
-  id: string
-  type: AdminRecordType
+  musicFile?: AdminMusicFilePayload
+  id?: string
+  type?: AdminRecordType
   deleteAssociatedFiles?: boolean
+  snapshot?: AdminManagedRecord
+  updatedAt: string
 }
 
-export type AdminMutationResponse = {
+export type AdminSyncRecordsPayload = {
+  changes: AdminPendingChange[]
+}
+
+export type AdminSyncRecordsResponse = {
   ok: true
-  record?: AdminManagedRecord
-  records?: AdminManagedRecord[]
-  sync?: {
-    local?: 'pending' | 'synced' | 'failed' | 'skipped'
-    github?: 'pending' | 'synced' | 'failed' | 'skipped'
+  records: AdminManagedRecord[]
+  syncedCount: number
+  commit?: {
+    sha?: string
+    url?: string
   }
 }
 

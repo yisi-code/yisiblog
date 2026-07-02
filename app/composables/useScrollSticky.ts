@@ -20,6 +20,7 @@ export function useScrollSticky(targetRef: Ref<HTMLElement | null>, options: Scr
   let resizeObserver: ResizeObserver | undefined
   let ticking = false
   let isSticky = false
+  let isListening = false
   let savedTarget: HTMLElement | null = null
 
   const originalStyle: StyleSnapshot = {
@@ -112,6 +113,7 @@ export function useScrollSticky(targetRef: Ref<HTMLElement | null>, options: Scr
 
   function updateStickyState() {
     const target = targetRef.value
+
     if (!target || !import.meta.client) return
 
     const shouldStick = getScrollTop() > stickyMetrics.threshold
@@ -136,10 +138,21 @@ export function useScrollSticky(targetRef: Ref<HTMLElement | null>, options: Scr
     })
   }
 
-  onMounted(() => {
-    const target = targetRef.value
-    if (!target) return
+  function addWindowListeners() {
+    if (!import.meta.client || isListening) return
+    window.addEventListener('resize', requestMetricsUpdate)
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    isListening = true
+  }
 
+  function removeWindowListeners() {
+    if (!import.meta.client || !isListening) return
+    window.removeEventListener('resize', requestMetricsUpdate)
+    window.removeEventListener('scroll', requestUpdate)
+    isListening = false
+  }
+
+  function bindTarget(target: HTMLElement) {
     savedTarget = target
     saveOriginalStyle(target)
     updateMetrics()
@@ -147,15 +160,18 @@ export function useScrollSticky(targetRef: Ref<HTMLElement | null>, options: Scr
 
     resizeObserver = new ResizeObserver(requestMetricsUpdate)
     resizeObserver.observe(target)
-    window.addEventListener('resize', requestMetricsUpdate)
-    window.addEventListener('scroll', requestUpdate, { passive: true })
+    addWindowListeners()
+  }
+
+  onMounted(() => {
+    const target = targetRef.value
+    if (target) bindTarget(target)
   })
 
   onBeforeUnmount(() => {
     if (savedTarget && isSticky) restoreOriginalStyle(savedTarget)
     resizeObserver?.disconnect()
-    window.removeEventListener('resize', requestMetricsUpdate)
-    window.removeEventListener('scroll', requestUpdate)
+    removeWindowListeners()
   })
 
   watch(targetRef, (target, previousTarget) => {
@@ -166,11 +182,6 @@ export function useScrollSticky(targetRef: Ref<HTMLElement | null>, options: Scr
 
     if (!target || !import.meta.client) return
 
-    savedTarget = target
-    saveOriginalStyle(target)
-    updateMetrics()
-    updateStickyState()
-    resizeObserver = new ResizeObserver(requestMetricsUpdate)
-    resizeObserver.observe(target)
+    bindTarget(target)
   })
 }

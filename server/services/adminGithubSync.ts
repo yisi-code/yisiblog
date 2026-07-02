@@ -3,15 +3,15 @@ import {
   adminLyricFileName,
   adminRecordNeedsMarkdown,
   type AdminDataRecord,
-  type AdminDeleteRecordPayload,
   type AdminManagedRecord,
-  type AdminSaveRecordPayload
+  type AdminPendingChange
 } from '~~/shared/adminData'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import { compactRecord, normalizeRecordForWrite } from './adminContentCore'
 
 type GitHubFile = {
   content?: string
-  sha?: string
 }
 
 type GitHubRef = {
@@ -33,8 +33,11 @@ type GitHubTree = {
 type GitHubChange = {
   path: string
   content?: string
+  contentBase64?: string
   delete?: boolean
 }
+
+const publicMusicRootPath = resolve(process.cwd(), 'public/music')
 
 function githubConfig() {
   const runtimeConfig = useRuntimeConfig()
@@ -77,6 +80,14 @@ function githubRepoApi(path: string) {
   }
 }
 
+function assertGithubConfigured() {
+  const config = githubConfig()
+  if (!config) {
+    throw new Error('未配置 GitHub 同步环境变量，无法同步远程仓库')
+  }
+  return config
+}
+
 function decodeBase64(value: string) {
   return Buffer.from(value.replace(/\n/g, ''), 'base64').toString('utf8')
 }
@@ -86,27 +97,40 @@ function githubContentPath(type: AdminDataRecord['type'], id: string) {
   return contentFile ? `content/${contentFile}` : ''
 }
 
+function localMusicPath(publicPath: string) {
+  const normalizedPath = publicPath.trim()
+  if (!normalizedPath.startsWith('/music/')) {
+    throw new Error('音乐文件路径必须以 /music/ 开头')
+  }
+
+  const fileName = normalizedPath.replace(/^\/music\//, '').replace(/[\\/]/g, '-')
+  const filePath = resolve(publicMusicRootPath, fileName)
+  if (!filePath.startsWith(publicMusicRootPath)) {
+    throw new Error('音乐文件路径无效')
+  }
+  return {
+    fileName,
+    filePath
+  }
+}
+
 async function requestGithub<T>(path: string, options: {
-  method?: 'GET' | 'PUT' | 'DELETE'
-  body?: Record<string, unknown>
+  method?: 'GET'
 } = {}) {
   const target = githubContentsApi(path)
-  if (!target) {
-    throw new Error('未配置 GitHub 同步环境变量，已跳过 GitHub 同步')
-  }
+  if (!target) throw new Error('未配置 GitHub 同步环境变量，无法读取远程仓库')
 
   const { config, url } = target
 
   return $fetch<T>(url, {
     method: options.method || 'GET',
-    query: options.method ? undefined : { ref: config.branch },
+    query: { ref: config.branch },
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${config.token}`,
       'X-GitHub-Api-Version': '2022-11-28',
       'User-Agent': 'yisiblog-admin-sync'
-    },
-    body: options.body
+    }
   })
 }
 
@@ -115,9 +139,7 @@ async function requestGithubRepo<T>(path: string, options: {
   body?: Record<string, unknown>
 } = {}) {
   const target = githubRepoApi(path)
-  if (!target) {
-    throw new Error('未配置 GitHub 同步环境变量，已跳过 GitHub 同步')
-  }
+  if (!target) throw new Error('未配置 GitHub 同步环境变量，无法访问远程仓库')
 
   const { config, url } = target
 
@@ -139,10 +161,7 @@ async function readGithubFile(path: string) {
 
 async function readGithubText(path: string) {
   const file = await readGithubFile(path)
-  return {
-    text: file.content ? decodeBase64(file.content) : '',
-    sha: file.sha
-  }
+  return file.content ? decodeBase64(file.content) : ''
 }
 
 async function githubFileExists(path: string) {
@@ -156,13 +175,21 @@ async function githubFileExists(path: string) {
   }
 }
 
-async function commitGithubChanges(changes: GitHubChange[], message: string) {
-  const target = githubConfig()
-  if (!target) {
-    throw new Error('未配置 GitHub 同步环境变量，已跳过 GitHub 同步')
-  }
+async function createBase64Blob(contentBase64: string) {
+  const blob = await requestGithubRepo<{ sha?: string }>('git/blobs', {
+    method: 'POST',
+    body: {
+      content: contentBase64,
+      encoding: 'base64'
+    }
+  })
+  if (!blob.sha) throw new Error('GitHub 同步失败：无法创建二进制文件 blob')
+  return blob.sha
+}
 
-  if (!changes.length) return
+async function commitGithubChanges(changes: GitHubChange[], message: string) {
+  const target = assertGithubConfigured()
+  if (!changes.length) return undefined
 
   const ref = await requestGithubRepo<GitHubRef>(`git/ref/heads/${target.branch}`)
   const headSha = ref.object?.sha
@@ -172,32 +199,43 @@ async function commitGithubChanges(changes: GitHubChange[], message: string) {
   const baseTreeSha = headCommit.tree?.sha
   if (!baseTreeSha) throw new Error('GitHub 同步失败：无法读取目标分支 tree')
 
+  const treeEntries = await Promise.all(changes.map(async (change) => {
+    if (change.delete) {
+      return {
+        path: change.path,
+        mode: '100644',
+        type: 'blob',
+        sha: null
+      }
+    }
+
+    if (change.contentBase64) {
+      return {
+        path: change.path,
+        mode: '100644',
+        type: 'blob',
+        sha: await createBase64Blob(change.contentBase64)
+      }
+    }
+
+    return {
+      path: change.path,
+      mode: '100644',
+      type: 'blob',
+      content: change.content || ''
+    }
+  }))
+
   const tree = await requestGithubRepo<GitHubTree>('git/trees', {
     method: 'POST',
     body: {
       base_tree: baseTreeSha,
-      tree: changes.map((change) => {
-        if (change.delete) {
-          return {
-            path: change.path,
-            mode: '100644',
-            type: 'blob',
-            sha: null
-          }
-        }
-
-        return {
-          path: change.path,
-          mode: '100644',
-          type: 'blob',
-          content: change.content || ''
-        }
-      })
+      tree: treeEntries
     }
   })
   if (!tree.sha) throw new Error('GitHub 同步失败：无法创建 tree')
 
-  const commit = await requestGithubRepo<{ sha?: string }>('git/commits', {
+  const commit = await requestGithubRepo<{ sha?: string; html_url?: string }>('git/commits', {
     method: 'POST',
     body: {
       message,
@@ -218,48 +256,65 @@ async function commitGithubChanges(changes: GitHubChange[], message: string) {
       force: false
     }
   })
+
+  return {
+    sha: commit.sha,
+    url: commit.html_url
+  }
+}
+
+function upsertChange(changes: GitHubChange[], nextChange: GitHubChange) {
+  const index = changes.findIndex((change) => change.path === nextChange.path)
+  if (index >= 0) {
+    changes[index] = nextChange
+    return
+  }
+  changes.push(nextChange)
 }
 
 async function readGithubRecords() {
   const source = await readGithubText('app/data/source/records.json')
-  return {
-    records: JSON.parse(source.text || '[]') as AdminDataRecord[],
-    sha: source.sha
-  }
+  return JSON.parse(source || '[]') as AdminDataRecord[]
 }
 
-export async function readAdminManagedRecordsFromGithub(): Promise<AdminManagedRecord[]> {
-  if (!githubConfig()) {
-    throw new Error('未配置 GitHub 同步环境变量，无法从 GitHub 读取记录')
-  }
-
-  const { records } = await readGithubRecords()
-
+async function hydrateManagedRecords(records: AdminDataRecord[], sidecar = new Map<string, {
+  content?: string
+  lrc?: string
+}>()): Promise<AdminManagedRecord[]> {
   return Promise.all(records.map(async (sourceRecord) => {
     const record = normalizeRecordForWrite(sourceRecord)
     const managedRecord: AdminManagedRecord = { ...record }
+    const extra = sidecar.get(`${record.type}:${record.id}`)
 
     if (adminRecordNeedsMarkdown(record.type)) {
       const contentFile = adminContentFile(record.type, record.id)
       managedRecord.contentFile = contentFile
-      try {
-        managedRecord.content = (await readGithubText(githubContentPath(record.type, record.id))).text
-      } catch (error: unknown) {
-        const responseError = error as { response?: { status?: number } }
-        if (responseError.response?.status !== 404) throw error
-        managedRecord.content = ''
+      if (typeof extra?.content === 'string') {
+        managedRecord.content = extra.content
+      } else {
+        try {
+          managedRecord.content = await readGithubText(githubContentPath(record.type, record.id))
+        } catch (error: unknown) {
+          const responseError = error as { response?: { status?: number } }
+          if (responseError.response?.status !== 404) throw error
+          managedRecord.content = ''
+        }
       }
     }
 
     if (record.type === 'music') {
       const lrcFile = adminLyricFileName(record.url, record.title, record.id)
       managedRecord.lrcFile = lrcFile
-      try {
-        managedRecord.lrc = (await readGithubText(`content/lyrics/${lrcFile}`)).text
-      } catch (error: unknown) {
-        const responseError = error as { response?: { status?: number } }
-        if (responseError.response?.status !== 404) throw error
-        managedRecord.lrc = ''
+      if (typeof extra?.lrc === 'string') {
+        managedRecord.lrc = extra.lrc
+      } else {
+        try {
+          managedRecord.lrc = await readGithubText(`content/lyrics/${lrcFile}`)
+        } catch (error: unknown) {
+          const responseError = error as { response?: { status?: number } }
+          if (responseError.response?.status !== 404) throw error
+          managedRecord.lrc = ''
+        }
       }
     }
 
@@ -267,105 +322,131 @@ export async function readAdminManagedRecordsFromGithub(): Promise<AdminManagedR
   }))
 }
 
-export async function syncSavedRecordToGithub(payload: AdminSaveRecordPayload) {
-  if (!githubConfig()) return 'skipped' as const
-
-  const originalId = payload.originalId?.trim()
-  const nextRecord = normalizeRecordForWrite(payload.record)
-  const { records } = await readGithubRecords()
-  const currentIndex = records.findIndex((record) => record.type === nextRecord.type && record.id === (originalId || nextRecord.id))
-  const duplicateIndex = records.findIndex((record, index) => record.type === nextRecord.type && record.id === nextRecord.id && index !== currentIndex)
-
-  if (duplicateIndex >= 0) {
-    throw new Error('GitHub 同步失败：同类型下已存在相同 ID 的记录')
-  }
-
-  if (currentIndex >= 0) {
-    records[currentIndex] = nextRecord
-  } else {
-    records.unshift(nextRecord)
-  }
-
-  const changes: GitHubChange[] = [{
-    path: 'app/data/source/records.json',
-    content: `${JSON.stringify(records.map(compactRecord), null, 2)}\n`
-  }]
-
-  if (adminRecordNeedsMarkdown(nextRecord.type)) {
-    changes.push({
-      path: githubContentPath(nextRecord.type, nextRecord.id),
-      content: payload.content || ''
-    })
-    if (originalId && originalId !== nextRecord.id) {
-      const previousPath = githubContentPath(nextRecord.type, originalId)
-      if (await githubFileExists(previousPath)) {
-        changes.push({
-          path: previousPath,
-          delete: true
-        })
-      }
-    }
-  }
-
-  if (nextRecord.type === 'music' && typeof payload.lrc === 'string') {
-    changes.push({
-      path: `content/lyrics/${adminLyricFileName(nextRecord.url, nextRecord.title, nextRecord.id)}`,
-      content: payload.lrc
-    })
-  }
-
-  await commitGithubChanges(changes, `admin: save ${nextRecord.type}/${nextRecord.id}`)
-  const latestRecords = await readAdminManagedRecordsFromGithub()
-
-  return {
-    status: 'synced' as const,
-    record: latestRecords.find((record) => record.type === nextRecord.type && record.id === nextRecord.id),
-    records: latestRecords
-  }
+export async function readAdminManagedRecordsFromGithub(): Promise<AdminManagedRecord[]> {
+  assertGithubConfigured()
+  return hydrateManagedRecords(await readGithubRecords())
 }
 
-export async function syncDeletedRecordToGithub(payload: AdminDeleteRecordPayload) {
-  if (!githubConfig()) return 'skipped' as const
+export async function syncAdminChangesToGithub(changesPayload: AdminPendingChange[]) {
+  assertGithubConfigured()
 
-  const { records } = await readGithubRecords()
-  const target = records.find((record) => record.type === payload.type && record.id === payload.id)
-  const nextRecords = records.filter((record) => !(record.type === payload.type && record.id === payload.id))
-  const changes: GitHubChange[] = []
-
-  if (nextRecords.length !== records.length) {
-    changes.push({
-      path: 'app/data/source/records.json',
-      content: `${JSON.stringify(nextRecords.map(compactRecord), null, 2)}\n`
-    })
-  }
-
-  if (payload.deleteAssociatedFiles && target) {
-    if (adminRecordNeedsMarkdown(payload.type)) {
-      const contentFile = githubContentPath(payload.type, payload.id)
-      if (await githubFileExists(contentFile)) {
-        changes.push({
-          path: contentFile,
-          delete: true
-        })
-      }
-    }
-    if (payload.type === 'music') {
-      const lyricFile = `content/lyrics/${adminLyricFileName(target.url, target.title, target.id)}`
-      if (await githubFileExists(lyricFile)) {
-        changes.push({
-          path: lyricFile,
-          delete: true
-        })
-      }
+  if (!changesPayload.length) {
+    return {
+      status: 'synced' as const,
+      records: await readAdminManagedRecordsFromGithub(),
+      syncedCount: 0
     }
   }
 
-  if (changes.length) {
-    await commitGithubChanges(changes, `admin: delete ${payload.type}/${payload.id}`)
+  const records = await readGithubRecords()
+  const githubChanges: GitHubChange[] = []
+  const sidecar = new Map<string, { content?: string; lrc?: string }>()
+
+  for (const change of changesPayload) {
+    if (change.action === 'save') {
+      if (!change.record) throw new Error('同步失败：保存变更缺少记录内容')
+
+      const originalId = change.originalId?.trim()
+      const nextRecord = normalizeRecordForWrite(change.record)
+      const currentIndex = records.findIndex((record) => record.type === nextRecord.type && record.id === (originalId || nextRecord.id))
+      const duplicateIndex = records.findIndex((record, index) => record.type === nextRecord.type && record.id === nextRecord.id && index !== currentIndex)
+
+      if (duplicateIndex >= 0) throw new Error('同步失败：同类型下已存在相同 ID 的记录')
+
+      if (currentIndex >= 0) {
+        records[currentIndex] = nextRecord
+      } else {
+        records.unshift(nextRecord)
+      }
+
+      const sidecarKey = `${nextRecord.type}:${nextRecord.id}`
+      const sidecarValue = sidecar.get(sidecarKey) || {}
+
+      if (adminRecordNeedsMarkdown(nextRecord.type)) {
+        sidecarValue.content = change.content || ''
+        upsertChange(githubChanges, {
+          path: githubContentPath(nextRecord.type, nextRecord.id),
+          content: change.content || ''
+        })
+
+        if (originalId && originalId !== nextRecord.id) {
+          const previousPath = githubContentPath(nextRecord.type, originalId)
+          if (await githubFileExists(previousPath)) {
+            upsertChange(githubChanges, {
+              path: previousPath,
+              delete: true
+            })
+          }
+        }
+      }
+
+      if (nextRecord.type === 'music') {
+        if (typeof change.lrc === 'string') {
+          sidecarValue.lrc = change.lrc
+          upsertChange(githubChanges, {
+            path: `content/lyrics/${adminLyricFileName(nextRecord.url, nextRecord.title, nextRecord.id)}`,
+            content: change.lrc
+          })
+        }
+
+        if (change.musicFile?.path) {
+          const music = localMusicPath(change.musicFile.path)
+          try {
+            const contentBase64 = (await readFile(music.filePath)).toString('base64')
+            upsertChange(githubChanges, {
+              path: `public/music/${music.fileName}`,
+              contentBase64
+            })
+          } catch {
+            throw new Error(`音乐文件不存在，无法同步：${change.musicFile.path}`)
+          }
+        }
+      }
+
+      sidecar.set(sidecarKey, sidecarValue)
+      continue
+    }
+
+    if (!change.id || !change.type) throw new Error('同步失败：删除变更缺少记录 ID 或类型')
+
+    const target = records.find((record) => record.type === change.type && record.id === change.id)
+    const nextRecords = records.filter((record) => !(record.type === change.type && record.id === change.id))
+    records.splice(0, records.length, ...nextRecords)
+
+    if (change.deleteAssociatedFiles && target) {
+      if (adminRecordNeedsMarkdown(change.type)) {
+        const contentFile = githubContentPath(change.type, change.id)
+        if (await githubFileExists(contentFile)) {
+          upsertChange(githubChanges, {
+            path: contentFile,
+            delete: true
+          })
+        }
+      }
+
+      if (change.type === 'music') {
+        const lyricFile = `content/lyrics/${adminLyricFileName(target.url, target.title, target.id)}`
+        if (await githubFileExists(lyricFile)) {
+          upsertChange(githubChanges, {
+            path: lyricFile,
+            delete: true
+          })
+        }
+      }
+    }
   }
+
+  upsertChange(githubChanges, {
+    path: 'app/data/source/records.json',
+    content: `${JSON.stringify(records.map(compactRecord), null, 2)}\n`
+  })
+
+  const commit = await commitGithubChanges(githubChanges, `admin: sync ${changesPayload.length} change${changesPayload.length > 1 ? 's' : ''}`)
 
   return {
     status: 'synced' as const,
-    records: await readAdminManagedRecordsFromGithub()
+    records: await hydrateManagedRecords(records, sidecar),
+    syncedCount: changesPayload.length,
+    commit
   }
 }

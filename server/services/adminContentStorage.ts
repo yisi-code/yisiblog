@@ -6,6 +6,7 @@ import {
   adminRecordNeedsMarkdown,
   type AdminDataRecord,
   type AdminManagedRecord,
+  type AdminPendingChange,
   type AdminRecordType
 } from '~~/shared/adminData'
 import {
@@ -145,6 +146,31 @@ export async function deleteAdminRecordFromLocal(params: {
   }
 }
 
-export const readAdminManagedRecords = readAdminManagedRecordsFromLocal
-export const saveAdminRecord = saveAdminRecordToLocal
-export const deleteAdminRecord = deleteAdminRecordFromLocal
+export async function applyAdminChangesToLocal(changes: AdminPendingChange[]) {
+  for (const change of changes) {
+    if (change.action === 'save') {
+      if (!change.record) continue
+      await saveAdminRecordToLocal({
+        originalId: change.originalId,
+        record: change.record,
+        content: change.content,
+        lrc: change.lrc
+      })
+
+      continue
+    }
+
+    if (change.id && change.type) {
+      try {
+        await deleteAdminRecordFromLocal({
+          id: change.id,
+          type: change.type,
+          deleteAssociatedFiles: change.deleteAssociatedFiles
+        })
+      } catch (error: unknown) {
+        const responseError = error as { statusCode?: number }
+        if (responseError.statusCode !== 404) throw error
+      }
+    }
+  }
+}

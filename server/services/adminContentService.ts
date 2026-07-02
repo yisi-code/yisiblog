@@ -1,17 +1,15 @@
 import type {
-  AdminDeleteRecordPayload,
-  AdminMutationResponse,
-  AdminSaveRecordPayload
+  AdminManagedRecord,
+  AdminPendingChange,
+  AdminSyncRecordsResponse
 } from '~~/shared/adminData'
 import {
-  deleteAdminRecordFromLocal,
-  readAdminManagedRecordsFromLocal,
-  saveAdminRecordToLocal
+  applyAdminChangesToLocal,
+  readAdminManagedRecordsFromLocal
 } from './adminContentStorage'
 import {
   readAdminManagedRecordsFromGithub,
-  syncDeletedRecordToGithub,
-  syncSavedRecordToGithub
+  syncAdminChangesToGithub
 } from './adminGithubSync'
 
 function logMirrorError(target: string, error: unknown) {
@@ -22,54 +20,64 @@ function runDetached(task: () => Promise<unknown>, target: string) {
   task().catch((error) => logMirrorError(target, error))
 }
 
+const adminRecordsCacheTtlMs = 60 * 1000
+let adminRecordsCache: {
+  records: AdminManagedRecord[]
+  expiresAt: number
+} | null = null
+let adminRecordsReadPromise: Promise<AdminManagedRecord[]> | null = null
+
+function cloneAdminRecords(records: AdminManagedRecord[]) {
+  return records.map((record) => ({
+    ...record,
+    tags: record.tags ? [...record.tags] : undefined,
+    images: record.images ? [...record.images] : undefined,
+    photos: record.photos ? record.photos.map((photo) => ({ ...photo })) : undefined
+  }))
+}
+
+function setAdminRecordsCache(records: AdminManagedRecord[]) {
+  adminRecordsCache = {
+    records: cloneAdminRecords(records),
+    expiresAt: Date.now() + adminRecordsCacheTtlMs
+  }
+}
+
 export async function readAdminManagedRecords() {
-  try {
-    return await readAdminManagedRecordsFromGithub()
-  } catch (error) {
-    logMirrorError('github-read-fallback', error)
-    return readAdminManagedRecordsFromLocal()
-  }
-}
-
-export async function saveAdminRecord(payload: AdminSaveRecordPayload): Promise<AdminMutationResponse> {
-  const githubResult = await syncSavedRecordToGithub(payload)
-
-  if (githubResult === 'skipped') {
-    throw createError({ statusCode: 500, statusMessage: '未配置 GitHub 同步环境变量，无法保存到远程仓库' })
+  if (adminRecordsCache && adminRecordsCache.expiresAt > Date.now()) {
+    return cloneAdminRecords(adminRecordsCache.records)
   }
 
-  runDetached(async () => {
-    await saveAdminRecordToLocal(payload)
-  }, 'local-save')
-
-  return {
-    ok: true,
-    record: githubResult.record,
-    records: githubResult.records,
-    sync: {
-      github: githubResult.status,
-      local: 'pending'
+  adminRecordsReadPromise ||= (async () => {
+    try {
+      const records = await readAdminManagedRecordsFromGithub()
+      setAdminRecordsCache(records)
+      return records
+    } catch (error) {
+      logMirrorError('github-read-fallback', error)
+      const records = await readAdminManagedRecordsFromLocal()
+      setAdminRecordsCache(records)
+      return records
+    } finally {
+      adminRecordsReadPromise = null
     }
-  }
+  })()
+
+  return cloneAdminRecords(await adminRecordsReadPromise)
 }
 
-export async function deleteAdminRecord(payload: AdminDeleteRecordPayload): Promise<AdminMutationResponse> {
-  const githubResult = await syncDeletedRecordToGithub(payload)
-
-  if (githubResult === 'skipped') {
-    throw createError({ statusCode: 500, statusMessage: '未配置 GitHub 同步环境变量，无法保存到远程仓库' })
-  }
+export async function syncAdminRecords(changes: AdminPendingChange[]): Promise<AdminSyncRecordsResponse> {
+  const githubResult = await syncAdminChangesToGithub(changes)
+  setAdminRecordsCache(githubResult.records)
 
   runDetached(async () => {
-    await deleteAdminRecordFromLocal(payload)
-  }, 'local-delete')
+    await applyAdminChangesToLocal(changes)
+  }, 'local-bulk-sync')
 
   return {
     ok: true,
     records: githubResult.records,
-    sync: {
-      github: githubResult.status,
-      local: 'pending'
-    }
+    syncedCount: githubResult.syncedCount,
+    commit: githubResult.commit
   }
 }

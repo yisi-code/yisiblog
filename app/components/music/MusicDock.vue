@@ -159,9 +159,18 @@ function syncTime() {
   music.setPlaybackTime(audio.currentTime, audio.duration)
 }
 
+function syncAudioVolume() {
+  const audio = audioRef.value
+  if (!audio) return
+  audio.volume = music.isMuted ? 0 : music.volume
+  audio.muted = music.isMuted
+}
+
 function handleLoadedMetadata() {
   const audio = audioRef.value
   if (!audio) return
+
+  syncAudioVolume()
 
   const restoredTime = Math.min(music.currentTime, Number.isFinite(audio.duration) ? audio.duration : music.currentTime)
   if (restoredTime > 0 && Math.abs(audio.currentTime - restoredTime) > 0.2) {
@@ -200,10 +209,14 @@ watch(() => music.isPlaying, async (playing) => {
 })
 
 watch(currentSong, async () => {
+  const restoredSongKey = music.restoredSongKey
+  const isRestoredSong = Boolean(restoredSongKey && restoredSongKey === music.songPlaybackKey(currentSong.value))
   await nextTick()
   const audio = audioRef.value
   if (!audio) return
-  music.resetPlaybackPosition()
+  syncAudioVolume()
+  if (isRestoredSong) music.restoredSongKey = ''
+  else music.resetPlaybackPosition()
   await music.syncLyrics()
   if (music.isPlaying) await audio.play().catch(() => music.pause())
 })
@@ -232,9 +245,7 @@ watch(() => music.progress, (progress) => {
 })
 
 watch([() => music.volume, () => music.isMuted], () => {
-  const audio = audioRef.value
-  if (!audio) return
-  audio.volume = music.isMuted ? 0 : music.volume
+  syncAudioVolume()
 }, { immediate: true })
 
 onBeforeUnmount(() => {

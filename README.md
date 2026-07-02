@@ -71,7 +71,7 @@ shared/                前后端共享类型与配置
 
 Markdown 正文不需要写 frontmatter。标题、日期、封面、标签等元数据统一放在 `records.json` 中，再由页面和内容读取逻辑合并使用。
 
-公开页面（首页、列表页、详情页）读取当前运行环境中的构建期内容：本地开发时读取工作区文件，Vercel 线上读取本次部署打包进来的仓库内容。管理页面 `/admin/data` 读取和保存时以 GitHub 仓库为主数据源；GitHub 读取失败时会回退读取本地文件，保存成功后会尽力同步写入本地文件，便于本地开发调试。线上公开页面不会在请求时直接读取 GitHub，内容更新需要等待 GitHub commit 触发平台重新部署后生效。
+公开页面（首页、列表页、详情页）读取当前运行环境中的构建期内容：本地开发时读取工作区文件，Vercel 线上读取本次部署打包进来的仓库内容。管理页面 `/admin/data` 读取时以 GitHub 仓库为主数据源；GitHub 读取失败时会回退读取本地文件。管理页的保存、删除只会进入浏览器待同步区，点击“同步 GitHub”后才会批量提交 GitHub，并尽力同步写入本地文件，便于本地开发调试。线上公开页面不会在请求时直接读取 GitHub，内容更新需要等待 GitHub commit 触发平台重新部署后生效。
 
 ## 本地开发
 
@@ -132,7 +132,7 @@ GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
 - `AI_PROVIDER` 当前支持 `deepseek` 和 `openai`，请求格式使用 OpenAI 兼容的 `/chat/completions`。
 - `NUXT_PUBLIC_*` 会进入浏览器运行时，只能放可公开配置。
 - `ADMIN_TOKEN` 配置后，管理页面 `/admin/data` 才能登录。
-- `GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。管理页保存/删除内容需要 GitHub 配置完整。
+- `GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。管理页批量同步 GitHub 需要这些配置完整。
 
 ## 部署
 
@@ -148,5 +148,5 @@ GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
 - `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 是依赖、生成缓存或本地 IDE 配置，已加入 Git 忽略。
 - `.data/content/contents.sqlite` 是 Nuxt Content 的本地索引缓存，不是业务源数据。
 - 修改已有记录的 `id` 会影响页面路径和关联 Markdown / LRC 文件名。
-- 管理页面保存/删除会提交 GitHub 并触发 Vercel 等平台重新部署；公开页面要等新部署完成后才会展示最新内容。
+- 管理页面保存/删除会先进入待同步区；点击“同步 GitHub”后才会提交 GitHub 并触发 Vercel 等平台重新部署，公开页面要等新部署完成后才会展示最新内容。
 - 管理页面删除记录时需要谨慎处理关联文件，避免误删正文或歌词。

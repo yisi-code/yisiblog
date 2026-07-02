@@ -39,7 +39,7 @@
           v-model="inputValue"
           class="cyber-cat__input"
           type="text"
-          placeholder="跟小狐说点啥喵..."
+          placeholder="跟小狐说点啥叭..."
           :disabled="isThinking"
         >
         <button
@@ -189,7 +189,7 @@ function startIdleTalk() {
   const messages = [
     '喵呜~ 今天天气真不错喵~',
     '好困哦，想睡觉喵...',
-    '铲屎官，快去敲代码！',
+    '不要看博客啦！快去敲代码！',
     '我的小鱼干藏哪里去了？',
     '怎么没人理本喵...'
   ]

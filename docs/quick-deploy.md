@@ -31,7 +31,7 @@ GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
 
 只展示给浏览器的配置使用 `NUXT_PUBLIC_*`。真实密钥只放在服务端变量中，不要提交到仓库。
 
-管理页面保存/删除内容需要 GitHub 同步变量。`GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。
+管理页面点击“同步 GitHub”时需要 GitHub 同步变量。`GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。
 
 `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 都已加入 Git 忽略。服务器部署时通常只需要源码、配置和构建产物，不需要提交这些本地目录。
 
@@ -142,11 +142,12 @@ npm run generate
 
 1. 确认已配置 `ADMIN_TOKEN` 和 GitHub 同步变量。
 2. 在 SSR / Node 服务端环境打开 `/admin/data`。
-3. 保存内容后，服务端会提交 GitHub commit，并把最新 records 返回给管理页。
-4. GitHub commit 触发 Vercel 或其他平台重新部署。
-5. 新部署完成后，公开页面读取新的构建期内容。
+3. 编辑内容并点击“保存草稿”，变更会进入右侧待同步区。
+4. 确认待同步内容后点击“同步 GitHub”，服务端会批量提交 GitHub commit，并把最新 records 返回给管理页。
+5. GitHub commit 触发 Vercel 或其他平台重新部署。
+6. 新部署完成后，公开页面读取新的构建期内容。
 
-如果是在本地开发环境保存，服务端还会尽力同步写入本地 `app/data/source/records.json`、`content/` 和 `content/lyrics/`。本地镜像失败不影响 GitHub commit，但公开首页本地预览是否立即更新取决于本地文件是否同步成功。
+如果是在本地开发环境同步 GitHub，服务端还会尽力同步写入本地 `app/data/source/records.json`、`content/` 和 `content/lyrics/`。音乐文件在选择时已暂存到 `public/music/`，同步时按 `/music/...` 路径读取并提交 GitHub；如果暂存文件丢失，同步会提示失败。公开首页本地预览是否立即更新取决于本地文件是否同步成功。
 
 ## 部署后检查
 
@@ -174,8 +175,8 @@ npm run generate
 
 ### 静态部署后管理页面不能保存
 
-这是纯静态部署的限制。管理页面保存需要 Nitro 服务端接口提交 GitHub。可以在本地或 SSR 环境使用管理页提交 GitHub，然后重新生成并发布静态产物。
+这是纯静态部署的限制。管理页面同步 GitHub 需要 Nitro 服务端接口。可以在本地或 SSR 环境使用管理页同步 GitHub，然后重新生成并发布静态产物。
 
 ### 管理页面已保存，但首页没有立即更新
 
-管理页面保存成功只代表 GitHub commit 已完成，并且管理页拿到了最新 records。公开页面读取的是当前部署的构建期内容，需要等待 Vercel 或其他平台重新部署完成后才会显示新内容。本地开发时，公开页面读取本地文件；如果本地镜像没有写入成功，需要拉取 GitHub 最新提交或手动同步文件。
+管理页面“保存草稿”只会更新待同步区，不会触发公开页面更新。点击“同步 GitHub”成功后，GitHub commit 才会触发部署。公开页面读取的是当前部署的构建期内容，需要等待 Vercel 或其他平台重新部署完成后才会显示新内容。本地开发时，公开页面读取本地文件；如果本地镜像没有写入成功，需要拉取 GitHub 最新提交或手动同步文件。
