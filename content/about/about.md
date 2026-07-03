@@ -1,9 +1,9 @@
-一位喜欢写代码的全栈工程师。  （管理页github推送测试）
+一位喜欢写代码的全栈工程师。 
 
 ## 技术栈
 
 - **后端**：Java, Spring Boot/Cloud, MySQL, MyBatis, Redisson, Kafka  
-- **前端**：JavaScript, Vue 3, Pinia, Vue Router, Vite, Tailwind CSS 4, Nuxt 4  
+- **前端**：JavaScript, Vue 3, Pinia, Vue Router 4, Vite, Tailwind CSS 4, Nuxt 4  
 - **小程序**：微信小程序原生开发（含云开发），也用过 uni-app 做跨端  
 - **工具**：IDEA, Apifox, Docker，微信开发者工具
 - **Vibe Coding**：Codex（燃烧中转站api！）
