@@ -149,17 +149,27 @@
                 v-for="change in pendingChanges"
                 :key="change.key"
                 class="admin-data-change-item"
-                :class="`admin-data-change-item--${change.action}`"
+                :class="[
+                  `admin-data-change-item--${change.action}`,
+                  { 'admin-data-change-item--active': activePendingChangeKey === change.key }
+                ]"
             >
-              <button type="button" @click="openPendingChange(change)">
-                <span>{{ changeLabel(change) }}</span>
+              <button
+                  class="admin-data-change-open"
+                  type="button"
+                  :aria-pressed="activePendingChangeKey === change.key"
+                  @click="openPendingChange(change)">
                 <strong>{{ changeTitle(change) }}</strong>
-                <small>{{ changeTime(change.updatedAt) }}</small>
+                <em>{{ changeSubtitle(change) }}</em>
+                <span class="admin-data-change-meta">
+                  <span class="admin-data-change-label">{{ changeLabel(change) }}</span>
+                  <small>{{ changeTime(change.updatedAt) }}</small>
+                </span>
               </button>
-              <button class="admin-data-change-undo" type="button" @click="undoChange(change.key)">
+              <div class="admin-data-change-undo" @click="undoChange(change.key)">
                 <Undo2 :size="15" aria-hidden="true"/>
-                撤销
-              </button>
+                <span class="h-fit">撤销</span>
+              </div>
             </article>
           </div>
         </template>
@@ -306,8 +316,10 @@
               <span>相册图片</span>
               <textarea v-model="albumPhotoUrlsText" class="admin-data-textarea" placeholder="每行一个图片地址"/>
               <div v-if="albumPhotoDrafts.length" class="admin-data-photo-rows">
-                <div v-for="(photo, index) in albumPhotoDrafts" :key="`${photo.url}-${index}`"
-                     class="admin-data-photo-row">
+                <div
+                    v-for="(photo, index) in albumPhotoDrafts"
+                    :key="`${photo.url}-${index}`"
+                    class="admin-data-photo-row">
                   <img :src="photo.url" :alt="photo.caption || `相册图片 ${index + 1}`">
                   <label>
                     <span>图片描述</span>
@@ -519,6 +531,7 @@ const showLrcField = computed(() => draft.type === 'music')
 const momentImages = computed(() => splitLines(imagesText.value))
 const parsedLyrics = computed(() => parseLrc(lrcText.value))
 const pendingChangeByKey = computed(() => Object.fromEntries(pendingChanges.value.map((change) => [change.key, change])))
+const activePendingChangeKey = computed(() => hasEditorDraft.value ? editorDraftKey.value || selectedRecordKey.value : '')
 
 const countByType = computed(() => records.value.reduce((result, record) => {
   result[record.type] = (result[record.type] || 0) + 1
@@ -1224,6 +1237,12 @@ function undoChange(key: string) {
 function openPendingChange(change: AdminPendingChange) {
   stashOpenDraft()
 
+  if (activePendingChangeKey.value === change.key) {
+    const targetType = change.record?.type || change.type || change.snapshot?.type || selectedType.value
+    clearEditorDraft(targetType)
+    return
+  }
+
   if (change.action === 'delete') {
     if (change.snapshot) {
       selectedType.value = change.snapshot.type
@@ -1248,6 +1267,13 @@ function changeLabel(change: AdminPendingChange) {
 function changeTitle(change: AdminPendingChange) {
   const record = change.record || change.snapshot
   return record?.title || record?.id || change.id || '未命名记录'
+}
+
+function changeSubtitle(change: AdminPendingChange) {
+  const record = change.record || change.snapshot
+  const typeText = record?.type ? adminRecordTypeLabels[record.type] : change.type ? adminRecordTypeLabels[change.type] : '记录'
+  const idText = record?.id || change.id || change.key
+  return `${typeText} · ${idText}`
 }
 
 function changeTime(value: string) {

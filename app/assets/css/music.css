@@ -125,7 +125,6 @@
   background: var(--color-slider-thumb);
   box-shadow: 0 0 0 3px var(--color-slider-thumb-ring), 0 8px 18px var(--color-slider-thumb-shadow);
   opacity: 0;
-  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .music-slider--vertical .music-slider__thumb {
