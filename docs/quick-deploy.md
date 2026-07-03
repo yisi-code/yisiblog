@@ -19,6 +19,11 @@ copy .env.example .env
 ```text
 NUXT_PUBLIC_SITE_URL=https://你的域名
 ADMIN_TOKEN=替换为强令牌
+AI_PROVIDER=deepseek
+AI_BASE_URL=https://api.deepseek.com
+AI_MODEL=deepseek-v4-flash
+AI_MAX_OUTPUT_TOKENS=150
+AI_TEMPERATURE=0.85
 AI_API_KEY=
 GITALK_CLIENT_SECRET=
 GITHUB_TOKEN=
@@ -54,7 +59,7 @@ npm run build
 ```text
 .output/
 .env
-public/        # 如果服务器运行目录需要保留本地静态资源
+public/        # 如果服务器运行目录需要保留本地静态资源，例如 /music 下的音乐文件
 content/       # 公开页面构建期读取的 Markdown / LRC
 app/data/source/records.json
 ```
@@ -133,7 +138,7 @@ npm run generate
 常规内容更新：
 
 1. 修改 `app/data/source/records.json`。
-2. 按需修改 `content/`、`content/lyrics/`、`public/images/`、`public/music/`。
+2. 按需修改 `content/`、`content/lyrics/`、`public/music/`，图片资源可以使用远程链接；如果你新增本地图片目录，也应一起部署到 `public/`。
 3. 本地运行 `npm run dev` 检查页面。
 4. 服务端部署执行 `npm run build`，静态部署执行 `npm run generate`。
 5. 上传新产物并重启服务或刷新静态文件。
@@ -171,7 +176,7 @@ npm run generate
 
 ### 线上图片或音乐 404
 
-检查资源是否放在 `public/images/` 或 `public/music/` 下，记录中的路径应类似 `/images/name.jpg` 或 `/music/name.m4a`。
+检查资源是否能被线上环境访问。音乐文件通常放在 `public/music/` 下，记录中的路径应类似 `/music/name.m4a`；图片当前主要通过远程链接维护，如果使用本地图片，需要确认对应文件已放入并部署到 `public/` 下。
 
 ### 静态部署后管理页面不能保存
 

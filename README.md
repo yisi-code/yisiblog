@@ -11,6 +11,7 @@
 - Nitro Server API
 - Gitalk 评论代理
 - OpenAI 兼容格式的 AI 聊天接口
+- Markdown 数学公式渲染（remark-math / KaTeX）
 
 ## 功能总览
 
@@ -49,7 +50,6 @@ content/
   lyrics/              音乐歌词 LRC
 docs/                  项目文档
 public/
-  images/              本地图片资源
   music/               本地音乐资源
   CNAME                GitHub Pages 自定义域名配置
   .nojekyll            GitHub Pages 静态资源保留配置
@@ -106,8 +106,6 @@ AI_BASE_URL=https://api.deepseek.com
 AI_MODEL=deepseek-v4-flash
 AI_MAX_OUTPUT_TOKENS=150
 AI_TEMPERATURE=0.85
-AI_THINKING=disabled
-AI_THINKING_LEVEL=high
 
 NUXT_PUBLIC_SITE_URL=http://localhost:3000
 ADMIN_TOKEN=
@@ -133,6 +131,7 @@ GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
 - `NUXT_PUBLIC_*` 会进入浏览器运行时，只能放可公开配置。
 - `ADMIN_TOKEN` 配置后，管理页面 `/admin/data` 才能登录。
 - `GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。管理页批量同步 GitHub 需要这些配置完整。
+- `AI_MAX_OUTPUT_TOKENS` 会作为 OpenAI 兼容接口请求中的 `max_tokens`，`AI_TEMPERATURE` 会被限制在 `0` 到 `2` 之间。
 
 ## 部署
 
