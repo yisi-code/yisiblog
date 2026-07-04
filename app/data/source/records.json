@@ -1,5 +1,50 @@
 [
   {
+    "id": "日常随录",
+    "type": "album",
+    "title": "日常随录",
+    "description": "不时涌出记录瞬间的悸动。",
+    "cover": "https://bee-reg-ab.imagency.cn/e/2fba8447b85d0a0c390d902ed9441f7a.jpg",
+    "tags": [
+      "日常",
+      "风景"
+    ],
+    "photos": [
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/2fba8447b85d0a0c390d902ed9441f7a.jpg",
+        "caption": "西湖雷峰塔"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/9baa8ed8645b3b454df2b3f9d31c0b19.jpg",
+        "caption": "渐变黄昏"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/072f272b8d157354d071313a9c0e9cbf.jpg",
+        "caption": "金线"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/9c5ecd6360664923af7e90871fa62c3b.jpg",
+        "caption": "云角低"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/13cb12ed37ca531d38eb912248997534.jpg",
+        "caption": "夕阳鳞光"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/04d630cf95af95658556a73f49fd7591.jpg",
+        "caption": "棉云"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/72041acb7e8a169ceca73120aef2e323.jpg",
+        "caption": "黄调时刻"
+      },
+      {
+        "url": "https://bee-reg-ab.imagency.cn/e/bcdd12f3b34da82330f810b5a910c402.jpg",
+        "caption": "映日"
+      }
+    ]
+  },
+  {
     "id": "20260701杂谈",
     "type": "chatter",
     "title": "思索扩展博客",
