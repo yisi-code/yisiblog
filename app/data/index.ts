@@ -1,17 +1,15 @@
 export {
-  albums,
-  friends,
-  projects,
-  records,
   recordsByType,
   findRecordBySlug,
+  normalizeDataRecord,
+  normalizeRecords,
   recordMatchesSlug,
   recordSlugText,
-  songs,
   useAlbumData,
   useAlbumsData,
   useFriendsData,
   useProjectsData,
+  useRecordsData,
   useSongsData
 } from './records'
 export {
@@ -26,9 +24,6 @@ export {
   useRecentChatters,
   useRecentPosts
 } from './content'
-export { lyricFileNameFromSongUrl, useLyricsData } from './lyrics'
-export type { LyricsData } from './lyrics'
-
 export type {
   Album,
   DataRecord,

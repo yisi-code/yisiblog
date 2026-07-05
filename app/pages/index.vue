@@ -35,10 +35,10 @@ import {
 const postItems = await usePostsData('home-posts')
 const chatterItems = await useChattersData('home-chatters')
 const momentItems = await useMomentsData('home-moments')
-const albumItems = useAlbumsData()
-const friendItems = useFriendsData()
-const projectItems = useProjectsData()
-const songItems = useSongsData()
+const albumItems = await useAlbumsData()
+const friendItems = await useFriendsData()
+const projectItems = await useProjectsData()
+const songItems = await useSongsData()
 
 const defaultChatterCover = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
 

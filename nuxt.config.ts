@@ -70,13 +70,11 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         adminToken: process.env.ADMIN_TOKEN || '',
-        github: {
-            token: process.env.GITHUB_TOKEN || '',
-            owner: process.env.GITHUB_OWNER || '',
-            repo: process.env.GITHUB_REPO || '',
-            branch: process.env.GITHUB_BRANCH || 'main',
-            committerName: process.env.GITHUB_COMMITTER_NAME || 'yisiblog-bot',
-            committerEmail: process.env.GITHUB_COMMITTER_EMAIL || 'yisiblog-bot@example.com'
+        dataCapsule: {
+            endpoint: process.env.DATA_CAPSULE_ENDPOINT || '',
+            bucket: process.env.DATA_CAPSULE_BUCKET || '',
+            accessKeyId: process.env.DATA_CAPSULE_ACCESS_KEY_ID || '',
+            secretAccessKey: process.env.DATA_CAPSULE_SECRET_ACCESS_KEY || ''
         },
         ai: {
             provider: process.env.AI_PROVIDER || 'deepseek',
@@ -255,4 +253,3 @@ function contentBodyValue(content: unknown) {
     const body = contentRecord.body as { value?: unknown }
     return Array.isArray(body.value) ? body.value as ContentBodyNode[] : undefined
 }
-

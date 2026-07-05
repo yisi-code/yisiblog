@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { siteConfig, useFriendsData } from '~/data'
 
-const friends = useFriendsData()
+const friends = await useFriendsData()
 const copied = ref(false)
 const applyFormat = computed(() => siteConfig.friendLinkApplyFormat)
 let copyTimer: number | undefined

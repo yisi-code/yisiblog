@@ -88,6 +88,8 @@ export type AdminDataRecord = {
   date?: string
   cover?: string
   url?: string
+  lrcUrl?: string
+  contentUrl?: string
   path?: string
   tags?: string[]
   mood?: string
@@ -113,6 +115,8 @@ export type AdminRecordsResponse = {
 export type AdminMusicFilePayload = {
   fileName: string
   path: string
+  publicUrl: string
+  storage: 'data-capsule'
   size?: number
   mimeType?: string
 }
@@ -140,10 +144,6 @@ export type AdminSyncRecordsResponse = {
   ok: true
   records: AdminManagedRecord[]
   syncedCount: number
-  commit?: {
-    sha?: string
-    url?: string
-  }
 }
 
 export function adminRecordNeedsMarkdown(type: AdminRecordType) {

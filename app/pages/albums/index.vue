@@ -64,7 +64,7 @@ type MatchedPhoto = Photo & {
 const preview = ref<{ images: PreviewImage[]; index: number } | null>(null)
 const searchQuery = ref('')
 const activeQuery = ref('')
-const albums = useAlbumsData()
+const albums = await useAlbumsData()
 let searchTimer: ReturnType<typeof setTimeout> | undefined
 
 const matchedAlbums = computed(() => {

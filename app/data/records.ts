@@ -1,5 +1,3 @@
-import recordsSource from './source/records.json'
-
 export type DataRecordType = 'post' | 'chatter' | 'moment' | 'music' | 'friend' | 'album' | 'project' | 'about'
 
 export type DataRecord = {
@@ -10,8 +8,10 @@ export type DataRecord = {
   date?: string
   cover?: string
   url?: string
+  lrcUrl?: string
+  contentUrl?: string
   path?: string
-  tags: string[]
+  tags?: string[]
   mood?: string
   location?: string
   images?: string[]
@@ -24,6 +24,8 @@ export type DataRecord = {
 export type NormalizedDataRecord = DataRecord & {
   path: string
   contentFile: string | undefined
+  contentUrl: string | undefined
+  tags: string[]
 }
 
 export type Photo = {
@@ -53,15 +55,20 @@ export type Project = NormalizedDataRecord & {
 export type Song = NormalizedDataRecord & {
   type: 'music'
   url: string
+  lrcUrl?: string
   title: string
   artist?: string
   error?: string
 }
 
+type RecordsResponse = {
+  records: DataRecord[]
+}
+
 const routeBaseByType: Partial<Record<DataRecordType, string>> = {
   post: 'posts',
   chatter: 'chatter',
-  album: 'albums',
+  album: 'albums'
 }
 
 const contentBaseByType: Partial<Record<DataRecordType, string>> = {
@@ -84,6 +91,43 @@ function recordContentFile(record: DataRecord) {
   return base ? `${base}/${record.id}` : undefined
 }
 
+function remoteAssetUrl(value?: string) {
+  if (!value || !value.includes('s3.cstcloud.cn')) return value
+  return `/api/assets/remote?url=${encodeURIComponent(value)}`
+}
+
+function normalizeAssetUrls<T extends DataRecord>(record: T): T {
+  return {
+    ...record,
+    cover: remoteAssetUrl(record.cover),
+    url: record.type === 'music' ? remoteAssetUrl(record.url) : record.url,
+    lrcUrl: remoteAssetUrl(record.lrcUrl),
+    icon: remoteAssetUrl(record.icon),
+    images: Array.isArray(record.images) ? record.images.map((image) => remoteAssetUrl(image) || image) : record.images,
+    photos: Array.isArray(record.photos)
+      ? record.photos.map((photo) => ({
+          ...photo,
+          url: remoteAssetUrl(photo.url) || photo.url
+        }))
+      : record.photos
+  }
+}
+
+export function normalizeDataRecord(record: DataRecord): NormalizedDataRecord {
+  const normalizedRecord = normalizeAssetUrls(record)
+  return {
+    ...normalizedRecord,
+    path: recordPath(normalizedRecord),
+    contentFile: recordContentFile(normalizedRecord),
+    contentUrl: normalizedRecord.contentUrl,
+    tags: Array.isArray(normalizedRecord.tags) ? normalizedRecord.tags : []
+  }
+}
+
+export function normalizeRecords(records: DataRecord[]) {
+  return records.map(normalizeDataRecord).sort(compareRecordsByLatest)
+}
+
 export function recordTimestamp(record: Pick<DataRecord, 'date' | 'id'>) {
   const rawDate = record.date || String(record.id || '').match(/-(\d{10,})/)?.[1] || ''
   if (/^\d{10,}$/.test(rawDate)) return Number(rawDate)
@@ -97,14 +141,7 @@ export function compareRecordsByLatest<T extends Pick<DataRecord, 'date' | 'id'>
   return recordTimestamp(b) - recordTimestamp(a)
 }
 
-export const records: NormalizedDataRecord[] = (recordsSource as DataRecord[]).map((record) => ({
-  ...record,
-  path: recordPath(record),
-  contentFile: recordContentFile(record),
-  tags: Array.isArray(record.tags) ? record.tags : []
-})).sort(compareRecordsByLatest) satisfies NormalizedDataRecord[]
-
-export function recordsByType<T extends DataRecordType>(type: T) {
+export function recordsByType<T extends DataRecordType>(records: NormalizedDataRecord[], type: T) {
   return records.filter((record): record is NormalizedDataRecord & { type: T } => record.type === type)
 }
 
@@ -118,59 +155,73 @@ export function recordSlugText(slug: string | string[]) {
   return Array.isArray(slug) ? slug.join('/') : slug
 }
 
-export function findRecordBySlug<T extends DataRecordType>(type: T, slug?: string | string[]) {
-  return recordsByType(type).find((record) => recordMatchesSlug(record, slug)) || null
+export function findRecordBySlug<T extends DataRecordType>(records: NormalizedDataRecord[], type: T, slug?: string | string[]) {
+  return recordsByType(records, type).find((record) => recordMatchesSlug(record, slug)) || null
 }
 
-export const albums: Album[] = recordsByType('album')
-  .filter((record): record is NormalizedDataRecord & { type: 'album'; title: string } => Boolean(record.title))
-  .map((record) => ({
-    ...record,
-    photos: Array.isArray(record.photos) ? record.photos : []
-  }))
-
-export const friends: Friend[] = recordsByType('friend')
-  .filter((record): record is NormalizedDataRecord & { type: 'friend'; title: string; url: string } => Boolean(record.title && record.url))
-  .map((record) => ({ ...record }))
-
-export const projects: Project[] = recordsByType('project')
-  .filter((record): record is NormalizedDataRecord & { type: 'project'; title: string; url: string } => Boolean(record.title && record.url))
-  .map((record) => ({
-    ...record,
-    icon: record.icon || ''
-  }))
-
-export const songs: Song[] = recordsByType('music')
-  .filter((record): record is NormalizedDataRecord & { type: 'music'; url: string; title: string } => Boolean(record.url && record.title))
-  .map((record) => ({
-    ...record,
-    artist: record.artist,
-    error: record.error
-  }))
-
-function useStaticData<T>(key: string, value: T) {
-  return useState<T>(key, () => value)
+function albumsFromRecords(records: NormalizedDataRecord[]) {
+  return recordsByType(records, 'album')
+    .filter((record): record is NormalizedDataRecord & { type: 'album'; title: string } => Boolean(record.title))
+    .map((record) => ({
+      ...record,
+      photos: Array.isArray(record.photos) ? record.photos : []
+    }))
 }
 
-// Pages and stores use these composables so static records and content records
-// share the same "useXxxData" access style.
-export function useAlbumsData() {
-  return useStaticData('albums-data', albums)
+function friendsFromRecords(records: NormalizedDataRecord[]) {
+  return recordsByType(records, 'friend')
+    .filter((record): record is NormalizedDataRecord & { type: 'friend'; title: string; url: string } => Boolean(record.title && record.url))
+    .map((record) => ({ ...record }))
 }
 
-export function useAlbumData(slug?: string) {
-  const albumItems = useAlbumsData()
+function projectsFromRecords(records: NormalizedDataRecord[]) {
+  return recordsByType(records, 'project')
+    .filter((record): record is NormalizedDataRecord & { type: 'project'; title: string; url: string } => Boolean(record.title && record.url))
+    .map((record) => ({
+      ...record,
+      icon: record.icon || ''
+    }))
+}
+
+function songsFromRecords(records: NormalizedDataRecord[]) {
+  return recordsByType(records, 'music')
+    .filter((record): record is NormalizedDataRecord & { type: 'music'; url: string; title: string } => Boolean(record.url && record.title))
+    .map((record) => ({
+      ...record,
+      artist: record.artist,
+      error: record.error
+    }))
+}
+
+export async function useRecordsData(key = 'records-data') {
+  const { data } = await useAsyncData(key, async () => {
+    const response = await $fetch<RecordsResponse>('/api/records')
+    return normalizeRecords(Array.isArray(response.records) ? response.records : [])
+  })
+  return computed(() => data.value || [])
+}
+
+export async function useAlbumsData() {
+  const records = await useRecordsData('albums-records-data')
+  return computed(() => albumsFromRecords(records.value))
+}
+
+export async function useAlbumData(slug?: string) {
+  const albumItems = await useAlbumsData()
   return computed(() => albumItems.value.find((item) => recordMatchesSlug(item, slug)) || null)
 }
 
-export function useFriendsData() {
-  return useStaticData('friends-data', friends)
+export async function useFriendsData() {
+  const records = await useRecordsData('friends-records-data')
+  return computed(() => friendsFromRecords(records.value))
 }
 
-export function useProjectsData() {
-  return useStaticData('projects-data', projects)
+export async function useProjectsData() {
+  const records = await useRecordsData('projects-records-data')
+  return computed(() => projectsFromRecords(records.value))
 }
 
-export function useSongsData() {
-  return useStaticData('songs-data', songs)
+export async function useSongsData() {
+  const records = await useRecordsData('songs-records-data')
+  return computed(() => songsFromRecords(records.value))
 }

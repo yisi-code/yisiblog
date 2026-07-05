@@ -26,23 +26,21 @@ AI_MAX_OUTPUT_TOKENS=150
 AI_TEMPERATURE=0.85
 AI_API_KEY=
 GITALK_CLIENT_SECRET=
-GITHUB_TOKEN=
-GITHUB_OWNER=yisi-code
-GITHUB_REPO=yisiblog
-GITHUB_BRANCH=main
-GITHUB_COMMITTER_NAME=Yisi Blog Bot
-GITHUB_COMMITTER_EMAIL=yisiblogbot@example.com
+DATA_CAPSULE_ENDPOINT=https://s3.cstcloud.cn
+DATA_CAPSULE_BUCKET=
+DATA_CAPSULE_ACCESS_KEY_ID=
+DATA_CAPSULE_SECRET_ACCESS_KEY=
 ```
 
 只展示给浏览器的配置使用 `NUXT_PUBLIC_*`。真实密钥只放在服务端变量中，不要提交到仓库。
 
-管理页面点击“同步 GitHub”时需要 GitHub 同步变量。`GITHUB_TOKEN` 建议使用 Fine-grained personal access token，只授权当前仓库，并授予 `Contents: Read and write` 与 `Metadata: Read` 权限。
+管理页面点击“同步数据胶囊”时需要完整的数据胶囊 S3 访问变量。
 
 `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 都已加入 Git 忽略。服务器部署时通常只需要源码、配置和构建产物，不需要提交这些本地目录。
 
 ## 方式一：Node 服务端部署
 
-适合需要 AI 接口、Gitalk 代理、管理页面提交 GitHub 等服务端能力的部署方式。
+适合需要 AI 接口、Gitalk 代理、数据胶囊内容读取和管理页面等服务端能力的部署方式。
 
 ### 1. 构建
 
@@ -60,8 +58,7 @@ npm run build
 .output/
 .env
 public/        # 如果服务器运行目录需要保留本地静态资源，例如 /music 下的音乐文件
-content/       # 公开页面构建期读取的 Markdown / LRC
-app/data/source/records.json
+content/       # 仅作为历史迁移或本地备份源；运行时内容从数据胶囊读取
 ```
 
 如果你直接在服务器上拉取完整仓库，可以省略手动上传这些源文件，直接在服务器构建和运行。
@@ -137,22 +134,21 @@ npm run generate
 
 常规内容更新：
 
-1. 修改 `app/data/source/records.json`。
-2. 按需修改 `content/`、`content/lyrics/`、`public/music/`，图片资源可以使用远程链接；如果你新增本地图片目录，也应一起部署到 `public/`。
+1. 在 `/admin/data` 修改记录并保存草稿。
+2. 按需上传 Markdown、音乐、歌词和图片资源到中国科技云数据胶囊，并在记录中保存远程地址。
 3. 本地运行 `npm run dev` 检查页面。
 4. 服务端部署执行 `npm run build`，静态部署执行 `npm run generate`。
 5. 上传新产物并重启服务或刷新静态文件。
 
 使用 `/admin/data` 更新内容：
 
-1. 确认已配置 `ADMIN_TOKEN` 和 GitHub 同步变量。
+1. 确认已配置 `ADMIN_TOKEN` 和中国科技云数据胶囊变量。
 2. 在 SSR / Node 服务端环境打开 `/admin/data`。
 3. 编辑内容并点击“保存草稿”，变更会进入右侧待同步区。
-4. 确认待同步内容后点击“同步 GitHub”，服务端会批量提交 GitHub commit，并把最新 records 返回给管理页。
-5. GitHub commit 触发 Vercel 或其他平台重新部署。
-6. 新部署完成后，公开页面读取新的构建期内容。
+4. 确认待同步内容后点击“同步数据胶囊”，服务端会写回数据胶囊根目录 `records.json`，并把最新 records 返回给管理页。
+5. 公开页面后续请求会读取数据胶囊中的最新内容。
 
-如果是在本地开发环境同步 GitHub，服务端还会尽力同步写入本地 `app/data/source/records.json`、`content/` 和 `content/lyrics/`。音乐文件在选择时已暂存到 `public/music/`，同步时按 `/music/...` 路径读取并提交 GitHub；如果暂存文件丢失，同步会提示失败。公开首页本地预览是否立即更新取决于本地文件是否同步成功。
+音乐音频、LRC 歌词、Markdown 正文和图片文件会上传到数据胶囊；`records.json` 保存在数据集根目录。
 
 ## 部署后检查
 
@@ -168,7 +164,7 @@ npm run generate
 
 ### 页面能打开，但内容为空
 
-检查 `app/data/source/records.json` 是否存在、JSON 是否合法，以及对应 Markdown 文件是否在 `content/` 下。
+检查数据胶囊根目录 `records.json` 是否存在、JSON 是否合法，以及记录中的 `contentUrl` 是否能通过服务端接口读取。
 
 ### 管理页面提示未配置令牌
 
@@ -176,12 +172,12 @@ npm run generate
 
 ### 线上图片或音乐 404
 
-检查资源是否能被线上环境访问。音乐文件通常放在 `public/music/` 下，记录中的路径应类似 `/music/name.m4a`；图片当前主要通过远程链接维护，如果使用本地图片，需要确认对应文件已放入并部署到 `public/` 下。
+检查资源是否能被线上环境访问。音乐记录中的 `url` 和 `lrcUrl`、封面、动态图片和相册图片都应是数据胶囊统一桶中的公开地址。如果桶没有公开读权限，页面会出现资源 404 或跨域读取失败。
 
 ### 静态部署后管理页面不能保存
 
-这是纯静态部署的限制。管理页面同步 GitHub 需要 Nitro 服务端接口。可以在本地或 SSR 环境使用管理页同步 GitHub，然后重新生成并发布静态产物。
+这是纯静态部署的限制。管理页面同步数据胶囊需要 Nitro 服务端接口。请使用 SSR / Node 环境运行管理页。
 
 ### 管理页面已保存，但首页没有立即更新
 
-管理页面“保存草稿”只会更新待同步区，不会触发公开页面更新。点击“同步 GitHub”成功后，GitHub commit 才会触发部署。公开页面读取的是当前部署的构建期内容，需要等待 Vercel 或其他平台重新部署完成后才会显示新内容。本地开发时，公开页面读取本地文件；如果本地镜像没有写入成功，需要拉取 GitHub 最新提交或手动同步文件。
+管理页面“保存草稿”只会更新待同步区，不会触发公开页面更新。点击“同步数据胶囊”成功后，根目录 `records.json` 和相关资源对象会更新，公开页面后续请求会读取最新数据。

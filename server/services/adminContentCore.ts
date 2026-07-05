@@ -1,35 +1,12 @@
-import { access } from 'node:fs/promises'
-import { resolve } from 'node:path'
 import {
   adminRecordHasField,
+  adminRecordNeedsMarkdown,
   type AdminDataRecord
 } from '~~/shared/adminData'
-
-export const rootDir = process.cwd()
-export const recordsFilePath = resolve(rootDir, 'app/data/source/records.json')
-export const contentRootPath = resolve(rootDir, 'content')
-export const lyricsRootPath = resolve(contentRootPath, 'lyrics')
 
 export function assertAdminId(id: string) {
   if (!id || id.length > 120 || id.includes('..') || /[\\/]/.test(id)) {
     throw createError({ statusCode: 400, statusMessage: '记录 ID 只能是普通文件名，不能包含路径字符' })
-  }
-}
-
-export function assertInside(basePath: string, targetPath: string) {
-  const resolvedBase = resolve(basePath)
-  const resolvedTarget = resolve(targetPath)
-  if (resolvedTarget !== resolvedBase && !resolvedTarget.startsWith(`${resolvedBase}\\`) && !resolvedTarget.startsWith(`${resolvedBase}/`)) {
-    throw createError({ statusCode: 400, statusMessage: '文件路径超出允许范围' })
-  }
-}
-
-export async function exists(filePath: string) {
-  try {
-    await access(filePath)
-    return true
-  } catch {
-    return false
   }
 }
 
@@ -66,6 +43,8 @@ export function normalizeRecordForWrite(record: AdminDataRecord): AdminDataRecor
     date: adminRecordHasField(record.type, 'date') ? record.date?.trim() : undefined,
     cover: adminRecordHasField(record.type, 'cover') ? record.cover?.trim() : undefined,
     url: adminRecordHasField(record.type, 'url') ? record.url?.trim() : undefined,
+    lrcUrl: record.type === 'music' ? record.lrcUrl?.trim() : undefined,
+    contentUrl: adminRecordNeedsMarkdown(record.type) ? record.contentUrl?.trim() : undefined,
     path: record.path?.trim(),
     tags: adminRecordHasField(record.type, 'tags') && Array.isArray(record.tags) ? record.tags.map((tag) => String(tag).trim()).filter(Boolean) : [],
     mood: adminRecordHasField(record.type, 'mood') ? record.mood?.trim() : undefined,

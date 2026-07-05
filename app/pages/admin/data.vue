@@ -1,7 +1,7 @@
 <template>
   <PageShell
       title="数据管理"
-      description="内容草稿、待同步变更与 GitHub 发布工作台"
+      description="内容草稿、待同步变更与数据胶囊发布工作台"
       width="wide"
       class="admin-data pt-page-top pb-panel-bottom">
     <template #toolbar>
@@ -105,7 +105,7 @@
                 @click="selectRecord(record)"
             >
               <span class="admin-data-list-cover">
-                <img v-if="record.cover" :src="record.cover" :alt="record.title || record.id">
+                <img v-if="record.cover" :src="previewAssetUrl(record.cover)" :alt="record.title || record.id">
                 <span v-else>{{ adminRecordTypeLabels[record.type].slice(0, 1) }}</span>
               </span>
               <span class="admin-data-list-main">
@@ -133,11 +133,11 @@
             <button
                 class="admin-data-button admin-data-button--primary"
                 type="button"
-                :disabled="!canSyncGithub"
-                @click="syncGithub"
+                :disabled="!canSyncDataCapsule"
+                @click="syncDataCapsule"
             >
               <CloudUpload :size="17" aria-hidden="true"/>
-              同步 GitHub
+              同步数据胶囊
             </button>
           </div>
 
@@ -189,6 +189,49 @@
           </div>
 
           <form class="admin-data-form" @submit.prevent="saveDraftChange()">
+            <div class="admin-data-field admin-data-field--wide">
+              <span>上传目录</span>
+              <div class="admin-data-upload-folders">
+                <div
+                    v-for="target in visibleUploadTargets"
+                    :key="target.key"
+                    class="admin-data-folder-field">
+                  <span class="admin-data-folder-field__label">{{ target.label }}</span>
+                  <AdminDataSelect
+                      select-class="admin-data-folder-select"
+                      dropdown-class="admin-data-folder-select__dropdown"
+                      :open="activeFolderTarget === target.key"
+                      @update:open="setFolderDropdownOpen(target.key, $event)">
+                    <template #control>
+                      <input
+                          v-model="uploadFolders[target.key]"
+                          class="admin-data-select__button admin-data-folder-select__input"
+                          :placeholder="target.placeholder"
+                          @focus="openFolderDropdown(target.key)"
+                          @input="openFolderDropdown(target.key)"
+                          @keydown.escape="closeFolderDropdown">
+                    </template>
+                    <button
+                        v-for="folder in filteredUploadFolders(target.key)"
+                        :key="folder"
+                        class="admin-data-select__option admin-data-folder-select__option"
+                        type="button"
+                        @mousedown.prevent="selectUploadFolder(target.key, folder)">
+                      <span class="admin-data-select__option-title">
+                        <template v-for="(part, index) in highlightFolderParts(folder, uploadFolders[target.key])" :key="`${folder}-${index}`">
+                          <mark v-if="part.match" class="search-highlight">{{ part.text }}</mark>
+                          <span v-else>{{ part.text }}</span>
+                        </template>
+                      </span>
+                    </button>
+                    <div v-if="!filteredUploadFolders(target.key).length" class="admin-data-folder-select__empty">
+                      {{ folderEmptyMessage(target.key) }}
+                    </div>
+                  </AdminDataSelect>
+                </div>
+              </div>
+            </div>
+
             <label v-if="isCreating" class="admin-data-field">
               <span>ID</span>
               <input v-model.trim="draft.id" class="admin-data-input" placeholder="new-post">
@@ -196,38 +239,30 @@
 
             <div v-if="isCreating" class="admin-data-field">
               <span>类型</span>
-              <div
-                  ref="typeSelectRef"
-                  class="admin-data-select user-select-none"
-                  :class="{ 'admin-data-select--open': isTypeSelectOpen }">
-                <div class="admin-data-select__inner">
+              <AdminDataSelect v-model:open="isTypeSelectOpen">
+                <template #control="{ toggle }">
                   <button
                       class="admin-data-select__button"
                       type="button"
                       :aria-expanded="isTypeSelectOpen"
-                      @click="toggleTypeSelect"
+                      @click="toggle"
                   >
                     <span>{{ adminRecordTypeLabels[draft.type] }}</span>
                     <ChevronDown class="admin-data-select__icon" :size="18" :stroke-width="2.4" aria-hidden="true"/>
                   </button>
-
-                  <div v-if="isTypeSelectOpen" class="admin-data-select__dropdown">
-                    <div class="admin-data-select__dropdown-container">
-                      <button
-                          v-for="type in creatableTypes"
-                          :key="type"
-                          class="admin-data-select__option"
-                          :class="{ 'admin-data-select__option--active': draft.type === type }"
-                          type="button"
-                          @click="selectDraftType(type)"
-                      >
-                        <span class="admin-data-select__option-title">{{ adminRecordTypeLabels[type] }}</span>
-                        <span class="admin-data-select__option-count">{{ countByType[type] || 0 }}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </template>
+                <button
+                    v-for="type in creatableTypes"
+                    :key="type"
+                    class="admin-data-select__option"
+                    :class="{ 'admin-data-select__option--active': draft.type === type }"
+                    type="button"
+                    @click="selectDraftType(type)"
+                >
+                  <span class="admin-data-select__option-title">{{ adminRecordTypeLabels[type] }}</span>
+                  <span class="admin-data-select__option-count">{{ countByType[type] || 0 }}</span>
+                </button>
+              </AdminDataSelect>
             </div>
 
             <label v-if="showTitleField" class="admin-data-field">
@@ -247,8 +282,11 @@
 
             <label v-if="showCoverField" class="admin-data-field admin-data-field--wide">
               <span>封面</span>
-              <input v-model="draft.cover" class="admin-data-input" placeholder="https://... 或 /images/cover.jpg">
-              <img v-if="draft.cover" class="admin-data-preview-image" :src="draft.cover" alt="封面预览">
+              <div class="admin-data-media-row">
+                <input v-model="draft.cover" class="admin-data-input" placeholder="选择图片后自动填入远程地址">
+                <AdminFilePicker label="选择图片" accept="image/*" @change="handleCoverImageSelected"/>
+              </div>
+              <img v-if="draft.cover" class="admin-data-preview-image" :src="previewAssetUrl(draft.cover)" alt="封面预览">
             </label>
 
             <label v-if="showUrlField" class="admin-data-field admin-data-field--wide">
@@ -258,15 +296,7 @@
                     v-model="draft.url"
                     class="admin-data-input"
                     :placeholder="draft.type === 'music' ? '/music/song.m4a 或 https://...' : 'https://...'">
-                <label v-if="draft.type === 'music'" class="admin-data-button">
-                  <Upload :size="17" aria-hidden="true"/>
-                  选择音乐
-                  <input
-                      class="admin-data-file"
-                      type="file"
-                      accept="audio/*"
-                      @change="handleMusicSelected">
-                </label>
+                <AdminFilePicker v-if="draft.type === 'music'" label="选择音乐" accept="audio/*" @change="handleMusicSelected"/>
               </div>
               <div v-if="musicFile" class="admin-data-file-pill">
                 <Music :size="16" aria-hidden="true"/>
@@ -274,7 +304,7 @@
                 <small v-if="musicFile.size">{{ formatBytes(musicFile.size) }}</small>
                 <button type="button" @click="clearMusicFile">移除</button>
               </div>
-              <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio" :src="draft.url" controls/>
+              <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio" :src="previewAssetUrl(draft.url)" controls/>
             </label>
 
             <label v-if="showTagsField" class="admin-data-field admin-data-field--wide">
@@ -294,9 +324,12 @@
               </label>
               <label v-if="showImagesField" class="admin-data-field admin-data-field--wide">
                 <span>图片</span>
-                <textarea v-model="imagesText" class="admin-data-textarea" placeholder="每行一个图片地址"/>
+                <div class="admin-data-media-row">
+                  <textarea v-model="imagesText" class="admin-data-textarea" placeholder="选择图片后自动追加远程地址"/>
+                  <AdminFilePicker label="选择图片" accept="image/*" multiple @change="handleMomentImagesSelected"/>
+                </div>
                 <div v-if="momentImages.length" class="admin-data-image-grid">
-                  <img v-for="image in momentImages" :key="image" :src="image" alt="动态图片">
+                  <img v-for="image in momentPreviewImages" :key="image" :src="image" alt="动态图片">
                 </div>
               </label>
             </template>
@@ -314,13 +347,16 @@
 
             <div v-if="showPhotosField" class="admin-data-field admin-data-field--wide">
               <span>相册图片</span>
-              <textarea v-model="albumPhotoUrlsText" class="admin-data-textarea" placeholder="每行一个图片地址"/>
+              <div class="admin-data-media-row">
+                <textarea v-model="albumPhotoUrlsText" class="admin-data-textarea" placeholder="选择图片后自动追加远程地址"/>
+                <AdminFilePicker label="选择图片" accept="image/*" multiple @change="handleAlbumImagesSelected"/>
+              </div>
               <div v-if="albumPhotoDrafts.length" class="admin-data-photo-rows">
                 <div
                     v-for="(photo, index) in albumPhotoDrafts"
                     :key="`${photo.url}-${index}`"
                     class="admin-data-photo-row">
-                  <img :src="photo.url" :alt="photo.caption || `相册图片 ${index + 1}`">
+                  <img :src="previewAssetUrl(photo.url)" :alt="photo.caption || `相册图片 ${index + 1}`">
                   <label>
                     <span>图片描述</span>
                     <input v-model="photo.caption" class="admin-data-input" placeholder="留空表示无描述">
@@ -344,20 +380,13 @@
 
             <label v-if="showLrcField" class="admin-data-field admin-data-field--wide">
               <span>LRC 歌词</span>
+              <input v-model="draft.lrcUrl" class="admin-data-input" placeholder="选择歌词后自动填入远程地址">
               <div class="admin-data-media-row">
                 <textarea
                     v-model="lrcText"
                     class="admin-data-textarea admin-data-textarea--code"
                     placeholder="[00:00.00]歌词"/>
-                <label class="admin-data-button">
-                  <Upload :size="17" aria-hidden="true"/>
-                  选择歌词
-                  <input
-                      class="admin-data-file"
-                      type="file"
-                      accept=".lrc,.txt"
-                      @change="handleLyricSelected">
-                </label>
+                <AdminFilePicker label="选择歌词" accept=".lrc,.txt" @change="handleLyricSelected"/>
               </div>
               <div v-if="parsedLyrics.length" class="admin-data-lyrics">
                 <div v-for="line in parsedLyrics" :key="`${line.time}-${line.text}`">
@@ -409,9 +438,9 @@ import {
   RotateCcw,
   Save,
   Trash2,
-  Undo2,
-  Upload
+  Undo2
 } from '@lucide/vue'
+import { highlightSearchParts } from '~/utils/searchHighlight'
 import {
   adminRecordHasField,
   adminRecordNeedsMarkdown,
@@ -454,6 +483,20 @@ type EditorDraftCache = {
     icon: string
   }
 }
+type AdminUploadedFilePayload = {
+  fileName: string
+  path: string
+  publicUrl: string
+  storage: 'data-capsule'
+  size?: number
+  mimeType?: string
+}
+type UploadFolderTarget = 'music' | 'lyric' | 'image'
+type UploadFolderConfig = {
+  key: UploadFolderTarget
+  label: string
+  placeholder: string
+}
 
 const adminSessionStorageKey = 'yisiblog-admin-session'
 const pendingChangesStorageKey = 'yisiblog-admin-pending-changes'
@@ -461,6 +504,16 @@ const editorDraftsStorageKey = 'yisiblog-admin-editor-drafts'
 const adminRecordsCacheStorageKey = 'yisiblog-admin-records-cache'
 const maxSyncPayloadBytes = 4 * 1024 * 1024
 const creatableTypes = adminRecordTypes.filter((type) => type !== 'about')
+const dataFolderByType: Record<AdminRecordType, string> = {
+  post: '博文',
+  chatter: '杂谈',
+  moment: '动态',
+  about: '关于',
+  music: '音乐',
+  friend: '友链',
+  album: '相册',
+  project: '项目'
+}
 
 const adminToken = ref('')
 const adminSession = ref<AdminSession | null>(null)
@@ -473,6 +526,8 @@ const selectedType = ref<AdminRecordType>('post')
 const selectedRecordKey = ref('')
 const editorDraftKey = ref('')
 const searchQuery = ref('')
+const dataCapsuleFolders = ref<string[]>([])
+const activeFolderTarget = ref<UploadFolderTarget | ''>('')
 const isVerifying = ref(false)
 const isLoading = ref(false)
 const isSyncing = ref(false)
@@ -489,7 +544,6 @@ const imagesText = ref('')
 const albumPhotoUrlsText = ref('')
 const albumPhotoDrafts = ref<AdminPhoto[]>([])
 const musicFile = ref<AdminMusicFilePayload | undefined>()
-const typeSelectRef = ref<HTMLElement | null>(null)
 const adminDataActionsRef = ref<HTMLElement | null>(null)
 const taskOverlay = reactive({
   active: false,
@@ -503,6 +557,19 @@ const typeFields = reactive({
   error: '',
   icon: ''
 })
+const uploadFolders = reactive({
+  music: '',
+  lyric: '',
+  image: ''
+})
+const uploadFolderConfigs: UploadFolderConfig[] = [
+  { key: 'music', label: '音乐', placeholder: '音乐文件夹' },
+  { key: 'lyric', label: '歌词', placeholder: '音乐歌词文件夹' },
+  { key: 'image', label: '图片', placeholder: '图片文件夹' }
+]
+let hasTriedLoadingFolders = false
+const isLoadingFolders = ref(false)
+const folderLoadError = ref('')
 
 const isBusy = computed(() => isVerifying.value || isLoading.value || isSyncing.value)
 const isAuthenticated = computed(() => Boolean(adminSession.value && adminSession.value.expiresAt > Date.now()))
@@ -512,7 +579,7 @@ const needsMarkdown = computed(() => adminRecordNeedsMarkdown(draft.type))
 const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type))
 const canDeleteDraft = computed(() => !isCreating.value && draft.type !== 'about')
 const canCreateSelectedType = computed(() => selectedType.value !== 'about')
-const canSyncGithub = computed(() => !isBusy.value && Boolean(pendingChanges.value.length || canSave.value))
+const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length || canSave.value))
 const statusClass = computed(() => `admin-data-status--${statusType.value}`)
 const showTitleField = computed(() => hasDraftField('title'))
 const showDateField = computed(() => hasDraftField('date'))
@@ -528,7 +595,13 @@ const showErrorField = computed(() => hasDraftField('error'))
 const showPhotosField = computed(() => hasDraftField('photos'))
 const showIconField = computed(() => hasDraftField('icon'))
 const showLrcField = computed(() => draft.type === 'music')
+const visibleUploadTargets = computed(() => uploadFolderConfigs.filter((target) => {
+  if (target.key === 'music' || target.key === 'lyric') return draft.type === 'music'
+  return showCoverField.value || showImagesField.value || showPhotosField.value
+}))
+const defaultUploadFolder = computed(() => recordUploadFolder())
 const momentImages = computed(() => splitLines(imagesText.value))
+const momentPreviewImages = computed(() => momentImages.value.map((image) => previewAssetUrl(image)))
 const parsedLyrics = computed(() => parseLrc(lrcText.value))
 const pendingChangeByKey = computed(() => Object.fromEntries(pendingChanges.value.map((change) => [change.key, change])))
 const activePendingChangeKey = computed(() => hasEditorDraft.value ? editorDraftKey.value || selectedRecordKey.value : '')
@@ -582,13 +655,11 @@ onMounted(() => {
   restoreSession()
   restorePendingChanges()
   restoreEditorDrafts()
-  document.addEventListener('mousedown', handleTypeSelectClickOutside)
   if (isAuthenticated.value) void loadRecords()
 })
 
 onBeforeUnmount(() => {
   stashOpenDraft()
-  document.removeEventListener('mousedown', handleTypeSelectClickOutside)
 })
 
 function createEmptyRecord(type: AdminRecordType): AdminDataRecord {
@@ -600,6 +671,7 @@ function createEmptyRecord(type: AdminRecordType): AdminDataRecord {
     date: '',
     cover: '',
     url: '',
+    lrcUrl: '',
     tags: []
   }
 }
@@ -631,6 +703,91 @@ function hideTask() {
 
 function hasDraftField(field: Parameters<typeof adminRecordHasField>[1]) {
   return adminRecordHasField(draft.type, field)
+}
+
+function normalizeFolderInput(value: string) {
+  return value.trim().replace(/^\/+|\/+$/g, '')
+}
+
+function safePathPart(value: string | undefined, fallback: string) {
+  const clean = Array.from(String(value || ''))
+      .filter((char) => {
+        const code = char.charCodeAt(0)
+        return code > 31 && code !== 127
+      })
+      .join('')
+      .replace(/[\\/]/g, '-')
+      .trim()
+
+  return clean || fallback
+}
+
+function recordUploadFolder() {
+  return `${dataFolderByType[draft.type]}/${safePathPart(draft.id.trim() || draft.title?.trim(), '未命名')}`
+}
+
+function uploadFolder(target: UploadFolderTarget) {
+  return normalizeFolderInput(uploadFolders[target]) || defaultUploadFolder.value
+}
+
+function filteredUploadFolders(target: UploadFolderTarget) {
+  const query = normalizeFolderInput(uploadFolders[target]).toLowerCase()
+  if (!query) return dataCapsuleFolders.value
+
+  return dataCapsuleFolders.value
+      .filter((folder) => folder.toLowerCase().includes(query))
+      .slice(0, 12)
+}
+
+function highlightFolderParts(folder: string, query: string) {
+  return highlightSearchParts(folder, query)
+}
+
+function folderEmptyMessage(target: UploadFolderTarget) {
+  const query = normalizeFolderInput(uploadFolders[target])
+  if (isLoadingFolders.value) return '正在加载目录...'
+  if (folderLoadError.value) return `目录加载失败：${folderLoadError.value}`
+  if (!dataCapsuleFolders.value.length) return '无已存在目录，可输入新建'
+  if (!query) return '无已存在目录，可输入新建'
+  return `将新建文件夹：${query}`
+}
+
+function openFolderDropdown(target: UploadFolderTarget) {
+  activeFolderTarget.value = target
+  if (!hasTriedLoadingFolders && !isLoadingFolders.value && isAuthenticated.value) void loadDataCapsuleFolders()
+}
+
+function closeFolderDropdown() {
+  activeFolderTarget.value = ''
+}
+
+function setFolderDropdownOpen(target: UploadFolderTarget, isOpen: boolean) {
+  activeFolderTarget.value = isOpen ? target : ''
+  if (isOpen && !hasTriedLoadingFolders && !isLoadingFolders.value && isAuthenticated.value) void loadDataCapsuleFolders()
+}
+
+function selectUploadFolder(target: UploadFolderTarget, folder: string) {
+  uploadFolders[target] = folder
+  closeFolderDropdown()
+}
+
+async function loadDataCapsuleFolders() {
+  if (!isAuthenticated.value || isLoadingFolders.value) return
+  hasTriedLoadingFolders = true
+  folderLoadError.value = ''
+  isLoadingFolders.value = true
+  try {
+    const response = await $fetch<{ folders: string[], error?: string }>('/api/admin/folders', {
+      headers: requestHeaders()
+    })
+    dataCapsuleFolders.value = Array.isArray(response.folders) ? response.folders : []
+    folderLoadError.value = response.error || ''
+  } catch (error) {
+    console.warn('[admin-data:load-folders]', error)
+    folderLoadError.value = error instanceof Error ? error.message : '目录加载失败'
+  } finally {
+    isLoadingFolders.value = false
+  }
 }
 
 function restoreSession() {
@@ -667,6 +824,11 @@ function requestHeaders() {
   return {
     'x-admin-session': adminSession.value?.session || ''
   }
+}
+
+function previewAssetUrl(value?: string) {
+  if (!value || !value.includes('s3.cstcloud.cn')) return value || ''
+  return `/api/assets/remote?url=${encodeURIComponent(value)}`
 }
 
 function restorePendingChanges() {
@@ -784,6 +946,8 @@ function syncDraftFromRecord(record: AdminManagedRecord) {
     date: record.date || '',
     cover: record.cover || '',
     url: record.url || '',
+    lrcUrl: record.lrcUrl || '',
+    contentUrl: record.contentUrl || '',
     path: record.path || '',
     tags: [...(record.tags || [])]
   })
@@ -889,6 +1053,8 @@ function buildRecordPayload() {
     date: hasDraftField('date') ? draft.date?.trim() : undefined,
     cover: hasDraftField('cover') ? draft.cover?.trim() : undefined,
     url: hasDraftField('url') ? draft.url?.trim() : undefined,
+    lrcUrl: draft.type === 'music' ? draft.lrcUrl?.trim() : undefined,
+    contentUrl: adminRecordNeedsMarkdown(draft.type) ? draft.contentUrl?.trim() : undefined,
     tags: hasDraftField('tags') ? tagsText.value.split(',').map((tag) => tag.trim()).filter(Boolean) : [],
     mood: hasDraftField('mood') ? typeFields.mood.trim() || undefined : undefined,
     location: hasDraftField('location') ? typeFields.location.trim() || undefined : undefined,
@@ -910,6 +1076,7 @@ function normalizedRecordValue(record?: AdminDataRecord) {
     date: record.date || '',
     cover: record.cover || '',
     url: record.url || '',
+    lrcUrl: record.lrcUrl || '',
     tags: record.tags || [],
     mood: record.mood || '',
     location: record.location || '',
@@ -962,6 +1129,7 @@ function hasDraftChanged(params: {
 
 function selectType(type: AdminRecordType) {
   stashOpenDraft()
+  closeFolderDropdown()
   selectedType.value = type
   clearEditorDraft(type)
 }
@@ -970,19 +1138,10 @@ function selectSidebarView(view: 'records' | 'sync') {
   sidebarView.value = view
 }
 
-function toggleTypeSelect() {
-  isTypeSelectOpen.value = !isTypeSelectOpen.value
-}
-
 function selectDraftType(type: AdminRecordType) {
   draft.type = type
+  closeFolderDropdown()
   isTypeSelectOpen.value = false
-}
-
-function handleTypeSelectClickOutside(event: MouseEvent) {
-  if (typeSelectRef.value && !typeSelectRef.value.contains(event.target as Node)) {
-    isTypeSelectOpen.value = false
-  }
 }
 
 function createRecord() {
@@ -1025,6 +1184,17 @@ function editRecord(record: AdminManagedRecord) {
   editorDraftKey.value = recordKey(record)
   editorMode.value = 'edit'
   syncDraftFromRecord(record)
+  void loadRemoteLyricPreview(record)
+}
+
+async function loadRemoteLyricPreview(record: AdminManagedRecord) {
+  if (record.type !== 'music' || record.lrc || !record.lrcUrl) return
+
+  try {
+    lrcText.value = await $fetch<string>(previewAssetUrl(record.lrcUrl), { responseType: 'text' })
+  } catch {
+    lrcText.value = ''
+  }
 }
 
 function resetDraft() {
@@ -1190,7 +1360,7 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
     editorMode.value = 'edit'
     editorDrafts.value[key] = currentEditorCache()
     applyPendingChanges(sourceRecords.value)
-    if (mode === 'manual') setStatus('已保存到待同步区，尚未同步 GitHub', 'success')
+    if (mode === 'manual') setStatus('已保存到待同步区，尚未同步数据胶囊', 'success')
     else if (mode === 'sync') setStatus('已将当前编辑加入本次同步', 'success')
     else setStatus('已自动保存草稿并加入待同步区', 'success')
     return 'saved'
@@ -1319,11 +1489,12 @@ async function loadRecords() {
 
   const hasCachedRecords = restoreRecordsCache()
   isLoading.value = true
-  if (!hasCachedRecords) showTask('正在加载数据', '正在读取 GitHub 或本地内容源。')
+  if (!hasCachedRecords) showTask('正在加载数据', '正在读取数据胶囊内容源。')
   try {
     const response = await $fetch<AdminRecordsResponse>('/api/admin/records', {
       headers: requestHeaders()
     })
+    void loadDataCapsuleFolders()
     sourceRecords.value = response.records
     persistRecordsCache(response.records)
     applyPendingChanges(response.records)
@@ -1340,7 +1511,7 @@ async function loadRecords() {
   }
 }
 
-async function syncGithub() {
+async function syncDataCapsule() {
   if (hasEditorDraft.value) saveDraftChange('sync')
   if (!pendingChanges.value.length) {
     setStatus('暂无需要同步的变更', 'info')
@@ -1355,7 +1526,7 @@ async function syncGithub() {
   }
 
   isSyncing.value = true
-  showTask('正在同步 GitHub', `正在提交 ${pendingChanges.value.length} 项变更，请不要关闭页面。`)
+  showTask('正在同步数据胶囊', `正在提交 ${pendingChanges.value.length} 项变更，请不要关闭页面。`)
   try {
     const response = await $fetch<AdminSyncRecordsResponse>('/api/admin/records/sync', {
       method: 'POST',
@@ -1370,52 +1541,127 @@ async function syncGithub() {
     const currentRecord = records.value.find((record) => recordKey(record) === selectedRecordKey.value)
     if (currentRecord) editRecord(currentRecord)
     else clearEditorDraft(selectedType.value)
-    setStatus(`已同步 ${response.syncedCount} 项变更到 GitHub`, 'success')
+    setStatus(`已同步 ${response.syncedCount} 项变更到数据胶囊`, 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '同步 GitHub 失败', 'error')
+    setStatus(error instanceof Error ? error.message : '同步数据胶囊失败', 'error')
   } finally {
     isSyncing.value = false
     hideTask()
   }
 }
 
-async function handleMusicSelected(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+async function handleMusicSelected(files: File[]) {
+  const file = files[0]
   if (!file) return
 
-  showTask('正在暂存音乐文件', '音乐文件可来自电脑任意位置，暂存后草稿只记录站内路径。')
+  showTask('正在上传音乐文件', `音乐文件会上传到 ${uploadFolder('music')} 目录，记录中只保存远程地址。`)
   try {
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('folder', uploadFolder('music'))
+    formData.append('fileName', draft.id.trim() || draft.title?.trim() || '音乐')
     const uploaded = await $fetch<AdminMusicFilePayload>('/api/admin/music', {
       method: 'POST',
       headers: requestHeaders(),
       body: formData
     })
     musicFile.value = uploaded
-    draft.url = uploaded.path
-    setStatus('音乐文件已暂存，保存草稿后进入待同步区', 'success')
+    draft.url = uploaded.publicUrl
+    setStatus('音乐文件已上传，保存草稿后进入待同步区', 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '暂存音乐文件失败', 'error')
+    setStatus(error instanceof Error ? error.message : '上传音乐文件失败', 'error')
   } finally {
     hideTask()
-    input.value = ''
   }
 }
 
-async function handleLyricSelected(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+async function handleLyricSelected(files: File[]) {
+  const file = files[0]
   if (!file) return
 
+  showTask('正在上传歌词文件', `歌词文件会上传到 ${uploadFolder('lyric')} 目录，记录中只保存远程地址。`)
   try {
     lrcText.value = await file.text()
-    setStatus('歌词已读取到草稿，保存草稿后进入待同步区', 'success')
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', uploadFolder('lyric'))
+    formData.append('fileName', draft.id.trim() || draft.title?.trim() || 'lyric')
+    const uploaded = await $fetch<AdminUploadedFilePayload>('/api/admin/lyric', {
+      method: 'POST',
+      headers: requestHeaders(),
+      body: formData
+    })
+    draft.lrcUrl = uploaded.publicUrl
+    setStatus('歌词已上传，保存草稿后进入待同步区', 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '读取歌词失败', 'error')
+    setStatus(error instanceof Error ? error.message : '上传歌词失败', 'error')
   } finally {
-    input.value = ''
+    hideTask()
+  }
+}
+
+function uploadBaseName(suffix?: string | number) {
+  const baseName = draft.id.trim() || draft.title?.trim() || 'image'
+  if (!suffix) return baseName
+  return `${baseName}-${suffix}`
+}
+
+async function uploadImageFile(file: File, fileName: string) {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('folder', uploadFolder('image'))
+  formData.append('fileName', fileName)
+
+  return await $fetch<AdminUploadedFilePayload>('/api/admin/image', {
+    method: 'POST',
+    headers: requestHeaders(),
+    body: formData
+  })
+}
+
+async function uploadSelectedImages(files: File[], fileNameForIndex: (index: number) => string) {
+  const selectedFiles = files
+  if (!selectedFiles.length) return []
+
+  showTask('正在上传图片', `正在上传 ${selectedFiles.length} 张图片到 ${uploadFolder('image')} 目录。`)
+  try {
+    return await Promise.all(selectedFiles.map((file, index) => uploadImageFile(file, fileNameForIndex(index))))
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : '上传图片失败', 'error')
+    return []
+  } finally {
+    hideTask()
+  }
+}
+
+async function handleCoverImageSelected(files: File[]) {
+  const uploaded = await uploadSelectedImages(files, () => uploadBaseName())
+  if (uploaded[0]?.publicUrl) {
+    draft.cover = uploaded[0].publicUrl
+    setStatus('封面已上传，保存草稿后进入待同步区', 'success')
+  }
+}
+
+async function handleMomentImagesSelected(files: File[]) {
+  const startIndex = splitLines(imagesText.value).length
+  const uploaded = await uploadSelectedImages(files, (index) => uploadBaseName(startIndex + index + 1))
+  const urls = uploaded.map((file) => file.publicUrl).filter(Boolean)
+  if (urls.length) {
+    imagesText.value = [...splitLines(imagesText.value), ...urls].join('\n')
+    setStatus(`已上传 ${urls.length} 张动态图片，保存草稿后进入待同步区`, 'success')
+  }
+}
+
+async function handleAlbumImagesSelected(files: File[]) {
+  const startIndex = albumPhotoDrafts.value.length
+  const uploaded = await uploadSelectedImages(files, (index) => {
+    const caption = albumPhotoDrafts.value[startIndex + index]?.caption?.trim()
+    return uploadBaseName(caption || startIndex + index + 1)
+  })
+  const urls = uploaded.map((file) => file.publicUrl).filter(Boolean)
+  if (urls.length) {
+    albumPhotoUrlsText.value = [...splitLines(albumPhotoUrlsText.value), ...urls].join('\n')
+    setStatus(`已上传 ${urls.length} 张相册图片，保存草稿后进入待同步区`, 'success')
   }
 }
 

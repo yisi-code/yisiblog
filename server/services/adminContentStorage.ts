@@ -1,8 +1,5 @@
-import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
 import {
   adminContentFile,
-  adminLyricFileName,
   adminRecordNeedsMarkdown,
   type AdminDataRecord,
   type AdminManagedRecord,
@@ -10,46 +7,116 @@ import {
   type AdminRecordType
 } from '~~/shared/adminData'
 import {
+  dataCapsuleCoverBaseName,
+  dataCapsuleImageBaseName,
+  dataCapsuleLyricBaseName,
+  dataCapsuleMarkdownBaseName,
+  dataCapsuleMusicBaseName,
+  dataCapsulePhotoBaseName,
+  dataCapsuleRecordFolder,
+  safeDataCapsulePathPart
+} from './adminDataAssetPaths'
+import {
   assertAdminId,
-  assertInside,
-  compactRecord,
-  contentRootPath,
-  exists,
-  lyricsRootPath,
   normalizeRecordForRead,
-  normalizeRecordForWrite,
-  recordsFilePath
+  normalizeRecordForWrite
 } from './adminContentCore'
+import {
+  deleteDataCapsuleObject,
+  readDataCapsuleObject,
+  renameDataCapsuleObject,
+  uploadDataCapsuleObject
+} from './dataCapsuleStorage'
+import {
+  readDataCapsuleRecords,
+  writeDataCapsuleRecords
+} from './adminRecordsDataCapsule'
 
-async function readOptionalText(filePath: string) {
-  if (!await exists(filePath)) return ''
-  return readFile(filePath, 'utf8')
+function extensionFromUrl(value?: string) {
+  if (!value) return ''
+  try {
+    const pathname = decodeURIComponent(new URL(value).pathname)
+    const fileName = pathname.split('/').pop() || ''
+    return fileName.match(/\.[^.]+$/)?.[0] || ''
+  } catch {
+    return ''
+  }
 }
 
-function markdownPath(type: AdminRecordType, id: string) {
-  const contentFile = adminContentFile(type, id)
-  if (!contentFile) return ''
-  const filePath = resolve(contentRootPath, contentFile)
-  assertInside(contentRootPath, filePath)
-  return filePath
+function keyInFolder(folder: string, fileBaseName: string, sourceUrl?: string) {
+  const extension = extensionFromUrl(sourceUrl)
+  return `${folder.replace(/^\/+|\/+$/g, '')}/${safeDataCapsulePathPart(fileBaseName, 'file')}${extension}`
 }
 
-function lyricPath(fileName: string) {
-  const filePath = resolve(lyricsRootPath, fileName)
-  assertInside(lyricsRootPath, filePath)
-  return filePath
+function recordAssetUrls(record?: AdminDataRecord) {
+  return [
+    record?.contentUrl,
+    record?.cover,
+    record?.url,
+    record?.lrcUrl,
+    ...(record?.images || []),
+    ...(record?.photos || []).map((photo) => photo.url)
+  ].filter(Boolean) as string[]
+}
+
+async function uploadMarkdownContent(record: AdminDataRecord, content: string) {
+  const uploaded = await uploadDataCapsuleObject({
+    key: `${dataCapsuleRecordFolder(record)}/${dataCapsuleMarkdownBaseName(record)}.md`,
+    body: Buffer.from(content || '', 'utf8'),
+    contentType: 'text/markdown; charset=utf-8'
+  })
+  return uploaded.url
+}
+
+async function reconcileDataCapsuleAssets(nextRecord: AdminDataRecord, previousRecord?: AdminDataRecord) {
+  const recordFolder = dataCapsuleRecordFolder(nextRecord)
+
+  if (adminRecordNeedsMarkdown(nextRecord.type)) {
+    nextRecord.contentUrl = await renameDataCapsuleObject(
+      nextRecord.contentUrl,
+      `${recordFolder}/${dataCapsuleMarkdownBaseName(nextRecord)}.md`
+    )
+  }
+
+  if (nextRecord.type === 'music') {
+    nextRecord.url = await renameDataCapsuleObject(nextRecord.url, keyInFolder(recordFolder, dataCapsuleMusicBaseName(nextRecord), nextRecord.url))
+    nextRecord.lrcUrl = await renameDataCapsuleObject(nextRecord.lrcUrl, keyInFolder(recordFolder, dataCapsuleLyricBaseName(nextRecord), nextRecord.lrcUrl))
+  }
+
+  if (nextRecord.cover) {
+    nextRecord.cover = await renameDataCapsuleObject(nextRecord.cover, keyInFolder(recordFolder, dataCapsuleCoverBaseName(nextRecord), nextRecord.cover))
+  }
+
+  if (Array.isArray(nextRecord.images)) {
+    nextRecord.images = await Promise.all(nextRecord.images.map((url, index) => {
+      return renameDataCapsuleObject(url, keyInFolder(recordFolder, dataCapsuleImageBaseName(nextRecord, index), url))
+    }))
+  }
+
+  if (Array.isArray(nextRecord.photos)) {
+    nextRecord.photos = await Promise.all(nextRecord.photos.map(async (photo, index) => {
+      return {
+        ...photo,
+        url: await renameDataCapsuleObject(photo.url, keyInFolder(recordFolder, dataCapsulePhotoBaseName(nextRecord, photo, index), photo.url))
+      }
+    }))
+  }
+
+  const nextUrls = new Set(recordAssetUrls(nextRecord))
+  for (const url of recordAssetUrls(previousRecord)) {
+    if (!nextUrls.has(url)) await deleteDataCapsuleObject(url)
+  }
 }
 
 export async function readAdminRecords() {
-  const source = await readFile(recordsFilePath, 'utf8')
-  return JSON.parse(source) as AdminDataRecord[]
+  return readDataCapsuleRecords()
 }
 
 export async function writeAdminRecords(records: AdminDataRecord[]) {
-  await writeFile(recordsFilePath, `${JSON.stringify(records.map(compactRecord), null, 2)}\n`, 'utf8')
+  await writeDataCapsuleRecords(records)
 }
 
-export async function readAdminManagedRecordsFromLocal(): Promise<AdminManagedRecord[]> {
+export async function readAdminManagedRecordsFromDataCapsule(): Promise<AdminManagedRecord[]> {
   const records = await readAdminRecords()
 
   return Promise.all(records.map(async (sourceRecord) => {
@@ -59,20 +126,22 @@ export async function readAdminManagedRecordsFromLocal(): Promise<AdminManagedRe
     if (adminRecordNeedsMarkdown(record.type)) {
       const contentFile = adminContentFile(record.type, record.id)
       managedRecord.contentFile = contentFile
-      managedRecord.content = await readOptionalText(markdownPath(record.type, record.id))
-    }
-
-    if (record.type === 'music') {
-      const lrcFile = adminLyricFileName(record.url, record.title, record.id)
-      managedRecord.lrcFile = lrcFile
-      managedRecord.lrc = await readOptionalText(lyricPath(lrcFile))
+      if (record.contentUrl) {
+        try {
+          managedRecord.content = (await readDataCapsuleObject(record.contentUrl)).toString('utf8')
+        } catch {
+          managedRecord.content = ''
+        }
+      } else {
+        managedRecord.content = ''
+      }
     }
 
     return managedRecord
   }))
 }
 
-export async function saveAdminRecordToLocal(params: {
+export async function saveAdminRecordToDataCapsule(params: {
   originalId?: string
   record: AdminDataRecord
   content?: string
@@ -88,6 +157,14 @@ export async function saveAdminRecordToLocal(params: {
     throw createError({ statusCode: 409, statusMessage: '同类型下已存在相同 ID 的记录' })
   }
 
+  const previousRecord = currentIndex >= 0 ? records[currentIndex] : undefined
+
+  if (adminRecordNeedsMarkdown(nextRecord.type)) {
+    nextRecord.contentUrl = await uploadMarkdownContent(nextRecord, params.content || '')
+  }
+
+  await reconcileDataCapsuleAssets(nextRecord, previousRecord)
+
   if (currentIndex >= 0) {
     records[currentIndex] = nextRecord
   } else {
@@ -96,30 +173,10 @@ export async function saveAdminRecordToLocal(params: {
 
   await writeAdminRecords(records)
 
-  if (adminRecordNeedsMarkdown(nextRecord.type)) {
-    const nextPath = markdownPath(nextRecord.type, nextRecord.id)
-    await mkdir(dirname(nextPath), { recursive: true })
-
-    if (originalId && originalId !== nextRecord.id) {
-      const previousPath = markdownPath(nextRecord.type, originalId)
-      if (await exists(previousPath) && !await exists(nextPath)) {
-        await rename(previousPath, nextPath)
-      }
-    }
-
-    await writeFile(nextPath, params.content || '', 'utf8')
-  }
-
-  if (nextRecord.type === 'music' && typeof params.lrc === 'string') {
-    const nextPath = lyricPath(adminLyricFileName(nextRecord.url, nextRecord.title, nextRecord.id))
-    await mkdir(dirname(nextPath), { recursive: true })
-    await writeFile(nextPath, params.lrc, 'utf8')
-  }
-
-  return (await readAdminManagedRecordsFromLocal()).find((record) => record.type === nextRecord.type && record.id === nextRecord.id)
+  return (await readAdminManagedRecordsFromDataCapsule()).find((record) => record.type === nextRecord.type && record.id === nextRecord.id)
 }
 
-export async function deleteAdminRecordFromLocal(params: {
+export async function deleteAdminRecordFromDataCapsule(params: {
   id: string
   type: AdminRecordType
   deleteAssociatedFiles?: boolean
@@ -134,23 +191,20 @@ export async function deleteAdminRecordFromLocal(params: {
     throw createError({ statusCode: 404, statusMessage: '记录不存在' })
   }
 
-  await writeAdminRecords(nextRecords)
-
   if (params.deleteAssociatedFiles && target) {
-    if (adminRecordNeedsMarkdown(params.type)) {
-      await rm(markdownPath(params.type, params.id), { force: true })
-    }
-    if (params.type === 'music') {
-      await rm(lyricPath(adminLyricFileName(target.url, target.title, target.id)), { force: true })
+    for (const url of recordAssetUrls(target)) {
+      await deleteDataCapsuleObject(url)
     }
   }
+
+  await writeAdminRecords(nextRecords)
 }
 
-export async function applyAdminChangesToLocal(changes: AdminPendingChange[]) {
+export async function applyAdminChangesToDataCapsule(changes: AdminPendingChange[]) {
   for (const change of changes) {
     if (change.action === 'save') {
       if (!change.record) continue
-      await saveAdminRecordToLocal({
+      await saveAdminRecordToDataCapsule({
         originalId: change.originalId,
         record: change.record,
         content: change.content,
@@ -162,7 +216,7 @@ export async function applyAdminChangesToLocal(changes: AdminPendingChange[]) {
 
     if (change.id && change.type) {
       try {
-        await deleteAdminRecordFromLocal({
+        await deleteAdminRecordFromDataCapsule({
           id: change.id,
           type: change.type,
           deleteAssociatedFiles: change.deleteAssociatedFiles

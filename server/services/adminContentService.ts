@@ -4,21 +4,9 @@ import type {
   AdminSyncRecordsResponse
 } from '~~/shared/adminData'
 import {
-  applyAdminChangesToLocal,
-  readAdminManagedRecordsFromLocal
+  applyAdminChangesToDataCapsule,
+  readAdminManagedRecordsFromDataCapsule
 } from './adminContentStorage'
-import {
-  readAdminManagedRecordsFromGithub,
-  syncAdminChangesToGithub
-} from './adminGithubSync'
-
-function logMirrorError(target: string, error: unknown) {
-  console.warn(`[admin-content:${target}]`, error instanceof Error ? error.message : error)
-}
-
-function runDetached(task: () => Promise<unknown>, target: string) {
-  task().catch((error) => logMirrorError(target, error))
-}
 
 const adminRecordsCacheTtlMs = 60 * 1000
 let adminRecordsCache: {
@@ -49,35 +37,23 @@ export async function readAdminManagedRecords() {
   }
 
   adminRecordsReadPromise ||= (async () => {
-    try {
-      const records = await readAdminManagedRecordsFromGithub()
-      setAdminRecordsCache(records)
-      return records
-    } catch (error) {
-      logMirrorError('github-read-fallback', error)
-      const records = await readAdminManagedRecordsFromLocal()
-      setAdminRecordsCache(records)
-      return records
-    } finally {
-      adminRecordsReadPromise = null
-    }
+    const records = await readAdminManagedRecordsFromDataCapsule()
+    setAdminRecordsCache(records)
+    adminRecordsReadPromise = null
+    return records
   })()
 
   return cloneAdminRecords(await adminRecordsReadPromise)
 }
 
 export async function syncAdminRecords(changes: AdminPendingChange[]): Promise<AdminSyncRecordsResponse> {
-  const githubResult = await syncAdminChangesToGithub(changes)
-  setAdminRecordsCache(githubResult.records)
-
-  runDetached(async () => {
-    await applyAdminChangesToLocal(changes)
-  }, 'local-bulk-sync')
+  await applyAdminChangesToDataCapsule(changes)
+  const records = await readAdminManagedRecordsFromDataCapsule()
+  setAdminRecordsCache(records)
 
   return {
     ok: true,
-    records: githubResult.records,
-    syncedCount: githubResult.syncedCount,
-    commit: githubResult.commit
+    records,
+    syncedCount: changes.length
   }
 }

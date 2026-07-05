@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { lyricFileNameFromSongUrl, type Song, useLyricsData, useSongsData } from '~/data'
+import { type Song, useSongsData } from '~/data'
 
 export type LyricLine = {
   time: number
@@ -63,10 +63,6 @@ function parseLrc(lrcText?: string | LyricLine[]) {
   }
 
   return result.sort((a, b) => a.time - b.time)
-}
-
-function lyricFileName(song: PlayerSong) {
-  return lyricFileNameFromSongUrl(song.url, song.title)
 }
 
 function songPlaybackKey(song: PlayerSong | null) {
@@ -197,17 +193,15 @@ export const useMusicStore = defineStore('music', () => {
   }
 
   async function loadSongLyrics(song: PlayerSong | null) {
-    if (!song?.title) return []
-    const fileName = lyricFileName(song)
-    const cachedLyrics = lyricCache.value[fileName]
+    if (!song?.lrcUrl) return []
+    const cachedLyrics = lyricCache.value[song.lrcUrl]
     if (cachedLyrics) return cachedLyrics
 
-    const lyricItems = useLyricsData()
-    const lrcText = lyricItems.value[fileName]
+    const lrcText = await $fetch<string>(song.lrcUrl, { responseType: 'text' }).catch(() => '')
     const parsedLyrics = parseLrc(lrcText)
     lyricCache.value = {
       ...lyricCache.value,
-      [fileName]: parsedLyrics
+      [song.lrcUrl]: parsedLyrics
     }
     return parsedLyrics
   }
@@ -234,7 +228,7 @@ export const useMusicStore = defineStore('music', () => {
       await syncLyrics()
       return
     }
-    const songItems = useSongsData()
+    const songItems = await useSongsData()
     songsList.value = songItems.value
         .filter((song) => !song.error && song.url)
         .map((song, index) => ({

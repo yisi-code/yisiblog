@@ -2,7 +2,7 @@ import { assertAdminSession } from '#server/services/adminAuth'
 import { assertAllowedExtension, safeUploadBaseName, safeUploadFileName, safeUploadFolder } from '#server/services/adminUploadUtils'
 import { uploadDataCapsuleObject } from '#server/services/dataCapsuleStorage'
 
-const allowedExtensions = ['.mp3', '.m4a', '.ogg', '.wav', '.flac']
+const allowedExtensions = ['.lrc', '.txt']
 
 export default defineEventHandler(async (event) => {
   assertAdminSession(event)
@@ -13,18 +13,17 @@ export default defineEventHandler(async (event) => {
   const targetName = form?.find((item) => item.name === 'fileName')?.data?.toString('utf8')
 
   if (!file?.data?.length) {
-    throw createError({ statusCode: 400, statusMessage: '请选择要上传的音乐文件' })
+    throw createError({ statusCode: 400, statusMessage: '请选择要上传的歌词文件' })
   }
 
-  const sourceName = safeUploadFileName(file.filename || '', `music-${Date.now()}`)
-  const extension = assertAllowedExtension(sourceName, allowedExtensions, '音乐文件格式不支持')
-
+  const sourceName = safeUploadFileName(file.filename || '', `lyric-${Date.now()}`)
+  const extension = assertAllowedExtension(sourceName, allowedExtensions, '歌词文件格式不支持')
   const fileName = `${safeUploadBaseName(targetName, sourceName.replace(/\.[^.]+$/, ''))}${extension}`
   const targetFolder = safeUploadFolder(folder, '音乐')
   const uploaded = await uploadDataCapsuleObject({
     key: `${targetFolder}/${fileName}`,
     body: file.data,
-    contentType: file.type
+    contentType: file.type || 'text/plain; charset=utf-8'
   })
 
   return {

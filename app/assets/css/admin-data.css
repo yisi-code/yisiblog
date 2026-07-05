@@ -269,6 +269,11 @@
   line-height: 1.6;
 }
 
+.admin-data-input::placeholder,
+.admin-data-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-text-second) 68%, transparent);
+}
+
 .admin-data-textarea--code {
   font-size: var(--font-size-normal);
   font-weight: 650;
@@ -520,6 +525,57 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.6rem;
   align-items: start;
+}
+
+.admin-data-upload-folders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.admin-data-folder-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-data-folder-field__label {
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal-75);
+  font-weight: 850;
+}
+
+.admin-data-folder-select {
+  min-width: 0;
+}
+
+.admin-data-folder-select__input {
+  border: 0;
+  cursor: text;
+  outline: none;
+  text-align: left;
+}
+
+.admin-data-folder-select__input::placeholder {
+  color: color-mix(in srgb, var(--color-text-second) 68%, transparent);
+}
+
+.admin-data-folder-select__input:focus {
+  box-shadow: none;
+}
+
+.admin-data-folder-select__dropdown {
+  max-height: 16rem;
+}
+
+.admin-data-folder-select__empty {
+  width: 100%;
+  padding: var(--pm-size-normal-75) var(--pm-size-normal);
+  color: var(--color-text-second);
+  font-size: var(--font-size-normal-75);
+  font-weight: 850;
+  line-height: 1.5;
 }
 
 .admin-data-file {
@@ -930,6 +986,10 @@
   }
 
   .admin-data-media-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-data-upload-folders {
     grid-template-columns: 1fr;
   }
 
