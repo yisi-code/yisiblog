@@ -113,7 +113,7 @@
               :aria-label="music.isPlaying ? '暂停' : '播放'"
               variant="primary"
               size="lg"
-              @click.stop="music.toggle"
+              @click.stop="togglePlayback"
           >
             <template #icon>
               <svg v-if="music.isPlaying" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -159,6 +159,10 @@ const cover = computed(() => currentSong.value?.cover || '')
 const displayedLyric = ref('')
 const localProgress = ref(0)
 
+onMounted(() => {
+  void music.load()
+})
+
 watch(() => music.currentLyric, (targetText, _oldValue, onCleanup) => {
   displayedLyric.value = ''
   if (!targetText) return
@@ -178,6 +182,15 @@ watch(() => music.progress, (value) => {
 
 function seek(value: number) {
   music.seekByProgress(value)
+}
+
+async function togglePlayback() {
+  if (music.isPlaying) {
+    music.pause()
+    return
+  }
+
+  await music.play()
 }
 
 </script>

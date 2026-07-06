@@ -16,9 +16,6 @@ import {
   normalizeRecordForRead,
   normalizeRecordForWrite
 } from './adminContentCore'
-import {
-  readDataCapsuleRecords
-} from './adminRecordsDataCapsule'
 import { readDataCapsuleObject as readDataCapsuleAsset } from './dataCapsuleStorage'
 import { clearAdminCloudDraftState } from './adminCloudDraftStorage'
 import { commitGitHubContent, githubDataBasePath } from './githubContentStorage'
@@ -125,7 +122,7 @@ function applyChanges(baseRecords: AdminDataRecord[], changes: AdminPendingChang
 }
 
 export async function syncAdminRecordsToGitHub(changes: AdminPendingChange[]) {
-  const baseRecords = await readStaticManagedRecords().catch(() => readDataCapsuleRecords())
+  const baseRecords = await readStaticManagedRecords()
   const contentByRecordKey = new Map(baseRecords.map((record) => [
     `${record.type}:${record.id}`,
     'content' in record ? String(record.content || '') : ''

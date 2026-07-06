@@ -31,6 +31,12 @@ async function writeJsonByKey(key: string, value: unknown) {
   })
 }
 
+function normalizeDrafts(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const { updatedAt: _updatedAt, ...drafts } = value as Record<string, unknown>
+  return drafts
+}
+
 export async function readAdminCloudDraftState(): Promise<AdminCloudDraftState> {
   const [drafts, pendingChanges] = await Promise.all([
     readJsonByKey<Record<string, unknown>>(cloudDraftsKey, {}),
@@ -38,7 +44,7 @@ export async function readAdminCloudDraftState(): Promise<AdminCloudDraftState> 
   ])
 
   return {
-    drafts: drafts && typeof drafts === 'object' && !Array.isArray(drafts) ? drafts : {},
+    drafts: normalizeDrafts(drafts),
     pendingChanges: Array.isArray(pendingChanges) ? pendingChanges : []
   }
 }
@@ -46,10 +52,7 @@ export async function readAdminCloudDraftState(): Promise<AdminCloudDraftState> 
 export async function writeAdminCloudDraftState(state: AdminCloudDraftState) {
   const updatedAt = new Date().toISOString()
   await Promise.all([
-    writeJsonByKey(cloudDraftsKey, {
-      ...(state.drafts || {}),
-      updatedAt
-    }),
+    writeJsonByKey(cloudDraftsKey, normalizeDrafts(state.drafts)),
     writeJsonByKey(cloudPendingKey, state.pendingChanges || [])
   ])
 

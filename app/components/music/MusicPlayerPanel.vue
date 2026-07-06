@@ -24,6 +24,9 @@
       <div class="w-full text-center">
         <h2 class="text-title truncate text-size-card-title-lg font-black">{{ music.currentTitle }}</h2>
         <p class="text-secondary mt-stack-xs truncate text-size-content-body font-black tracking-widest">{{ music.currentArtist }}</p>
+        <p v-if="music.lastError" class="text-size-meta-label mt-stack-xs font-bold" style="color: var(--color-status-error);">
+          {{ music.lastError }}
+        </p>
       </div>
     </div>
 
@@ -89,7 +92,7 @@
             class="shadow-primary shadow-xl"
             :aria-label="music.isPlaying ? '暂停' : '播放'"
             variant="primary" size="xl"
-            @click="music.toggle">
+            @click="togglePlayback">
           <template #icon>
             <svg v-if="music.isPlaying" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -167,5 +170,14 @@ function seek(value: number) {
 
 function setVolume(value: number) {
   music.setVolume(value / 100)
+}
+
+async function togglePlayback() {
+  if (music.isPlaying) {
+    music.pause()
+    return
+  }
+
+  await music.play()
 }
 </script>

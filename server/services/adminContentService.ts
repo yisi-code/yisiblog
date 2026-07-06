@@ -38,7 +38,7 @@ export async function readAdminManagedRecords() {
   }
 
   adminRecordsReadPromise ||= (async () => {
-    const records = await readStaticManagedRecords().catch(() => readAdminManagedRecordsFromDataCapsule())
+    const records = await readStaticManagedRecords()
     setAdminRecordsCache(records)
     adminRecordsReadPromise = null
     return records

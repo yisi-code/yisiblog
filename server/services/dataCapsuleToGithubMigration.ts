@@ -11,6 +11,12 @@ import { readDataCapsuleRecords } from './adminRecordsDataCapsule'
 import { readDataCapsuleObject } from './dataCapsuleStorage'
 import { commitGitHubContent, githubDataBasePath } from './githubContentStorage'
 
+type DataCapsuleMigrationResult = {
+  ok: true
+  migratedCount: number
+  commit: Awaited<ReturnType<typeof commitGitHubContent>>
+}
+
 function extensionFromUrl(value?: string) {
   if (!value) return ''
   try {
@@ -21,7 +27,7 @@ function extensionFromUrl(value?: string) {
   }
 }
 
-export async function migrateDataCapsuleContentToGitHub() {
+export async function migrateDataCapsuleContentToGitHub(): Promise<DataCapsuleMigrationResult> {
   const sourceRecords = await readDataCapsuleRecords()
   const basePath = githubDataBasePath()
   const nextRecords: AdminDataRecord[] = []

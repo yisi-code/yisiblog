@@ -48,10 +48,14 @@
 import { siteConfig, useSongsData } from '~/data'
 
 const music = useMusicStore()
-const songItems = useSongsData()
+const { songs: songItems } = await useSongsData()
 
 const currentSong = computed(() => music.currentSong)
 const cover = computed(() => currentSong.value?.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=1000&auto=format&fit=crop')
+
+onMounted(() => {
+  void music.load()
+})
 
 useHead(() => ({title: `音乐${siteConfig.navSuffix}${siteConfig.navAfter}`}))
 </script>

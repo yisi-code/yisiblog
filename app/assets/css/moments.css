@@ -43,7 +43,7 @@
 
 .moment-images__single img,
 .moment-images__cell img {
-  transition: transform 0.5s ease;
+  transition: transform 0.15s ease;
 }
 
 .moment-images__single:hover,

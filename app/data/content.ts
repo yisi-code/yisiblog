@@ -13,7 +13,7 @@ import {
     type NormalizedDataRecord
 } from '~/data/records'
 import {formatDisplayDate} from '~/utils/dateFormat'
-import { parseMarkdown } from '@nuxtjs/mdc/runtime'
+import type { MDCRoot } from '@nuxtjs/mdc'
 
 type ContentBodyNode = string | number | boolean | null | undefined | {
     type?: string
@@ -32,12 +32,23 @@ export type ContentItem = {
     cover?: string
     tags?: string[]
     contentUrl?: string
+    bodyRaw?: string
+    toc?: {
+        links?: {
+            id?: string
+            text?: string
+            depth?: number
+            children?: {
+                id?: string
+                text?: string
+                depth?: number
+            }[]
+        }[]
+    }
     mood?: string
     location?: string
     images?: string[]
-    body?: {
-        type?: string
-        children?: ContentBodyNode[]
+    body?: MDCRoot & {
         value?: ContentBodyNode[]
         toc?: {
             links?: {
@@ -80,10 +91,19 @@ const emptyHomePageData = (): HomePageData => ({
 })
 
 function mergeRecordContent(record: NormalizedDataRecord, item?: ContentItem | null): SiteContentItem {
+    const body = item?.body
+        ? {
+            ...item.body,
+            toc: item.body.toc || item.toc
+        }
+        : undefined
+
     return {
         ...record,
-        body: item?.body,
-        description: record.description || '',
+        title: record.title || item?.title,
+        body,
+        bodyRaw: item?.bodyRaw,
+        description: record.description || item?.description || '',
         cover: record.cover,
         date: formatDisplayDate(record.date),
         tags: Array.isArray(record.tags) ? record.tags : []
@@ -104,41 +124,38 @@ async function loadRecordContent(record: NormalizedDataRecord) {
     if (!record.contentUrl) return mergeRecordContent(record)
 
     if (record.contentUrl.startsWith('/content-data/')) {
-        const markdown = await $fetch<string>(record.contentUrl)
-        const parsed = await parseMarkdown(markdown)
-        return mergeRecordContent(record, {
-            path: record.path,
-            body: parsed.body,
-            title: parsed.data?.title,
-            description: parsed.data?.description
+        const data = await $fetch<ContentItem>('/api/content/static', {
+            query: {
+                url: record.contentUrl,
+                path: record.path
+            }
         })
+        return mergeRecordContent(record, data)
     }
 
-    const data = await $fetch<ContentItem>('/api/content/remote', {
-        query: {
-            url: record.contentUrl,
-            path: record.path
-        }
-    })
-    return mergeRecordContent(record, data)
+    throw createError({ statusCode: 400, statusMessage: 'contentUrl 必须指向 /content-data/ 静态 Markdown' })
 }
 
-function loadContentRecords(type: DataRecordType, key: string) {
-    const {data} = useAsyncData(key, async () => {
+async function loadContentRecords(type: DataRecordType, key: string) {
+    const {data, pending, status} = await useAsyncData(key, async () => {
         const records = await fetchNormalizedRecords()
         return Promise.all(sortedRecords(records, type).map(loadRecordContent))
     }, {
         default: () => []
     })
-    return computed(() => data.value || [])
+    return {
+        items: computed(() => data.value || []),
+        pending,
+        status
+    }
 }
 
 function contentDataKey(type: DataRecordType, slug: string | string[]) {
     return `${type}-${recordSlugText(slug)}`
 }
 
-function loadContentRecordBySlug(type: DataRecordType, slug: string | string[]) {
-    return useAsyncData(contentDataKey(type, slug), async () => {
+async function loadContentRecordBySlug(type: DataRecordType, slug: string | string[]) {
+    return await useAsyncData(contentDataKey(type, slug), async () => {
         const records = await fetchNormalizedRecords()
         const record = findRecordBySlug(records, type, slug)
         if (!record) return null
@@ -149,11 +166,12 @@ function loadContentRecordBySlug(type: DataRecordType, slug: string | string[]) 
 export function useHomePageData() {
     return useAsyncData('home-page-data', async () => {
         const records = await fetchNormalizedRecords()
+        const moments = await Promise.all(sortedRecords(records, 'moment').map(loadRecordContent))
 
         return {
             posts: recordsAsContentItems(records, 'post'),
             chatters: recordsAsContentItems(records, 'chatter'),
-            moments: recordsAsContentItems(records, 'moment'),
+            moments,
             albums: albumsFromRecords(records),
             friends: friendsFromRecords(records),
             projects: projectsFromRecords(records),
@@ -164,9 +182,9 @@ export function useHomePageData() {
     })
 }
 
-function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {
+async function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {
     const slugText = recordSlugText(currentSlug)
-    const {data} = useAsyncData(`recent-${type}-${slugText}`, async () => {
+    const {data, pending, status} = await useAsyncData(`recent-${type}-${slugText}`, async () => {
         const records = await fetchNormalizedRecords()
         return Promise.all(sortedRecords(records, type)
             .filter((item) => !recordMatchesSlug(item, currentSlug))
@@ -175,7 +193,11 @@ function loadRecentContentRecords(type: DataRecordType, currentSlug: string | st
     }, {
         default: () => []
     })
-    return computed(() => data.value || [])
+    return {
+        items: computed(() => data.value || []),
+        pending,
+        status
+    }
 }
 
 export function collectContentText(nodes: ContentBodyNode[] = []): string[] {
@@ -214,6 +236,27 @@ function compressExtraLineBreaks(text: string) {
   return text.replace(/\n{3,}/g, '\n\n')
 }
 
+function plainMarkdownText(markdown = '', options: { preserveLineBreaks?: boolean } = {}) {
+  const text = markdown
+      .replace(/^---[\s\S]*?---\s*/m, '')
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/!\[[^\]]*]\([^)]*\)/g, '')
+      .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^>\s?/gm, '')
+      .replace(/^[\s-]*[-*+]\s+/gm, '')
+      .replace(/^\s*\d+\.\s+/gm, '')
+      .replace(/[*_~]/g, '')
+      .trim()
+
+  if (options.preserveLineBreaks) {
+    return compressExtraLineBreaks(text.replace(/[^\S\r\n]+/g, ' '))
+  }
+
+  return text.replace(/\s+/g, ' ')
+}
+
 function collectContentTextBlocks(nodes: ContentBodyNode[] = []): string[] {
     return nodes.flatMap((node) => {
         if (!node) return []
@@ -239,48 +282,50 @@ function collectContentTextBlocks(nodes: ContentBodyNode[] = []): string[] {
 export function extractContentText(item: ContentItem, options: { preserveLineBreaks?: boolean } = {}) {
   const bodyNodes = item.body?.value || item.body?.children
   if (options.preserveLineBreaks) {
-    return compressExtraLineBreaks(collectContentTextBlocks(bodyNodes)
+    const text = compressExtraLineBreaks(collectContentTextBlocks(bodyNodes)
       .join('\n')
       .replace(/[^\S\r\n]+/g, ' ')
       .trim())
+    return text || plainMarkdownText(item.bodyRaw, options)
   }
 
-    return collectContentText(bodyNodes)
+    const text = collectContentText(bodyNodes)
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim()
+    return text || plainMarkdownText(item.bodyRaw, options)
 }
 
-export function usePostsData(key = 'posts-data') {
-    return loadContentRecords('post', key)
+export async function usePostsData(key = 'posts-data') {
+    return await loadContentRecords('post', key)
 }
 
-export function useChattersData(key = 'chatters-data') {
-    return loadContentRecords('chatter', key)
+export async function useChattersData(key = 'chatters-data') {
+    return await loadContentRecords('chatter', key)
 }
 
-export function useMomentsData(key = 'moments-data') {
-    return loadContentRecords('moment', key)
+export async function useMomentsData(key = 'moments-data') {
+    return await loadContentRecords('moment', key)
 }
 
-export function usePostData(slug: string | string[]) {
-    return loadContentRecordBySlug('post', slug)
+export async function usePostData(slug: string | string[]) {
+    return await loadContentRecordBySlug('post', slug)
 }
 
-export function useRecentPosts(currentSlug: string | string[], limit = 3) {
-    return loadRecentContentRecords('post', currentSlug, limit)
+export async function useRecentPosts(currentSlug: string | string[], limit = 3) {
+    return await loadRecentContentRecords('post', currentSlug, limit)
 }
 
-export function useChatterData(slug: string | string[]) {
-    return loadContentRecordBySlug('chatter', slug)
+export async function useChatterData(slug: string | string[]) {
+    return await loadContentRecordBySlug('chatter', slug)
 }
 
-export function useRecentChatters(currentSlug: string | string[], limit = 3) {
-    return loadRecentContentRecords('chatter', currentSlug, limit)
+export async function useRecentChatters(currentSlug: string | string[], limit = 3) {
+    return await loadRecentContentRecords('chatter', currentSlug, limit)
 }
 
-export function useAboutPage() {
-    return useAsyncData('about-page', async () => {
+export async function useAboutPage() {
+    return await useAsyncData('about-page', async () => {
         const records = await fetchNormalizedRecords()
         const record = findRecordBySlug(records, 'about', 'about')
         if (!record) return null

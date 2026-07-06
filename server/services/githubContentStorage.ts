@@ -35,8 +35,18 @@ type GitHubCommitResponse = {
 }
 
 type GitHubCommitResult = {
+  sha: string
+  tree: {
+    sha: string
+  }
+}
+
+type GitHubCommitContentResult = {
   commitSha: string
   treeSha: string
+  branch: string
+  owner: string
+  repo: string
 }
 
 function githubContentConfig(): GitHubContentConfig {
@@ -63,8 +73,8 @@ function githubContentConfig(): GitHubContentConfig {
 
 async function githubRequest<T>(config: GitHubContentConfig, path: string, options: {
   method?: 'GET' | 'POST' | 'PATCH'
-  body?: unknown
-} = {}) {
+  body?: Record<string, unknown>
+} = {}): Promise<T> {
   try {
     return await $fetch<T>(`https://api.github.com/repos/${config.owner}/${config.repo}${path}`, {
       method: options.method || 'GET',
@@ -75,7 +85,7 @@ async function githubRequest<T>(config: GitHubContentConfig, path: string, optio
         'User-Agent': 'yisiblog-admin-sync'
       },
       body: options.body
-    })
+    }) as T
   } catch (error: unknown) {
     const responseError = error as {
       response?: {
@@ -122,7 +132,7 @@ export async function commitGitHubContent(params: {
   textFiles: Record<string, string>
   binaryFiles?: Record<string, Buffer>
   deleteFiles?: string[]
-}) {
+}): Promise<GitHubCommitContentResult> {
   const config = githubContentConfig()
   const ref = await githubRequest<GitHubRefResponse>(config, `/git/ref/heads/${encodeURIComponent(config.branch)}`)
   const baseCommitSha = ref.object.sha

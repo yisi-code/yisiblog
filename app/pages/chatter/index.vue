@@ -83,7 +83,7 @@
       </div>
     </section>
 
-    <section v-else class="glass-panel empty-state empty-state-panel">
+    <section v-else-if="!isLoadingChatters" class="glass-panel empty-state empty-state-panel">
       <strong>{{ searchQuery ? '没有匹配的杂谈' : '暂无杂谈' }}</strong>
       <span>{{ searchQuery ? '可以换个关键词试试。' : '之后会在这里展示一些随笔。' }}</span>
     </section>
@@ -94,7 +94,7 @@
 import {extractContentText, useChattersData, type SiteContentItem} from '~/data'
 import {Sparkles} from "@lucide/vue";
 
-const items = useChattersData('chatters-list')
+const { items, pending: isLoadingChatters } = await useChattersData('chatters-list')
 const allTag = '全部'
 const searchQuery = ref('')
 const activeTag = ref(allTag)

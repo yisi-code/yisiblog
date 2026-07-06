@@ -91,6 +91,7 @@ export const useMusicStore = defineStore('music', () => {
   const lyricCache = ref<Record<string, LyricLine[]>>({})
   const hasRestoredPlayback = ref(false)
   const restoredSongKey = ref('')
+  let loadPromise: Promise<void> | null = null
 
   // ---------- Getters (computed) ----------
   const currentSong = computed(() => {
@@ -186,7 +187,7 @@ export const useMusicStore = defineStore('music', () => {
         playMode.value = state.playMode
       }
       isEnded.value = false
-      isPlaying.value = false
+      isPlaying.value = Boolean(state.isPlaying)
     } catch {
       window.localStorage.removeItem(musicStorageKey)
     }
@@ -228,16 +229,23 @@ export const useMusicStore = defineStore('music', () => {
       await syncLyrics()
       return
     }
-    const songItems = await fetchSongsData()
-    songsList.value = songItems
-        .filter((song) => !song.error && song.url)
-        .map((song, index) => ({
-          ...song,
-          id: song.id || `${song.title || 'local'}-${index}`
-        }))
-    loaded.value = true
-    restorePlaybackState()
-    await syncLyrics()
+
+    loadPromise ||= (async () => {
+      const songItems = await fetchSongsData()
+      songsList.value = songItems
+          .filter((song) => !song.error && song.url)
+          .map((song, index) => ({
+            ...song,
+            id: song.id || `${song.title || 'local'}-${index}`
+          }))
+      loaded.value = true
+      restorePlaybackState()
+      await syncLyrics()
+    })().finally(() => {
+      loadPromise = null
+    })
+
+    await loadPromise
   }
 
   async function play(index?: number) {
@@ -369,6 +377,20 @@ export const useMusicStore = defineStore('music', () => {
 
   if (import.meta.client) {
     let persistTimer: number | undefined
+    let playingPersistInterval: number | undefined
+
+    function stopPlayingPersistInterval() {
+      if (!playingPersistInterval) return
+      window.clearInterval(playingPersistInterval)
+      playingPersistInterval = undefined
+    }
+
+    function syncPlayingPersistInterval() {
+      stopPlayingPersistInterval()
+      if (!isPlaying.value) return
+      playingPersistInterval = window.setInterval(persistPlaybackState, 500)
+    }
+
     watch([
       currentIndex,
       isPlaying,
@@ -382,6 +404,8 @@ export const useMusicStore = defineStore('music', () => {
       window.clearTimeout(persistTimer)
       persistTimer = window.setTimeout(persistPlaybackState, 300)
     })
+
+    watch(isPlaying, syncPlayingPersistInterval, { immediate: true })
     window.addEventListener('beforeunload', persistPlaybackState)
   }
 

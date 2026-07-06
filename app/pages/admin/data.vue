@@ -41,14 +41,6 @@
           <Save :size="17" aria-hidden="true"/>
           保存草稿
         </button>
-        <button
-            class="admin-data-button"
-            type="button"
-            :disabled="!canSaveCloudDraft"
-            @click="saveCloudDraft">
-          <CloudUpload :size="17" aria-hidden="true"/>
-          保存云端草稿
-        </button>
       </div>
 
       <aside class="admin-data-sidebar glass-panel">
@@ -138,15 +130,25 @@
         <template v-else>
           <div class="admin-data-sync-head">
             <strong>{{ pendingChanges.length }} 项待同步</strong>
-            <button
-                class="admin-data-button admin-data-button--primary"
-                type="button"
-                :disabled="!canSyncDataCapsule"
-                @click="syncDataCapsule"
-            >
-              <CloudUpload :size="17" aria-hidden="true"/>
-              同步 GitHub
-            </button>
+            <div class="admin-data-sync-actions">
+              <button
+                  class="admin-data-button"
+                  type="button"
+                  :disabled="!canSaveCloudDraft"
+                  @click="saveCloudDraft">
+                <CloudUpload :size="17" aria-hidden="true"/>
+                保存云端草稿
+              </button>
+              <button
+                  class="admin-data-button admin-data-button--primary"
+                  type="button"
+                  :disabled="!canSyncDataCapsule"
+                  @click="syncDataCapsule"
+              >
+                <CloudUpload :size="17" aria-hidden="true"/>
+                同步 GitHub
+              </button>
+            </div>
           </div>
 
           <div class="admin-data-change-list">
@@ -461,6 +463,7 @@ type DraftSaveResult = 'saved' | 'unchanged' | 'invalid' | 'error'
 type AdminCloudDraftState = {
   drafts: Record<string, EditorDraftCache>
   pendingChanges: AdminPendingChange[]
+  updatedAt?: string
 }
 type AdminSession = {
   session: string
@@ -583,7 +586,7 @@ const isCreating = computed(() => editorMode.value === 'create')
 const hasEditorDraft = computed(() => editorMode.value !== 'idle')
 const needsMarkdown = computed(() => adminRecordNeedsMarkdown(draft.type))
 const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type))
-const canSaveCloudDraft = computed(() => !isBusy.value && isAuthenticated.value && Boolean(pendingChanges.value.length || canSave.value))
+const canSaveCloudDraft = computed(() => !isBusy.value && isAuthenticated.value && Boolean(pendingChanges.value.length || Object.keys(editorDrafts.value).length || hasEditorDraft.value))
 const canDeleteDraft = computed(() => !isCreating.value && draft.type !== 'about')
 const canCreateSelectedType = computed(() => selectedType.value !== 'about')
 const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length || canSave.value))
@@ -888,8 +891,7 @@ function requestHeaders() {
 }
 
 function previewAssetUrl(value?: string) {
-  if (!value || !value.includes('s3.cstcloud.cn')) return value || ''
-  return `/api/assets/remote?url=${encodeURIComponent(value)}`
+  return value || ''
 }
 
 function restorePendingChanges() {
@@ -918,8 +920,8 @@ function restoreEditorDrafts() {
   const raw = window.localStorage.getItem(editorDraftsStorageKey)
   if (!raw) return
   try {
-    const parsed = JSON.parse(raw) as Record<string, EditorDraftCache>
-    if (parsed && typeof parsed === 'object') editorDrafts.value = parsed
+    const parsed = JSON.parse(raw)
+    editorDrafts.value = normalizeEditorDrafts(parsed)
   } catch {
     window.localStorage.removeItem(editorDraftsStorageKey)
   }
@@ -933,12 +935,13 @@ async function restoreCloudDraftState() {
       headers: requestHeaders()
     })
     const cloudPendingChanges = Array.isArray(cloudState.pendingChanges) ? cloudState.pendingChanges : []
-    const cloudDrafts = cloudState.drafts && typeof cloudState.drafts === 'object' ? cloudState.drafts : {}
+    const cloudDrafts = normalizeEditorDrafts(cloudState.drafts)
     const hasCloudState = cloudPendingChanges.length || Object.keys(cloudDrafts).length
     if (!hasCloudState) return false
 
     pendingChanges.value = cloudPendingChanges
     editorDrafts.value = cloudDrafts
+    pruneEditorDrafts()
     setStatus('已恢复云端草稿和待同步数据', 'success')
     return true
   } catch (error) {
@@ -989,6 +992,23 @@ function persistEditorDrafts() {
 function removeEditorDraft(key: string) {
   const {[key]: _removed, ...nextDrafts} = editorDrafts.value
   editorDrafts.value = nextDrafts
+}
+
+function isEditorDraftCache(value: unknown): value is EditorDraftCache {
+  if (!value || typeof value !== 'object') return false
+  const draftCache = value as Partial<EditorDraftCache>
+  return (draftCache.mode === 'create' || draftCache.mode === 'edit') && Boolean(draftCache.record?.type)
+}
+
+function normalizeEditorDrafts(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const drafts: Record<string, EditorDraftCache> = {}
+
+  Object.entries(value).forEach(([key, cache]) => {
+    if (isEditorDraftCache(cache)) drafts[key] = cache
+  })
+
+  return drafts
 }
 
 function splitLines(value: string) {
@@ -1091,12 +1111,60 @@ function currentEditorCache(): EditorDraftCache {
   }
 }
 
+function shouldKeepEditorDraft() {
+  if (!hasEditorDraft.value || !editorDraftKey.value || !draft.type) return false
+  if (pendingChanges.value.some((change) => change.key === editorDraftKey.value || change.key === selectedRecordKey.value)) return false
+
+  try {
+    const {
+      record,
+      sourceKey,
+      snapshot,
+      content,
+      lrc,
+      nextMusicFile
+    } = buildDraftChangePayload()
+
+    if (!record.id.trim()) {
+      return normalizedChangeValue({
+        record,
+        content,
+        lrc,
+        musicPath: nextMusicFile?.path
+      }) !== normalizedChangeValue({
+        record: createEmptyRecord(record.type),
+        content: '',
+        lrc: '',
+        musicPath: undefined
+      })
+    }
+
+    if (pendingChanges.value.some((change) => change.key === sourceKey)) return false
+
+    return hasDraftChanged({
+      base: snapshot,
+      record,
+      content,
+      lrc,
+      musicPath: nextMusicFile?.path
+    })
+  } catch {
+    return false
+  }
+}
+
 function stashEditorDraft() {
   if (!hasEditorDraft.value || !editorDraftKey.value) return
+  if (!shouldKeepEditorDraft()) {
+    removeEditorDraft(editorDraftKey.value)
+    if (selectedRecordKey.value && selectedRecordKey.value !== editorDraftKey.value) removeEditorDraft(selectedRecordKey.value)
+    return
+  }
+
   try {
     editorDrafts.value[editorDraftKey.value] = currentEditorCache()
   } catch {
-    // invalid incomplete form drafts are allowed to disappear
+    removeEditorDraft(editorDraftKey.value)
   }
 }
 
@@ -1214,6 +1282,56 @@ function hasDraftChanged(params: {
     lrc: params.base.lrc,
     musicPath: undefined
   })
+}
+
+function isPendingEditorDraft(key: string, cache?: EditorDraftCache) {
+  const selectedKey = cache?.selectedKey || ''
+  const recordDraftKey = cache?.record?.id ? recordKey(cache.record) : ''
+  return pendingChanges.value.some((change) => change.key === key || change.key === selectedKey || change.key === recordDraftKey)
+}
+
+function editorDraftHasChanges(cache: EditorDraftCache) {
+  const record = cache.record
+  const content = adminRecordNeedsMarkdown(record.type) ? cache.content : undefined
+  const lrc = record.type === 'music' ? cache.lrc : undefined
+  const musicPath = record.type === 'music' ? cache.musicFile?.path : undefined
+
+  if (!record.id.trim()) {
+    return normalizedChangeValue({
+      record,
+      content,
+      lrc,
+      musicPath
+    }) !== normalizedChangeValue({
+      record: createEmptyRecord(record.type),
+      content: '',
+      lrc: '',
+      musicPath: undefined
+    })
+  }
+
+  const sourceKey = cache.selectedKey || recordKey(record)
+  const snapshot = sourceRecords.value.find((item) => recordKey(item) === sourceKey)
+  return hasDraftChanged({
+    base: snapshot,
+    record,
+    content,
+    lrc,
+    musicPath
+  })
+}
+
+function pruneEditorDrafts() {
+  const nextDrafts: Record<string, EditorDraftCache> = {}
+
+  Object.entries(editorDrafts.value).forEach(([key, cache]) => {
+    if (!isEditorDraftCache(cache)) return
+    if (isPendingEditorDraft(key, cache)) return
+    if (!editorDraftHasChanges(cache)) return
+    nextDrafts[key] = cache
+  })
+
+  editorDrafts.value = nextDrafts
 }
 
 function selectType(type: AdminRecordType) {
@@ -1446,7 +1564,7 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
     selectedRecordKey.value = key
     originalId.value = record.id
     editorMode.value = 'edit'
-    editorDrafts.value[key] = currentEditorCache()
+    removeEditorDraft(key)
     applyPendingChanges(sourceRecords.value)
     if (mode === 'manual') setStatus('已保存到待同步区，尚未同步数据胶囊', 'success')
     else if (mode === 'sync') setStatus('已将当前编辑加入本次同步', 'success')
@@ -1459,10 +1577,8 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
 }
 
 async function saveCloudDraft() {
-  if (hasEditorDraft.value) {
-    const result = saveDraftChange('sync')
-    if (result === 'invalid' || result === 'error') return
-  }
+  stashEditorDraft()
+  pruneEditorDrafts()
 
   if (!pendingChanges.value.length && !Object.keys(editorDrafts.value).length) {
     setStatus('暂无需要保存的云端草稿', 'info')
@@ -1476,11 +1592,11 @@ async function saveCloudDraft() {
       method: 'POST',
       headers: requestHeaders(),
       body: {
-        drafts: editorDrafts.value,
-        pendingChanges: pendingChanges.value
+        drafts: {...editorDrafts.value},
+        pendingChanges: [...pendingChanges.value]
       }
     })
-    setStatus('云端草稿已保存', 'success')
+    setStatus(`云端草稿已保存：${Object.keys(editorDrafts.value).length} 份草稿，${pendingChanges.value.length} 项待同步`, 'success')
   } catch (error) {
     setStatus(error instanceof Error ? error.message : '保存云端草稿失败', 'error')
   } finally {
@@ -1544,7 +1660,7 @@ function openPendingChange(change: AdminPendingChange) {
   if (record) {
     selectedType.value = record.type
     editorDraftKey.value = recordKey(record)
-    if (!restoreEditorCache(recordKey(record))) editRecord(record)
+    editRecord(record)
   }
 }
 
@@ -1620,6 +1736,7 @@ async function loadRecords() {
     }
     void loadDataCapsuleFolders()
     sourceRecords.value = response.records
+    pruneEditorDrafts()
     persistRecordsCache(response.records)
     applyPendingChanges(response.records)
     setStatus(`已加载 ${records.value.length} 条记录`, 'success')

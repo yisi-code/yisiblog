@@ -20,5 +20,9 @@
     <ClientOnly>
       <ToastHost/>
     </ClientOnly>
+
+    <ClientOnly>
+      <PageLoadingOverlay/>
+    </ClientOnly>
   </div>
 </template>

@@ -69,7 +69,7 @@
             :aria-label="music.isPlaying ? '暂停' : '播放'"
             variant="primary"
             size="sm"
-            @click="music.toggle"
+            @click="togglePlayback"
           >
             <template #icon>
             <svg v-if="music.isPlaying" class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -117,6 +117,10 @@ const {
   stopDrag,
   cancelDrag
 } = useDraggableEdgeSnap({ dragMoveThreshold: 6, overflowResetRatio: 1 / 3 })
+
+onMounted(() => {
+  void music.load().then(syncAudioPlayback)
+})
 
 function startDockDrag(event: PointerEvent) {
   if (!startDrag(event)) return
@@ -184,7 +188,7 @@ function handleLoadedMetadata() {
     syncTime()
   }
 
-  if (music.isPlaying) void audio.play().catch(() => music.pause())
+  if (music.isPlaying) void playAudio(audio)
 }
 
 function handleEnded() {
@@ -192,21 +196,30 @@ function handleEnded() {
   music.handleEnded()
   if (music.isPlaying && audio && music.progress === 0) {
     audio.currentTime = 0
-    void audio.play().catch(() => music.pause())
+    void playAudio(audio)
   }
 }
 
 function handleAudioError() {
-  music.lastError = `Audio failed: ${currentSong.value?.url || 'unknown source'}`
+  music.lastError = formatAudioError(audioRef.value)
   music.pause()
 }
 
 watch(() => music.isPlaying, async (playing) => {
   const audio = audioRef.value
   if (!audio) return
-  if (playing) await audio.play().catch(() => music.pause())
+  if (playing) await playAudio(audio)
   else audio.pause()
-})
+}, { immediate: true })
+
+async function togglePlayback() {
+  if (music.isPlaying) {
+    music.pause()
+    return
+  }
+
+  await music.play()
+}
 
 watch(currentSong, async () => {
   const restoredSongKey = music.restoredSongKey
@@ -218,8 +231,57 @@ watch(currentSong, async () => {
   if (isRestoredSong) music.restoredSongKey = ''
   else music.resetPlaybackPosition()
   await music.syncLyrics()
-  if (music.isPlaying) await audio.play().catch(() => music.pause())
-})
+  await syncAudioPlayback()
+}, { immediate: true })
+
+async function syncAudioPlayback() {
+  await nextTick()
+  const audio = audioRef.value
+  if (!audio) return
+
+  syncAudioVolume()
+  if (music.isPlaying) {
+    await playAudio(audio)
+  } else {
+    audio.pause()
+  }
+}
+
+async function playAudio(audio: HTMLAudioElement) {
+  try {
+    music.lastError = ''
+    await audio.play()
+    await new Promise((resolve) => window.setTimeout(resolve, 100))
+    if (audio.paused) {
+      music.lastError = '浏览器未能开始播放音频，已切换为暂停状态。'
+      music.pause()
+    }
+  } catch (error) {
+    music.lastError = formatAudioError(audio, error)
+    music.pause()
+  }
+}
+
+function formatAudioError(audio?: HTMLAudioElement | null, error?: unknown) {
+  const message = error instanceof Error ? error.message : ''
+  const mediaError = audio?.error
+  const isUnsupportedSource = mediaError?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+      || /supported source|not supported/i.test(message)
+
+  if (isUnsupportedSource) {
+    return '音频文件无法播放：浏览器不支持当前文件或编码，请使用 MP3 或 AAC 编码的 M4A。'
+  }
+
+  if (mediaError?.code === MediaError.MEDIA_ERR_NETWORK) {
+    return '音频加载失败：网络或静态资源访问异常。'
+  }
+
+  if (mediaError?.code === MediaError.MEDIA_ERR_DECODE) {
+    return '音频解码失败：文件可能损坏或编码异常。'
+  }
+
+  return message || `音频加载失败：${currentSong.value?.url || '未知音频'}`
+}
 
 watch(() => music.seekRequestId, () => {
   const audio = audioRef.value

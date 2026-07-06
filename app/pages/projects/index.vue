@@ -62,7 +62,7 @@
         </a>
       </div>
 
-      <div v-else class="glass-panel empty-state empty-state-panel">
+      <div v-else-if="!isLoadingProjects" class="glass-panel empty-state empty-state-panel">
         <strong>{{ searchQuery ? '没有匹配的项目' : '暂无分享项目' }}</strong>
         <span>{{ searchQuery ? '可以换个关键词试试。' : '之后会在这里展示一些我喜欢的项目。' }}</span>
       </div>
@@ -79,7 +79,7 @@ import { highlightSearchParts } from '~/utils/searchHighlight'
 type ProjectSourceType = 'github' | 'gitee' | 'website'
 
 const searchQuery = ref('')
-const projects = useProjectsData()
+const { projects, pending: isLoadingProjects } = await useProjectsData()
 const lucideIconMap = LucideIcons as unknown as Record<string, Component | undefined>
 const fallbackProjectIcon = LucideIcons.Code2
 const projectIconAliases: Record<string, Component> = {

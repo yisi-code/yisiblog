@@ -25,7 +25,7 @@
       :all-count="posts.length"
     />
 
-    <section v-if="displayPosts.length === 0" class="glass-panel empty-state empty-state-panel">
+    <section v-if="!isLoadingPosts && displayPosts.length === 0" class="glass-panel empty-state empty-state-panel">
       <strong>{{ searchQuery ? '没有匹配的博文' : '暂无博文' }}</strong>
       <span>{{ searchQuery ? '可以换个关键词试试。' : '之后会在这里展示一些笔记感悟。' }}</span>
     </section>
@@ -43,7 +43,7 @@
 import { usePostsData, type SiteContentItem } from '~/data'
 import { formatDisplayDate } from '~/utils/dateFormat'
 
-const data = usePostsData('posts-page')
+const { items: data, pending: isLoadingPosts } = await usePostsData('posts-page')
 
 const allTag = '全部'
 const searchQuery = ref('')

@@ -28,11 +28,7 @@
       </div>
 
       <div id="article-content" class="article-body user-select-text">
-        <ContentRenderer
-            class="content-prose"
-            :value="data"
-            :prose="false"
-        />
+        <ArticleMarkdown :body="data.body" :source="data.bodyRaw"/>
 
         <ArticleComments/>
       </div>
@@ -65,8 +61,8 @@ if (!slug) {
   throw createError({statusCode: 404, statusMessage: '未找到博文'})
 }
 
-const {data, status} = usePostData(slug)
-const recentPosts = useRecentPosts(slug)
+const {data, status} = await usePostData(slug)
+const { items: recentPosts } = await useRecentPosts(slug)
 
 useAdaptiveSticky(sidebarRef)
 useScrollSticky(backButtonStickyRef, {

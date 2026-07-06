@@ -27,7 +27,7 @@
       </div>
 
       <div class="article-body user-select-text">
-        <ContentRenderer class="content-prose" :prose="false" :value="data" />
+        <ArticleMarkdown :body="data.body" :source="data.bodyRaw" />
 
         <ArticleComments />
       </div>
@@ -81,8 +81,8 @@ if (!slug) {
   throw createError({ statusCode: 404, statusMessage: '未找到杂谈' })
 }
 
-const { data, status } = useChatterData(slug)
-const recentChatters = useRecentChatters(slug)
+const { data, status } = await useChatterData(slug)
+const { items: recentChatters } = await useRecentChatters(slug)
 
 if (status.value === 'success' && !data.value) {
   throw createError({ statusCode: 404, statusMessage: '未找到杂谈' })

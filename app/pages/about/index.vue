@@ -45,7 +45,7 @@
 
         <Transition name="about-panel" mode="out-in">
           <section v-if="activeTab === 'intro'" key="intro" class="about-panel user-select-text">
-            <ContentRenderer class="content-prose" :prose="false" :value="data" />
+            <ArticleMarkdown :body="data.body" :source="data.bodyRaw" />
             <ArticleComments />
           </section>
 
@@ -158,10 +158,10 @@ type ActivityRecord = {
 
 const route = useRoute()
 const router = useRouter()
-const { data} = useAboutPage()
-const posts = usePostsData('about-posts')
-const chatters = useChattersData('about-chatters')
-const moments = useMomentsData('about-moments')
+const { data} = await useAboutPage()
+const { items: posts } = await usePostsData('about-posts')
+const { items: chatters } = await useChattersData('about-chatters')
+const { items: moments } = await useMomentsData('about-moments')
 
 const fallbackCover = 'https://bu.dusays.com/2026/03/24/69c23dc278c78.jpg'
 const heatmapScrollRef = ref<HTMLElement | null>(null)

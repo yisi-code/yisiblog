@@ -3,6 +3,7 @@
     <HomeSearch :items="homeSearchItems" class="hover:scale-[1.02] z-10"/>
     <HomeMusicOverview :stats="stats"/>
     <HomeContentGrid
+        v-if="!isLoadingHomeData || hasHomeContent"
         :latest-album="latestAlbum"
         :latest-chatters="latestChatters"
         :latest-posts="latestPosts"
@@ -26,7 +27,7 @@ import {
   buildLatestPosts
 } from '~/data/home'
 
-const { data: homeData, refresh, status } = useHomePageData()
+const { data: homeData, pending: isLoadingHomeData } = await useHomePageData()
 
 const defaultChatterCover = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
 
@@ -38,18 +39,12 @@ const safeFriendItems = computed(() => homeData.value?.friends || [])
 const safeProjectItems = computed(() => homeData.value?.projects || [])
 const safeSongItems = computed(() => homeData.value?.songs || [])
 
-function refreshEmptyHomeData() {
-  const hasCoreContent = safePostItems.value.length > 0
+const hasHomeContent = computed(() => {
+  return safePostItems.value.length > 0
       || safeChatterItems.value.length > 0
       || safeMomentItems.value.length > 0
-
-  if (!hasCoreContent && status.value === 'idle') {
-    void refresh()
-  }
-}
-
-onMounted(refreshEmptyHomeData)
-onActivated(refreshEmptyHomeData)
+      || safeAlbumItems.value.length > 0
+})
 
 const latestPosts = computed(() => buildLatestPosts(safePostItems.value))
 const latestChatters = computed(() => buildLatestChatters(safeChatterItems.value, defaultChatterCover))

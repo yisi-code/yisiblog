@@ -18,19 +18,23 @@ function publicContentPath(path: string) {
   return join(process.cwd(), 'public', 'content-data', relativePath)
 }
 
-async function readTextContent(path: string) {
+export async function readStaticTextContent(path: string) {
   return readFile(publicContentPath(path), 'utf8')
 }
 
+export async function readStaticRecords() {
+  const source = await readStaticTextContent(contentRecordsPath())
+  return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
+}
+
 export async function readStaticManagedRecords(): Promise<AdminManagedRecord[]> {
-  const source = await readTextContent(contentRecordsPath())
-  const records = (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
+  const records = await readStaticRecords()
 
   return Promise.all(records.map(async (record) => {
     const managedRecord: AdminManagedRecord = { ...record }
     if (adminRecordNeedsMarkdown(record.type)) {
       try {
-        managedRecord.content = await readTextContent(record.contentUrl || contentMarkdownPath(record))
+        managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
       } catch {
         managedRecord.content = ''
       }

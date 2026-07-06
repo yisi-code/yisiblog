@@ -65,7 +65,6 @@ type RecordsResponse = {
   error?: string
 }
 
-const staticRecordsPath = '/content-data/records.json'
 const normalizedRecordsCacheTtlMs = 60 * 1000
 let normalizedRecordsCache: {
   records: NormalizedDataRecord[]
@@ -87,26 +86,11 @@ function recordPath(record: DataRecord) {
   return `/${record.type}s`
 }
 
-function remoteAssetUrl(value?: string) {
-  if (!value || value.startsWith('/content-data/')) return value
-  if (!value.includes('s3.cstcloud.cn')) return value
-  return `/api/assets/remote?url=${encodeURIComponent(value)}`
-}
-
 function normalizeAssetUrls<T extends DataRecord>(record: T): T {
   return {
     ...record,
-    cover: remoteAssetUrl(record.cover),
-    url: record.type === 'music' ? remoteAssetUrl(record.url) : record.url,
-    lrcUrl: remoteAssetUrl(record.lrcUrl),
-    icon: remoteAssetUrl(record.icon),
-    images: Array.isArray(record.images) ? record.images.map((image) => remoteAssetUrl(image) || image) : record.images,
-    photos: Array.isArray(record.photos)
-      ? record.photos.map((photo) => ({
-          ...photo,
-          url: remoteAssetUrl(photo.url) || photo.url
-        }))
-      : record.photos
+    images: Array.isArray(record.images) ? [...record.images] : record.images,
+    photos: Array.isArray(record.photos) ? record.photos.map((photo) => ({ ...photo })) : record.photos
   }
 }
 
@@ -205,9 +189,7 @@ export async function fetchNormalizedRecords() {
   }
 
   normalizedRecordsPromise ||= (async () => {
-    const response: RecordsResponse = await $fetch<DataRecord[]>(staticRecordsPath)
-      .then((records) => ({ records }))
-      .catch(() => $fetch<RecordsResponse>('/api/records'))
+    const response = await $fetch<RecordsResponse>('/api/records')
     const records = normalizeRecords(Array.isArray(response.records) ? response.records : [])
 
     if (!response.error) {
@@ -229,20 +211,28 @@ export async function fetchSongsData() {
   return songsFromRecords(await fetchNormalizedRecords())
 }
 
-export function useRecordsData(key = 'records-data') {
-  const { data } = useAsyncData(key, fetchNormalizedRecords, {
+export async function useRecordsData(key = 'records-data') {
+  const { data, pending, status } = await useAsyncData(key, fetchNormalizedRecords, {
     default: () => []
   })
-  return computed(() => data.value || [])
+  return {
+    records: computed(() => data.value || []),
+    pending,
+    status
+  }
 }
 
-export function useAlbumsData() {
-  const records = useRecordsData('albums-records-data')
-  return computed(() => albumsFromRecords(records.value))
+export async function useAlbumsData() {
+  const { records, pending, status } = await useRecordsData('albums-records-data')
+  return {
+    albums: computed(() => albumsFromRecords(records.value)),
+    pending,
+    status
+  }
 }
 
-export function useAlbumData(slug?: string) {
-  return useAsyncData(`album-${recordSlugText(slug || '')}`, async () => {
+export async function useAlbumData(slug?: string) {
+  return await useAsyncData(`album-${recordSlugText(slug || '')}`, async () => {
     const records = await fetchNormalizedRecords()
     return albumsFromRecords(records).find((item) => recordMatchesSlug(item, slug)) || null
   }, {
@@ -250,17 +240,29 @@ export function useAlbumData(slug?: string) {
   })
 }
 
-export function useFriendsData() {
-  const records = useRecordsData('friends-records-data')
-  return computed(() => friendsFromRecords(records.value))
+export async function useFriendsData() {
+  const { records, pending, status } = await useRecordsData('friends-records-data')
+  return {
+    friends: computed(() => friendsFromRecords(records.value)),
+    pending,
+    status
+  }
 }
 
-export function useProjectsData() {
-  const records = useRecordsData('projects-records-data')
-  return computed(() => projectsFromRecords(records.value))
+export async function useProjectsData() {
+  const { records, pending, status } = await useRecordsData('projects-records-data')
+  return {
+    projects: computed(() => projectsFromRecords(records.value)),
+    pending,
+    status
+  }
 }
 
-export function useSongsData() {
-  const records = useRecordsData('songs-records-data')
-  return computed(() => songsFromRecords(records.value))
+export async function useSongsData() {
+  const { records, pending, status } = await useRecordsData('songs-records-data')
+  return {
+    songs: computed(() => songsFromRecords(records.value)),
+    pending,
+    status
+  }
 }

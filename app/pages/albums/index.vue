@@ -33,7 +33,7 @@
 
       <AlbumCardGrid v-if="matchedAlbums.length" :albums="matchedAlbums" :query="activeQuery"/>
 
-      <section v-else class="glass-panel empty-state empty-state-panel">
+      <section v-else-if="!isLoadingAlbums" class="glass-panel empty-state empty-state-panel">
         <strong>{{ searchQuery ? '没有匹配的相册' : '暂无相册' }}</strong>
         <span>{{ searchQuery ? '可以换个关键词试试。' : '之后会在这里展示定个瞬间。' }}</span>
       </section>
@@ -64,7 +64,7 @@ type MatchedPhoto = Photo & {
 const preview = ref<{ images: PreviewImage[]; index: number } | null>(null)
 const searchQuery = ref('')
 const activeQuery = ref('')
-const albums = useAlbumsData()
+const { albums, pending: isLoadingAlbums } = await useAlbumsData()
 let searchTimer: ReturnType<typeof setTimeout> | undefined
 
 const matchedAlbums = computed(() => {

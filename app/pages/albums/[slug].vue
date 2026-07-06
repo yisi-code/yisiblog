@@ -65,7 +65,7 @@ const slug = Array.isArray(route.params.slug) ? route.params.slug[0] : route.par
 const preview = ref<{ images: PreviewImage[]; index: number } | null>(null)
 const backButtonStickyRef = ref<HTMLElement | null>(null)
 
-const { data: album, status } = useAlbumData(slug)
+const { data: album, status } = await useAlbumData(slug)
 const albumCover = computed(() => album.value?.cover || album.value?.photos[0]?.url || '')
 const indexedPhotos = computed<IndexedPhoto[]>(() => album.value?.photos.map((photo, index) => ({
   ...photo,

@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <div v-else class="glass-panel empty-state empty-state-panel">
+      <div v-else-if="!isLoadingMoments" class="glass-panel empty-state empty-state-panel">
         <strong>{{ searchQuery ? '没有匹配的动态' : '暂无动态' }}</strong>
         <span>{{ searchQuery ? '可以换个关键词试试。' : '之后会在这里展示生活碎片。' }}</span>
       </div>
@@ -78,7 +78,7 @@ type MomentViewItem = SiteContentItem & {
   rawDate?: string
 }
 
-const moments = useMomentsData('moments-list')
+const { items: moments, pending: isLoadingMoments } = await useMomentsData('moments-list')
 const searchQuery = ref('')
 const sortOrder = ref<'desc' | 'asc'>('desc')
 const openCommentId = ref<string | null>(null)

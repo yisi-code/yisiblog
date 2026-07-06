@@ -32,8 +32,9 @@
                   class="group/stat block w-fit rounded-2xl px-chip-inline text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ring-accent-soft)]"
                   :aria-label="`查看${stat.label}`"
               >
-                <div class="text-size-card-title-lg font-black group-hover/stat:scale-110"
-                     :style="`color: ${stat.color}`">
+                <div
+                    class="text-size-card-title-lg font-black group-hover/stat:scale-110"
+                    :style="`color: ${stat.color}`">
                   {{ stat.value }}
                 </div>
                 <div
