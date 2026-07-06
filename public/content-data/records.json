@@ -4,42 +4,42 @@
     "type": "album",
     "title": "日常随录",
     "description": "不时涌出记录瞬间的悸动。",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/2fba8447b85d0a0c390d902ed9441f7a.jpg",
     "tags": [
       "日常",
       "风景"
     ],
     "photos": [
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E8%A5%BF%E6%B9%96%E9%9B%B7%E5%B3%B0%E5%A1%94.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/2fba8447b85d0a0c390d902ed9441f7a.jpg",
         "caption": "西湖雷峰塔"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E6%B8%90%E5%8F%98%E9%BB%84%E6%98%8F.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/9baa8ed8645b3b454df2b3f9d31c0b19.jpg",
         "caption": "渐变黄昏"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E9%87%91%E7%BA%BF.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/072f272b8d157354d071313a9c0e9cbf.jpg",
         "caption": "金线"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E4%BA%91%E8%A7%92%E4%BD%8E.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/9c5ecd6360664923af7e90871fa62c3b.jpg",
         "caption": "云角低"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E5%A4%95%E9%98%B3%E9%B3%9E%E5%85%89.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/13cb12ed37ca531d38eb912248997534.jpg",
         "caption": "夕阳鳞光"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E6%A3%89%E4%BA%91.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/04d630cf95af95658556a73f49fd7591.jpg",
         "caption": "棉云"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E9%BB%84%E8%B0%83%E6%97%B6%E5%88%BB.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/72041acb7e8a169ceca73120aef2e323.jpg",
         "caption": "黄调时刻"
       },
       {
-        "url": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E7%9B%B8%E5%86%8C/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95/%E6%97%A5%E5%B8%B8%E9%9A%8F%E5%BD%95-%E6%98%A0%E6%97%A5.jpg",
+        "url": "https://bee-reg-ab.imagency.cn/e/bcdd12f3b34da82330f810b5a910c402.jpg",
         "caption": "映日"
       }
     ]
@@ -49,7 +49,7 @@
     "type": "chatter",
     "title": "思索扩展博客",
     "date": "2026-07-01",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E6%9D%82%E8%B0%88/20260701%E6%9D%82%E8%B0%88/20260701%E6%9D%82%E8%B0%88.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/450d41a2443aaa26577a60a517192fa0.jpg",
     "tags": [
       "博客"
     ],
@@ -67,7 +67,7 @@
     "type": "about",
     "title": "关于我",
     "date": "2026-03-31",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%85%B3%E4%BA%8E/about/about.jpeg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/4a351c73d2e0bcc6f79298dffaaf0aee.jpeg",
     "contentUrl": "/content-data/about/about.md"
   },
   {
@@ -75,7 +75,7 @@
     "type": "music",
     "title": "Head in the clouds",
     "description": "人生如此乐观豁达",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E9%9F%B3%E4%B9%90/Head%20in%20the%20clouds/Head%20in%20the%20clouds.jpg",
+    "cover": "http://p2.music.126.net/NhAuuAE5dco8o1MFcRsc7w==/109951173224179059.jpg?param=130y130",
     "url": "/content-data/music/Head in the clouds.m4a",
     "artist": "检猫怪",
     "lrcUrl": "/content-data/music/Head in the clouds.lrc"
@@ -85,7 +85,7 @@
     "type": "music",
     "title": "拣爱",
     "description": "《拣爱》游戏同名主题曲",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E9%9F%B3%E4%B9%90/%E6%8B%A3%E7%88%B1/%E6%8B%A3%E7%88%B1.jpg",
+    "cover": "http://p1.music.126.net/cm6YL5_vfEGBpyzvlMHfRg==/109951166093188922.jpg?param=130y130",
     "url": "/content-data/music/拣爱.m4a",
     "artist": "亚恒",
     "lrcUrl": "/content-data/music/拣爱.lrc"
@@ -96,7 +96,7 @@
     "title": "Docker 安装 Redis 完整指南",
     "description": "详解 Docker 安装 Redis 的完整流程，包括基础安装、带密码安装、数据持久化（Bind Mount 与 Volume）、配置文件管理、Docker Compose 配置、性能优化、故障排查及安全建议，涵盖 Windows/WSL2 环境下的最佳实践。",
     "date": "2026-02-26 22:43:26",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Docker%20%E5%AE%89%E8%A3%85%20Redis%20%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/Docker%20%E5%AE%89%E8%A3%85%20Redis%20%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "docker",
       "redis",
@@ -110,7 +110,7 @@
     "title": "在 Windows Docker 中安装 Kafka 并映射 Windows 端口",
     "description": "在 Windows Docker 中运行 Kafka（KRaft 模式），映射端口和配置文件，并提供验证测试。",
     "date": "2026-02-25 06:44:15",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E5%9C%A8%20Windows%20Docker%20%E4%B8%AD%E5%AE%89%E8%A3%85%20Kafka%20%E5%B9%B6%E6%98%A0%E5%B0%84%20Windows%20%E7%AB%AF%E5%8F%A3/%E5%9C%A8%20Windows%20Docker%20%E4%B8%AD%E5%AE%89%E8%A3%85%20Kafka%20%E5%B9%B6%E6%98%A0%E5%B0%84%20Windows%20%E7%AB%AF%E5%8F%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "docker",
       "kafka"
@@ -123,7 +123,7 @@
     "title": "在 Windows Docker 中安装并配置 Nginx (映射 Windows 端口与路径)",
     "description": "在 Windows Docker 中运行 Nginx，映射本地配置文件和日志目录，以及静态资源目录。",
     "date": "2026-02-25 05:49:54",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E5%9C%A8%20Windows%20Docker%20%E4%B8%AD%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE%20Nginx%20%28%E6%98%A0%E5%B0%84%20Windows%20%E7%AB%AF%E5%8F%A3%E4%B8%8E%E8%B7%AF%E5%BE%84%29/%E5%9C%A8%20Windows%20Docker%20%E4%B8%AD%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE%20Nginx%20%28%E6%98%A0%E5%B0%84%20Windows%20%E7%AB%AF%E5%8F%A3%E4%B8%8E%E8%B7%AF%E5%BE%84%29.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "windows",
       "docker",
@@ -137,7 +137,7 @@
     "title": "windows安装docker（末尾附命令大全）",
     "description": "详细图文教程安装 Docker Desktop for Windows，包括环境检查、安装、WSL2 启用、镜像加速、基本操作及命令大全。",
     "date": "2026-02-25 04:12:42",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/windows%E5%AE%89%E8%A3%85docker%EF%BC%88%E6%9C%AB%E5%B0%BE%E9%99%84%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8%EF%BC%89/windows%E5%AE%89%E8%A3%85docker%EF%BC%88%E6%9C%AB%E5%B0%BE%E9%99%84%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "docker",
       "容器"
@@ -150,7 +150,7 @@
     "title": "Spring WebSocket 核心注解详解",
     "description": "详解 Spring WebSocket 中 @MessageMapping 和 @SendTo 等核心注解的定义、路径匹配规则、参数支持、工作原理，以及完整的前后端交互流程和最佳实践建议。",
     "date": "2026-02-22 01:25:29",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20WebSocket%20%E6%A0%B8%E5%BF%83%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3/Spring%20WebSocket%20%E6%A0%B8%E5%BF%83%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring",
       "websocket",
@@ -164,7 +164,7 @@
     "title": "Spring WebSocket 的 MessageBrokerRegistry 与 StompEndpointRegistry 配置参数详解",
     "description": "全面介绍 Spring WebSocket 中 MessageBrokerRegistry 和 StompEndpointRegistry 的配置方法，包括启用简单代理、设置应用前缀、用户目的地、STOMP 代理中继、端点注册、跨域设置及 SockJS 支持等参数。",
     "date": "2026-02-22 01:19:08",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20WebSocket%20%E7%9A%84%20MessageBrokerRegistry%20%E4%B8%8E%20StompEndpointRegistry%20%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3/Spring%20WebSocket%20%E7%9A%84%20MessageBrokerRegistry%20%E4%B8%8E%20StompEndpointRegistry%20%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "websocket",
       "java"
@@ -177,7 +177,7 @@
     "title": "WebSocket连接教程示例（Spring Boot + STOMP + SockJS + Vue）",
     "description": "实现基于 Spring Boot STOMP 的 WebSocket 服务，支持公共/私有频道、心跳、认证，并提供 Vue 前端完整示例。",
     "date": "2026-02-21 20:13:45",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/WebSocket%E8%BF%9E%E6%8E%A5%E6%95%99%E7%A8%8B%E7%A4%BA%E4%BE%8B%EF%BC%88Spring%20Boot%20%2B%20STOMP%20%2B%20SockJS%20%2B%20Vue%EF%BC%89/WebSocket%E8%BF%9E%E6%8E%A5%E6%95%99%E7%A8%8B%E7%A4%BA%E4%BE%8B%EF%BC%88Spring%20Boot%20%2B%20STOMP%20%2B%20SockJS%20%2B%20Vue%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "websocket",
       "spring boot",
@@ -191,7 +191,7 @@
     "title": "WebSocket 完整教程：从安装到实战",
     "description": "介绍 WebSocket 协议及 Spring Boot 后端实现（WebSocketHandler）、前端原生 JavaScript 使用，包括连接、发送消息、广播、心跳、安全性等。",
     "date": "2026-02-18 04:42:06",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/WebSocket%20%E5%AE%8C%E6%95%B4%E6%95%99%E7%A8%8B%EF%BC%9A%E4%BB%8E%E5%AE%89%E8%A3%85%E5%88%B0%E5%AE%9E%E6%88%98/WebSocket%20%E5%AE%8C%E6%95%B4%E6%95%99%E7%A8%8B%EF%BC%9A%E4%BB%8E%E5%AE%89%E8%A3%85%E5%88%B0%E5%AE%9E%E6%88%98.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "websocket",
       "java"
@@ -204,7 +204,7 @@
     "title": "Kafka TopicBuilder 主题配置详解",
     "description": "详细介绍 Kafka TopicBuilder 的配置方法，包括主题名称、分区数、副本因子、生命周期配置（retention.ms、cleanup.policy）、性能与可靠性参数（min.insync.replicas、max.message.bytes）、消费者组配置，并提供完整示例和最佳实践。",
     "date": "2026-02-13 23:53:29",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Kafka%20TopicBuilder%20%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/Kafka%20TopicBuilder%20%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "服务器",
@@ -218,7 +218,7 @@
     "title": "Kafka 生产者与消费者配置详解",
     "description": "详细列出 Kafka 生产者和消费者的配置参数，包括序列化器、确认机制、重试、幂等性、压缩、批量大小、偏移量提交、拉取策略等，并给出高可靠、高吞吐、低延迟等场景的配置模板和调优建议。",
     "date": "2026-02-13 22:19:24",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Kafka%20%E7%94%9F%E4%BA%A7%E8%80%85%E4%B8%8E%E6%B6%88%E8%B4%B9%E8%80%85%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/Kafka%20%E7%94%9F%E4%BA%A7%E8%80%85%E4%B8%8E%E6%B6%88%E8%B4%B9%E8%80%85%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "kafka",
       "分布式",
@@ -233,7 +233,7 @@
     "title": "Java HttpServletRequest 详解",
     "description": "详解 Java Servlet 中的 HttpServletRequest 接口，涵盖获取请求信息（URL、方法、参数）、请求头、客户端信息、属性、会话管理、输入流读取，以及中文乱码处理和 Spring 中的用法。",
     "date": "2026-02-06 23:46:28",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Java%20HttpServletRequest%20%E8%AF%A6%E8%A7%A3/Java%20HttpServletRequest%20%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "开发语言"
@@ -246,7 +246,7 @@
     "title": "Spring Boot 整合 Redisson 极易上手的入门教程",
     "description": "面向初学者的 Spring Boot 整合 Redisson 教程，涵盖环境准备、Maven 依赖、配置文件（YAML/Java）、基础操作（字符串、集合、分布式锁、延迟队列、排行榜、发布订阅）、Spring Cache 集成、监控及最佳实践。",
     "date": "2026-01-19 18:55:42",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E6%95%B4%E5%90%88%20Redisson%20%E6%9E%81%E6%98%93%E4%B8%8A%E6%89%8B%E7%9A%84%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Spring%20Boot%20%E6%95%B4%E5%90%88%20Redisson%20%E6%9E%81%E6%98%93%E4%B8%8A%E6%89%8B%E7%9A%84%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "后端",
@@ -261,7 +261,7 @@
     "title": "Kafka部署指南：单机开发模式与集群生产模式（ 4.1.1 版本）",
     "description": "基于 Kafka 4.1.1 的 KRaft 模式，分别介绍 Windows 和 Linux 下的单机开发模式部署，以及 Linux 集群生产模式的完整步骤，包括配置、初始化、启动、验证和 Systemd 管理。",
     "date": "2026-01-09 04:55:10",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Kafka%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%95%E6%9C%BA%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%94%9F%E4%BA%A7%E6%A8%A1%E5%BC%8F%EF%BC%88%204.1.1%20%E7%89%88%E6%9C%AC%EF%BC%89/Kafka%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97%EF%BC%9A%E5%8D%95%E6%9C%BA%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%94%9F%E4%BA%A7%E6%A8%A1%E5%BC%8F%EF%BC%88%204.1.1%20%E7%89%88%E6%9C%AC%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "kafka",
       "分布式",
@@ -275,7 +275,7 @@
     "title": "MyBatis-Plus Mapper 接口方法详解",
     "description": "详细解析 MyBatis-Plus 的 BaseMapper 接口提供的 CRUD 方法，包括插入、删除（根据ID、条件、批量）、更新（根据ID、条件）、查询（根据ID、条件、分页）等，并给出使用示例和最佳实践。",
     "date": "2025-11-29 16:20:27",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MyBatis-Plus%20Mapper%20%E6%8E%A5%E5%8F%A3%E6%96%B9%E6%B3%95%E8%AF%A6%E8%A7%A3/MyBatis-Plus%20Mapper%20%E6%8E%A5%E5%8F%A3%E6%96%B9%E6%B3%95%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "mybatis"
@@ -288,7 +288,7 @@
     "title": "MyBatis XML 配置详解",
     "description": "全面介绍 MyBatis 的 XML 配置方式，包括核心配置文件结构（properties、settings、typeAliases、environments、mappers）、Mapper XML 映射文件（CRUD 标签、参数传递、结果映射 ResultMap、关联查询 association/collection）、动态 SQL（if、choose、foreach、trim）、以及缓存、类型处理器、插件等高级功能。",
     "date": "2025-11-29 13:54:56",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MyBatis%20XML%20%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/MyBatis%20XML%20%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mybatis",
       "xml",
@@ -302,7 +302,7 @@
     "title": "MyBatis-Plus 核心注解详解",
     "description": "详解 MyBatis-Plus 的核心注解，包括 @TableName（表名映射）、@TableId（主键策略）、@TableField（字段映射及自动填充）、@TableLogic（逻辑删除）、@Version（乐观锁）、@EnumValue（枚举映射）等，并给出全局配置建议。",
     "date": "2025-11-29 00:06:29",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MyBatis-Plus%20%E6%A0%B8%E5%BF%83%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3/MyBatis-Plus%20%E6%A0%B8%E5%BF%83%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mybatis",
       "数据库",
@@ -316,7 +316,7 @@
     "title": "MyBatis 注解详解",
     "description": "系统介绍 MyBatis 的注解配置方式，涵盖核心 CRUD 注解（@Select、@Insert、@Update、@Delete）、结果映射（@Results、@Result）、关联查询（@One、@Many）、参数处理（@Param、@Options、@SelectKey）、动态 SQL（@SelectProvider 等）以及缓存注解，并给出最佳实践。",
     "date": "2025-11-28 23:06:09",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MyBatis%20%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3/MyBatis%20%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mybatis",
       "后端",
@@ -330,7 +330,7 @@
     "title": "JPA Repository 详解",
     "description": "深入讲解 Spring Data JPA 的 Repository 接口层次结构（Repository、CrudRepository、PagingAndSortingRepository、JpaRepository），包括方法命名派生查询、@Query 注解、分页排序、动态查询（Specification、Example）、实体图、审计功能、自定义实现以及事务管理和性能优化。",
     "date": "2025-11-28 17:22:54",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JPA%20Repository%20%E8%AF%A6%E8%A7%A3/JPA%20Repository%20%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "数据库",
       "后端",
@@ -344,7 +344,7 @@
     "title": "JPA 注解完整指南",
     "description": "全面列举 JPA 常用注解，包括实体映射（@Entity、@Table、@MappedSuperclass）、主键（@Id、@GeneratedValue、@EmbeddedId）、字段映射（@Column、@Enumerated、@Temporal、@Lob）、关联关系（@OneToOne、@OneToMany、@ManyToOne、@ManyToMany）、继承策略、审计注解（@CreatedDate 等）以及查询注解（@NamedQuery），并提供完整示例。",
     "date": "2025-11-28 16:11:54",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JPA%20%E6%B3%A8%E8%A7%A3%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/JPA%20%E6%B3%A8%E8%A7%A3%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "数据库",
       "java",
@@ -358,7 +358,7 @@
     "title": "Spring Boot CORS 配置详解：CorsConfigurationSource 全面指南",
     "description": "详细讲解 Spring Boot 中基于 CorsConfigurationSource 的 CORS 配置，包括 UrlBasedCorsConfigurationSource 的使用、CorsConfiguration 属性（允许源、方法、头、凭证、maxAge）、多路径差异化配置、与 Spring Security 集成、动态配置源、环境特定配置，以及常见问题与测试方法。",
     "date": "2025-11-28 14:48:19",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20CORS%20%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%EF%BC%9ACorsConfigurationSource%20%E5%85%A8%E9%9D%A2%E6%8C%87%E5%8D%97/Spring%20Boot%20CORS%20%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3%EF%BC%9ACorsConfigurationSource%20%E5%85%A8%E9%9D%A2%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "后端",
@@ -372,7 +372,7 @@
     "title": "JPA事务与锁机制详解",
     "description": "详解 JPA 事务管理（声明式 @Transactional 属性、编程式事务）和锁机制（乐观锁 @Version、悲观锁 LockModeType），包括事务传播行为、隔离级别、锁的范围、死锁预防、性能优化及分布式事务考量。",
     "date": "2025-11-28 14:43:40",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JPA%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/JPA%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "数据库",
       "java",
@@ -386,7 +386,7 @@
     "title": "Spring Boot 架构中的异常处理分层指南",
     "description": "针对 Spring Boot 分层架构（Repository、Service、Controller、全局异常处理器）提供异常处理原则，明确各层职责（何时抛出、何时处理），给出详细代码示例，并涵盖高级主题（异常分类、事务边界、监控集成）和测试策略。",
     "date": "2025-11-27 14:19:33",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E6%9E%B6%E6%9E%84%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%88%86%E5%B1%82%E6%8C%87%E5%8D%97/Spring%20Boot%20%E6%9E%B6%E6%9E%84%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%88%86%E5%B1%82%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "架构",
@@ -400,7 +400,7 @@
     "title": "Spring Boot异常处理全面指南",
     "description": "全面讲解 Spring Boot 异常处理机制，包括默认处理流程、@ControllerAdvice + @ExceptionHandler 全局处理、自定义异常设计（枚举错误码）、特定场景（404、校验异常）、HandlerExceptionResolver 实现、生产环境安全与监控，以及测试策略。",
     "date": "2025-11-27 12:53:29",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%85%A8%E9%9D%A2%E6%8C%87%E5%8D%97/Spring%20Boot%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%85%A8%E9%9D%A2%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "python",
@@ -414,7 +414,7 @@
     "title": "HttpServletResponse 详细指南",
     "description": "详细介绍 HttpServletResponse 接口，包括 HTTP 响应组成（状态行、响应头、响应体）、状态码常量、响应头设置、响应体输出（字符流/字节流）、文件下载、JSON API、动态图片生成、缓存控制、异常处理以及性能优化技巧。",
     "date": "2025-11-26 22:41:40",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/HttpServletResponse%20%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97/HttpServletResponse%20%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "后端"
@@ -427,7 +427,7 @@
     "title": "JavaScript 正则表达式核心用法指南",
     "description": "介绍 JavaScript 正则表达式的创建方式（字面量/构造函数）、修饰符（i、g、m 等）、元字符与量词、字符集合与分组、常用方法（test、exec、match、replace 等），并提供表单验证、数据提取等实用示例和高级技巧（贪婪/惰性、前瞻断言）。",
     "date": "2025-11-26 00:18:09",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JavaScript%20%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%A0%B8%E5%BF%83%E7%94%A8%E6%B3%95%E6%8C%87%E5%8D%97/JavaScript%20%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%A0%B8%E5%BF%83%E7%94%A8%E6%B3%95%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "javascript",
       "正则表达式",
@@ -441,7 +441,7 @@
     "title": "Spring Boot Security 全面详解与实战指南",
     "description": "全面讲解 Spring Boot Security，包括核心架构、认证机制（内存/数据库认证、密码加密）、授权控制（URL/方法级）、JWT 集成、前后端分离安全配置、CORS/CSRF/会话管理、高级特性（安全头部、事件监控）以及生产环境最佳实践。",
     "date": "2025-11-25 15:58:06",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20Security%20%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/Spring%20Boot%20Security%20%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "后端",
@@ -455,7 +455,7 @@
     "title": "Spring Security UserDetailsService 详解",
     "description": "详细解析 Spring Security 的 UserDetailsService 接口，包括其作用、自定义实现步骤（loadUserByUsername）、UserDetails 接口详解、集成到安全配置（密码编码器、AuthenticationManagerBuilder）、高级特性（缓存、多数据源、事务管理）及生产环境注意事项。",
     "date": "2025-11-25 02:58:52",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Security%20UserDetailsService%20%E8%AF%A6%E8%A7%A3/Spring%20Security%20UserDetailsService%20%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "后端",
@@ -469,7 +469,7 @@
     "title": "JavaScript Cookie 使用完整指南",
     "description": "全面介绍 JavaScript 中 Cookie 的用法，包括基本概念、设置/读取/删除 Cookie、属性详解（过期时间、路径、域、安全标志）、使用 js-cookie 库、实际应用场景（登录状态、用户偏好、购物车）、安全最佳实践及性能优化。",
     "date": "2025-11-24 02:49:20",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JavaScript%20Cookie%20%E4%BD%BF%E7%94%A8%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/JavaScript%20Cookie%20%E4%BD%BF%E7%94%A8%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "javascript",
       "开发语言"
@@ -482,7 +482,7 @@
     "title": "Spring Boot 注解全解",
     "description": "系统梳理 Spring Boot 常用注解，涵盖核心启动与配置（@SpringBootApplication、条件注解）、Bean 定义（@Component、@Service、@Repository、@Controller）、依赖注入（@Autowired、@Qualifier、@Primary）、Web MVC（请求映射、参数绑定、响应处理）、数据校验、配置属性（@Value、@ConfigurationProperties）、JPA、事务、定时任务、异步、AOP 以及测试注解。",
     "date": "2025-11-24 02:09:54",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E6%B3%A8%E8%A7%A3%E5%85%A8%E8%A7%A3/Spring%20Boot%20%E6%B3%A8%E8%A7%A3%E5%85%A8%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "后端",
@@ -496,7 +496,7 @@
     "title": "Hutool-json 库完整指南",
     "description": "全面介绍 Hutool-json 库的使用，包括核心类（JSONUtil、JSONObject、JSONArray）、基础操作（解析、创建）、Java 对象与 JSON 互转、路径表达式（getByPath）、自定义序列化配置、XML 互转、性能优化与大数据处理，并提供实战案例（API 响应、配置文件解析）。",
     "date": "2025-11-24 02:07:59",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Hutool-json%20%E5%BA%93%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/Hutool-json%20%E5%BA%93%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "json",
       "java"
@@ -509,7 +509,7 @@
     "title": "Spring Boot 测试注解全解：从单元测试到集成测试",
     "description": "全面讲解 Spring Boot 测试注解，包括集成测试（@SpringBootTest）、切片测试（@WebMvcTest、@DataJpaTest、@JsonTest）、Mock 支持（@MockBean、@SpyBean）、数据管理（@Transactional、@Sql）、测试配置（@TestConfiguration、@DynamicPropertySource），并提供实战示例和最佳实践。",
     "date": "2025-11-23 02:48:58",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E6%B5%8B%E8%AF%95%E6%B3%A8%E8%A7%A3%E5%85%A8%E8%A7%A3%EF%BC%9A%E4%BB%8E%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%88%B0%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95/Spring%20Boot%20%E6%B5%8B%E8%AF%95%E6%B3%A8%E8%A7%A3%E5%85%A8%E8%A7%A3%EF%BC%9A%E4%BB%8E%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%88%B0%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "单元测试",
@@ -523,7 +523,7 @@
     "title": "Spring Boot 中的 Bean 与自动装配详解",
     "description": "详解 Spring Boot 中的 Bean 概念、生命周期（实例化、依赖注入、初始化、销毁）、作用域（singleton、prototype 等），以及自动装配机制（@Autowired、@Qualifier、@Primary），条件化控制（@Conditional 系列），并介绍自动配置原理和常见问题。",
     "date": "2025-11-22 23:28:26",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E4%B8%AD%E7%9A%84%20Bean%20%E4%B8%8E%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E8%AF%A6%E8%A7%A3/Spring%20Boot%20%E4%B8%AD%E7%9A%84%20Bean%20%E4%B8%8E%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "python",
@@ -537,7 +537,7 @@
     "title": "Redisson 基本操作指令完整指南",
     "description": "提供 Redisson 的基本操作指令速查表，涵盖键操作、字符串（RBucket）、哈希（RMap）、列表（RList）、集合（RSet）、有序集合（RScoredSortedSet）、原子操作、过期时间、发布订阅、批量操作等，并附实用工具类示例。",
     "date": "2025-11-21 20:34:23",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Redisson%20%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97/Redisson%20%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4%E5%AE%8C%E6%95%B4%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "后端",
@@ -551,7 +551,7 @@
     "title": "Redisson 基础教程",
     "description": "Redisson 入门教程，介绍其核心优势、环境配置（Maven 依赖、单机/集群配置）、基础数据结构操作（字符串、哈希、列表、集合、有序集合、发布订阅），并提供完整示例和最佳实践（资源管理、异常处理、性能优化）。",
     "date": "2025-11-21 16:52:10",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Redisson%20%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/Redisson%20%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "后端",
@@ -565,7 +565,7 @@
     "title": "Java泛型详解：尖括号＜＞、通配符?与类型参数T",
     "description": "深入解析 Java 泛型中的尖括号（声明/使用泛型）、通配符 ?（无界、上界 extends、下界 super）和类型参数 T（定义占位符）的区别与用法，包括协变/逆变、PECS 原则，并通过大量代码示例阐明三者角色。",
     "date": "2025-11-21 00:40:27",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Java%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%B0%96%E6%8B%AC%E5%8F%B7%EF%BC%9C%EF%BC%9E%E3%80%81%E9%80%9A%E9%85%8D%E7%AC%A6_%E4%B8%8E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0T/Java%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3%EF%BC%9A%E5%B0%96%E6%8B%AC%E5%8F%B7%EF%BC%9C%EF%BC%9E%E3%80%81%E9%80%9A%E9%85%8D%E7%AC%A6_%E4%B8%8E%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0T.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java"
     ],
@@ -577,7 +577,7 @@
     "title": "哈希表、红黑树、初始容量与负载因子详解",
     "description": "详解哈希表原理、冲突解决、红黑树特性、HashMap 中初始容量和负载因子的作用及调优。",
     "date": "2025-11-21 00:02:33",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E5%93%88%E5%B8%8C%E8%A1%A8%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81%E5%88%9D%E5%A7%8B%E5%AE%B9%E9%87%8F%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9B%A0%E5%AD%90%E8%AF%A6%E8%A7%A3/%E5%93%88%E5%B8%8C%E8%A1%A8%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81%E5%88%9D%E5%A7%8B%E5%AE%B9%E9%87%8F%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9B%A0%E5%AD%90%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "散列表",
       "哈希算法",
@@ -591,7 +591,7 @@
     "title": "Spring ResponseEntity 全面详解",
     "description": "全面介绍 Spring 中的 ResponseEntity，包括其结构（状态码、响应头、响应体）、构建方式（构造函数、静态工厂、Builder）、与 @RestController 的配合、请求参数绑定注解、实际应用场景（RESTful API、文件下载、统一异常处理），以及与其他响应方式（@ResponseBody、@ResponseStatus）的对比。",
     "date": "2025-11-16 15:54:33",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20ResponseEntity%20%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3/Spring%20ResponseEntity%20%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring",
       "java",
@@ -605,7 +605,7 @@
     "title": "Java静态工厂方法详解",
     "description": "讲解静态工厂方法的概念、与构造函数的对比、优点（有名称、缓存实例、返回子类型等）、缺点及适用场景，并通过 Integer.valueOf、List.of 等实际例子说明，同时介绍命名约定和实现示例。",
     "date": "2025-11-16 15:04:28",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Java%E9%9D%99%E6%80%81%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E8%AF%A6%E8%A7%A3/Java%E9%9D%99%E6%80%81%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "开发语言",
       "java"
@@ -618,7 +618,7 @@
     "title": "HttpServletResponse 与 ResponseEntity 详解",
     "description": "对比分析 Java Web 中的 HttpServletResponse（底层 Servlet API）和 Spring 的 ResponseEntity（高层封装）的层级关系、功能差异和选型建议，并讨论国内常用的自定义统一响应体（Result）现象。",
     "date": "2025-11-16 14:27:06",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/HttpServletResponse%20%E4%B8%8E%20ResponseEntity%20%E8%AF%A6%E8%A7%A3/HttpServletResponse%20%E4%B8%8E%20ResponseEntity%20%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring",
       "后端",
@@ -632,7 +632,7 @@
     "title": "Spring Boot 日志系统全面详解",
     "description": "全面介绍 Spring Boot 日志系统，包括日志框架架构（SLF4J + Logback）、基础配置（properties/yml）、高级 XML 配置（logback-spring.xml 的 Appender、滚动策略、异步日志）、代码中使用（@Slf4j）、MDC 分布式追踪、性能优化及监控管理。",
     "date": "2025-11-16 01:34:50",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20Boot%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3/Spring%20Boot%20%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%E5%85%A8%E9%9D%A2%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "单元测试",
@@ -646,7 +646,7 @@
     "title": "HTMLElement 与MouseEvent 事件对象属性详解",
     "description": "详细列举 HTMLElement 对象的属性和方法（标识、几何尺寸、样式、结构关系等）以及 MouseEvent 事件对象的坐标属性（clientX、pageX、offsetX 等）、按键状态、事件目标，并给出实用代码示例和注意事项。",
     "date": "2025-11-15 15:47:39",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/HTMLElement%20%E4%B8%8EMouseEvent%20%E4%BA%8B%E4%BB%B6%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E8%AF%A6%E8%A7%A3/HTMLElement%20%E4%B8%8EMouseEvent%20%E4%BA%8B%E4%BB%B6%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "javascript",
       "前端"
@@ -659,7 +659,7 @@
     "title": "MySQL 配置文件属性详解",
     "description": "详解 MySQL 配置文件（my.cnf/my.ini）的各项属性，包括网络与路径、连接与并发、内存与缓存（innodb_buffer_pool_size 等）、日志、存储引擎（InnoDB）、字符集与排序规则（推荐 utf8mb4），并给出平衡型配置模板。",
     "date": "2025-11-15 15:47:22",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MySQL%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%B1%9E%E6%80%A7%E8%AF%A6%E8%A7%A3/MySQL%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%B1%9E%E6%80%A7%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mysql",
       "数据库"
@@ -672,7 +672,7 @@
     "title": "Spring 注解详解：@Service 与 @Transactional",
     "description": "对比 Spring 中 @Service（组件标识）和 @Transactional（事务管理）的核心职责、使用方式及注意事项，重点剖析类级别 @Transactional 的潜在问题（内部调用失效、粒度不精确），并给出方法级别使用的最佳实践，同时详解事务传播行为（7 种）和配置要点。",
     "date": "2025-11-15 15:47:07",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Spring%20%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3%EF%BC%9A%40Service%20%E4%B8%8E%20%40Transactional/Spring%20%E6%B3%A8%E8%A7%A3%E8%AF%A6%E8%A7%A3%EF%BC%9A%40Service%20%E4%B8%8E%20%40Transactional.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring",
       "java",
@@ -686,7 +686,7 @@
     "title": "数据库事务ACID特性详解",
     "description": "详解事务的原子性、一致性、隔离性、持久性，包括实现机制（Undo/Redo Log）、隔离级别及并发问题。",
     "date": "2025-11-15 15:46:55",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1ACID%E7%89%B9%E6%80%A7%E8%AF%A6%E8%A7%A3/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1ACID%E7%89%B9%E6%80%A7%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "数据库",
       "mysql"
@@ -699,7 +699,7 @@
     "title": "MySQL 并发控制机制详解：锁机制、MVCC 与 Read View",
     "description": "深入讲解 MySQL 的并发控制机制，包括锁机制（表锁、行锁、间隙锁、临键锁、意向锁）、MVCC（多版本并发控制）的工作原理（隐藏字段、Undo Log、Read View）以及不同隔离级别下的 Read View 生成策略，并分析快照读与当前读的区别。",
     "date": "2025-11-15 15:46:18",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/MySQL%20%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%EF%BC%9A%E9%94%81%E6%9C%BA%E5%88%B6%E3%80%81MVCC%20%E4%B8%8E%20Read%20View/MySQL%20%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%EF%BC%9A%E9%94%81%E6%9C%BA%E5%88%B6%E3%80%81MVCC%20%E4%B8%8E%20Read%20View.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mysql",
       "数据库"
@@ -712,7 +712,7 @@
     "title": "JAVA音频研究1：解析音频文件格式（javax.sound学习指南，javax.sound学习实战）",
     "description": "通过 Java 的 javax.sound 库解析音频文件格式，获取音频时长、文件类型、帧长、编码类型等信息，并提供完整的代码示例和注释，可作为 javax.sound 的学习实战指南。",
     "date": "2025-11-15 15:31:09",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JAVA%E9%9F%B3%E9%A2%91%E7%A0%94%E7%A9%B61%EF%BC%9A%E8%A7%A3%E6%9E%90%E9%9F%B3%E9%A2%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%EF%BC%88javax.sound%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%8Cjavax.sound%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98%EF%BC%89/JAVA%E9%9F%B3%E9%A2%91%E7%A0%94%E7%A9%B61%EF%BC%9A%E8%A7%A3%E6%9E%90%E9%9F%B3%E9%A2%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%EF%BC%88javax.sound%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97%EF%BC%8Cjavax.sound%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java",
       "音视频",
@@ -726,7 +726,7 @@
     "title": "Pinia Store 生命周期与状态持久性详解",
     "description": "深入解析 Pinia Store 的生命周期和状态持久性，说明组件卸载后 Store 实例不会删除、状态会保留（单例模式），并解释 detached: true 仅影响订阅函数而非 Store 本身，同时提供手动管理（$reset、$dispose）和内存管理建议。",
     "date": "2025-11-13 21:08:54",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Pinia%20Store%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%B8%8E%E7%8A%B6%E6%80%81%E6%8C%81%E4%B9%85%E6%80%A7%E8%AF%A6%E8%A7%A3/Pinia%20Store%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E4%B8%8E%E7%8A%B6%E6%80%81%E6%8C%81%E4%B9%85%E6%80%A7%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "javascript",
       "前端"
@@ -739,7 +739,7 @@
     "title": "CSS 选择器空格使用区别详解",
     "description": "详解 CSS 选择器中空格的有无区别：无空格（如 .class1.class2）表示多类选择器（同一元素同时拥有这些类），有空格（如 .class1 .class2）表示后代选择器（嵌套元素）。并通过示例、对比表格、记忆技巧和扩展选择器（子选择器、兄弟选择器）加深理解。",
     "date": "2025-11-13 12:03:56",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/CSS%20%E9%80%89%E6%8B%A9%E5%99%A8%E7%A9%BA%E6%A0%BC%E4%BD%BF%E7%94%A8%E5%8C%BA%E5%88%AB%E8%AF%A6%E8%A7%A3/CSS%20%E9%80%89%E6%8B%A9%E5%99%A8%E7%A9%BA%E6%A0%BC%E4%BD%BF%E7%94%A8%E5%8C%BA%E5%88%AB%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "css",
       "前端"
@@ -752,7 +752,7 @@
     "title": "addEventListener() 事件类型与应用场景",
     "description": "系统列出 addEventListener 支持的各种事件类型（鼠标、键盘、表单、窗口、拖拽、剪贴板、多媒体、动画/过渡）及其应用场景，并以 mouseout 为例详解事件冒泡机制，对比 mouseenter/mouseleave 与 mouseover/mouseout 的区别，提供推荐使用建议。",
     "date": "2025-11-11 21:45:06",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/addEventListener%28%29%20%E4%BA%8B%E4%BB%B6%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF/addEventListener%28%29%20%E4%BA%8B%E4%BB%B6%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "javascript",
       "前端"
@@ -765,7 +765,7 @@
     "title": "从零开始搭建 Vue 3 + Vite 项目：一份极速上手指南",
     "description": "使用 Vite 脚手架创建 Vue 3 项目，介绍项目结构、配置（vite.config.js）、添加 Vue Router 等。",
     "date": "2025-11-10 01:54:37",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%20Vue%203%20%2B%20Vite%20%E9%A1%B9%E7%9B%AE%EF%BC%9A%E4%B8%80%E4%BB%BD%E6%9E%81%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%20Vue%203%20%2B%20Vite%20%E9%A1%B9%E7%9B%AE%EF%BC%9A%E4%B8%80%E4%BB%BD%E6%9E%81%E9%80%9F%E4%B8%8A%E6%89%8B%E6%8C%87%E5%8D%97.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "vue.js",
       "前端",
@@ -779,7 +779,7 @@
     "title": "ECMAScript Modules (ESM) 详解",
     "description": "全面介绍 ECMAScript Modules（ESM），包括基本语法（导出/导入）、特点（静态结构、模块作用域、严格模式）、与 CommonJS 的对比、动态导入、循环依赖、聚合导出，以及在浏览器和 Node.js 中的使用方式，并提供最佳实践建议。",
     "date": "2025-11-10 00:42:46",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/ECMAScript%20Modules%20%28ESM%29%20%E8%AF%A6%E8%A7%A3/ECMAScript%20Modules%20%28ESM%29%20%E8%AF%A6%E8%A7%A3.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "ecmascript",
       "前端",
@@ -793,7 +793,7 @@
     "title": "Ubuntu22.04版本左右，开机自动启动脚本",
     "description": "指导在 Ubuntu 22.04 系统中设置开机自动启动脚本，包括修改 rc-local.service 文件、创建 rc.local 脚本文件、赋予执行权限、启用服务，并提供手动管理（启动/停止/重启/状态查看）的命令。",
     "date": "2025-10-18 15:11:16",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Ubuntu22.04%E7%89%88%E6%9C%AC%E5%B7%A6%E5%8F%B3%EF%BC%8C%E5%BC%80%E6%9C%BA%E8%87%AA%E5%8A%A8%E5%90%AF%E5%8A%A8%E8%84%9A%E6%9C%AC/Ubuntu22.04%E7%89%88%E6%9C%AC%E5%B7%A6%E5%8F%B3%EF%BC%8C%E5%BC%80%E6%9C%BA%E8%87%AA%E5%8A%A8%E5%90%AF%E5%8A%A8%E8%84%9A%E6%9C%AC.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "linux",
       "ubuntu"
@@ -806,7 +806,7 @@
     "title": "Ubuntu22.04版本左右，扩充用户可使用内存",
     "description": "指导 Ubuntu 22.04 通过挂载新分区扩充用户目录存储空间，包括分区挂载、数据迁移、修改 fstab 等步骤。",
     "date": "2025-10-18 15:11:02",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/Ubuntu22.04%E7%89%88%E6%9C%AC%E5%B7%A6%E5%8F%B3%EF%BC%8C%E6%89%A9%E5%85%85%E7%94%A8%E6%88%B7%E5%8F%AF%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98/Ubuntu22.04%E7%89%88%E6%9C%AC%E5%B7%A6%E5%8F%B3%EF%BC%8C%E6%89%A9%E5%85%85%E7%94%A8%E6%88%B7%E5%8F%AF%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "linux"
     ],
@@ -818,7 +818,7 @@
     "title": "mysql.zip压缩包安装（9.4.0版本为例）",
     "description": "以 MySQL 9.4.0 为例，分别介绍 Windows 和 Linux 下通过 .zip 压缩包安装 MySQL 的详细步骤，包括下载、解压、配置 my.ini/my.cnf、初始化、安装服务、启动、登录及修改密码，以及卸载和重建服务的方法。",
     "date": "2025-10-18 14:58:08",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/mysql.zip%E5%8E%8B%E7%BC%A9%E5%8C%85%E5%AE%89%E8%A3%85%EF%BC%889.4.0%E7%89%88%E6%9C%AC%E4%B8%BA%E4%BE%8B%EF%BC%89/mysql.zip%E5%8E%8B%E7%BC%A9%E5%8C%85%E5%AE%89%E8%A3%85%EF%BC%889.4.0%E7%89%88%E6%9C%AC%E4%B8%BA%E4%BE%8B%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "mysql",
       "数据库",
@@ -833,7 +833,7 @@
     "title": "安装Anaconda与pytorch，在IDEA中配置环境进行编程",
     "description": "指导安装 Anaconda、创建虚拟环境、安装 PyTorch（CUDA 版本），并在 IDEA 中配置 Python 解释器。",
     "date": "2024-11-01 21:54:16",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E5%AE%89%E8%A3%85Anaconda%E4%B8%8Epytorch%EF%BC%8C%E5%9C%A8IDEA%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83%E8%BF%9B%E8%A1%8C%E7%BC%96%E7%A8%8B/%E5%AE%89%E8%A3%85Anaconda%E4%B8%8Epytorch%EF%BC%8C%E5%9C%A8IDEA%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83%E8%BF%9B%E8%A1%8C%E7%BC%96%E7%A8%8B.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "pytorch",
       "人工智能",
@@ -847,7 +847,7 @@
     "title": "SSM学习记录7：通过cdn引入vue进行使用",
     "description": "记录在 SSM 项目中通过 CDN 引入 Vue 和 Vue Router 的方法，包括实例化 Vue、模块化开发（导出/导入配置）、路由配置、动态组件使用、数据双向绑定，以及 Vue3 的简单引用方式。",
     "date": "2024-10-27 18:22:20",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%957%EF%BC%9A%E9%80%9A%E8%BF%87cdn%E5%BC%95%E5%85%A5vue%E8%BF%9B%E8%A1%8C%E4%BD%BF%E7%94%A8/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%957%EF%BC%9A%E9%80%9A%E8%BF%87cdn%E5%BC%95%E5%85%A5vue%E8%BF%9B%E8%A1%8C%E4%BD%BF%E7%94%A8.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "vue.js",
       "javascript",
@@ -861,7 +861,7 @@
     "title": "SSM学习记录8：通过axios上传文件并在网页得到服务器中的图片（注解方式）",
     "description": "讲解在 SSM（注解方式）中通过 axios 上传文件，并在 Spring MVC 中接收文件（MultipartFile）存储到服务器，同时配置资源处理器使前端能访问图片，并介绍刷新图片缓存的方法。",
     "date": "2024-10-27 18:21:02",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%958%EF%BC%9A%E9%80%9A%E8%BF%87axios%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%B9%B6%E5%9C%A8%E7%BD%91%E9%A1%B5%E5%BE%97%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%AD%E7%9A%84%E5%9B%BE%E7%89%87%EF%BC%88%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F%EF%BC%89/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%958%EF%BC%9A%E9%80%9A%E8%BF%87axios%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%B9%B6%E5%9C%A8%E7%BD%91%E9%A1%B5%E5%BE%97%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%AD%E7%9A%84%E5%9B%BE%E7%89%87%EF%BC%88%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "学习",
       "servlet",
@@ -875,7 +875,7 @@
     "title": "SSM学习记录9：SpringBoot整合SSM（注解方式）",
     "description": "记录 Spring Boot 整合 SSM（注解方式）的过程，包括创建项目、选择依赖、配置文件（properties/yml）、数据读取、JUnit 测试、整合 MyBatis（@Mapper）、配置数据源（Druid）、静态资源处理、文件上传配置以及页面引用。",
     "date": "2024-10-27 18:20:41",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%959%EF%BC%9ASpringBoot%E6%95%B4%E5%90%88SSM%EF%BC%88%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F%EF%BC%89/SSM%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%959%EF%BC%9ASpringBoot%E6%95%B4%E5%90%88SSM%EF%BC%88%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "spring boot",
       "学习",
@@ -889,7 +889,7 @@
     "title": "YOLOV1学习笔记",
     "description": "记录 YOLOv1 目标检测算法的原理，包括思想、网络结构、损失函数、训练预测流程及后处理（NMS）。",
     "date": "2024-10-27 18:19:31",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/YOLOV1%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/YOLOV1%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "YOLO",
       "学习",
@@ -903,7 +903,7 @@
     "title": "yolov8-ultralytics-利用TP、TN、FP、FN添加mIoU指标",
     "description": "在 YOLOv8 的 Ultralytics 代码中添加 mIoU 指标，通过修改 ConfusionMatrix 和验证类实现。",
     "date": "2024-10-27 18:18:20",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/yolov8-ultralytics-%E5%88%A9%E7%94%A8TP%E3%80%81TN%E3%80%81FP%E3%80%81FN%E6%B7%BB%E5%8A%A0mIoU%E6%8C%87%E6%A0%87/yolov8-ultralytics-%E5%88%A9%E7%94%A8TP%E3%80%81TN%E3%80%81FP%E3%80%81FN%E6%B7%BB%E5%8A%A0mIoU%E6%8C%87%E6%A0%87.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "YOLO"
     ],
@@ -915,7 +915,7 @@
     "title": "JAVA音频研究7：读取MP3标签信息（ID3V1、ID3V2）",
     "description": "通过 Java 代码读取 MP3 文件的 ID3V1 和 ID3V2 标签信息（标题、作者、专辑等），并提取嵌入的图片保存到本地，提供了完整的 MediaInfoHandler 类实现和调用示例。",
     "date": "2024-10-26 01:46:05",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/JAVA%E9%9F%B3%E9%A2%91%E7%A0%94%E7%A9%B67%EF%BC%9A%E8%AF%BB%E5%8F%96MP3%E6%A0%87%E7%AD%BE%E4%BF%A1%E6%81%AF%EF%BC%88ID3V1%E3%80%81ID3V2%EF%BC%89/JAVA%E9%9F%B3%E9%A2%91%E7%A0%94%E7%A9%B67%EF%BC%9A%E8%AF%BB%E5%8F%96MP3%E6%A0%87%E7%AD%BE%E4%BF%A1%E6%81%AF%EF%BC%88ID3V1%E3%80%81ID3V2%EF%BC%89.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "java"
     ],
@@ -927,7 +927,7 @@
     "title": "图片文件探究1：各种图片文件十六进制的文件头和文件尾",
     "description": "列举常见图片文件（JPEG、PNG、GIF 等）的十六进制文件头尾标识。",
     "date": "2024-10-26 01:45:34",
-    "cover": "https://s3.cstcloud.cn/a82efaf0641a40d2b81869f1d11789d2/%E5%8D%9A%E6%96%87/%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E6%8E%A2%E7%A9%B61%EF%BC%9A%E5%90%84%E7%A7%8D%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B4%E5%92%8C%E6%96%87%E4%BB%B6%E5%B0%BE/%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E6%8E%A2%E7%A9%B61%EF%BC%9A%E5%90%84%E7%A7%8D%E5%9B%BE%E7%89%87%E6%96%87%E4%BB%B6%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B4%E5%92%8C%E6%96%87%E4%BB%B6%E5%B0%BE.jpg",
+    "cover": "https://bee-reg-ab.imagency.cn/e/355377101f1f5236d827ba89a1caeace.jpg",
     "tags": [
       "imageview"
     ],
