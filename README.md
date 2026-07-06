@@ -5,7 +5,7 @@
 ## 技术栈
 
 - Nuxt 4 / Vue 3 / TypeScript
-- Nuxt Content 3
+- @nuxtjs/mdc Markdown 渲染
 - Pinia
 - Tailwind CSS 4
 - Nitro Server API
@@ -41,16 +41,9 @@ app/
   layouts/             页面布局
   pages/               Nuxt 路由页面
   stores/              Pinia 状态
-  utils/               通用工具函数与历史迁移辅助脚本
-content/
-  about/               关于页 Markdown
-  chatters/            杂谈 Markdown
-  moments/             动态 Markdown
-  posts/               博文 Markdown
-  lyrics/              音乐歌词 LRC
+  utils/               通用工具函数
 docs/                  项目文档
 public/
-  music/               本地音乐资源
   CNAME                GitHub Pages 自定义域名配置
   .nojekyll            GitHub Pages 静态资源保留配置
   orange-cat-sprite.png 页面橘猫精灵图资源
@@ -66,7 +59,6 @@ shared/                前后端共享类型与配置
 
 - 元数据入口：数据胶囊数据集根目录 `records.json`
 - 内容读取入口：`app/data/records.ts`、`app/data/content.ts`
-- Nuxt Content 集合配置：`content.config.ts`
 - 内容维护说明：[`docs/data-guide.md`](docs/data-guide.md)
 
 Markdown 正文不需要写 frontmatter。标题、日期、封面、标签等元数据统一放在 `records.json` 中，再由页面和内容读取逻辑合并使用。
@@ -143,7 +135,6 @@ DATA_CAPSULE_SECRET_ACCESS_KEY=
 
 - 不要提交 `.env`、本地日志、构建产物和真实密钥。
 - `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 是依赖、生成缓存或本地 IDE 配置，已加入 Git 忽略。
-- `.data/content/contents.sqlite` 是 Nuxt Content 的本地索引缓存，不是业务源数据。
 - 修改已有记录的 `id` 会影响页面路径和关联 Markdown / LRC 文件名。
 - 管理页面保存/删除会先进入待同步区；点击“同步数据胶囊”后会写回数据胶囊根目录 `records.json` 并同步相关资源对象。
 - 管理页面删除记录时需要谨慎处理关联文件，避免误删正文或歌词。

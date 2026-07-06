@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type Song, useSongsData } from '~/data'
+import { fetchSongsData, type Song } from '~/data'
 
 export type LyricLine = {
   time: number
@@ -186,7 +186,7 @@ export const useMusicStore = defineStore('music', () => {
         playMode.value = state.playMode
       }
       isEnded.value = false
-      isPlaying.value = Boolean(state.isPlaying)
+      isPlaying.value = false
     } catch {
       window.localStorage.removeItem(musicStorageKey)
     }
@@ -228,8 +228,8 @@ export const useMusicStore = defineStore('music', () => {
       await syncLyrics()
       return
     }
-    const songItems = await useSongsData()
-    songsList.value = songItems.value
+    const songItems = await fetchSongsData()
+    songsList.value = songItems
         .filter((song) => !song.error && song.url)
         .map((song, index) => ({
           ...song,

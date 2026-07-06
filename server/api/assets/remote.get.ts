@@ -29,7 +29,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: '资源不存在' })
   }
 
-  const asset = await readDataCapsuleObjectWithMeta(url)
+  let asset
+  try {
+    asset = await readDataCapsuleObjectWithMeta(url)
+  } catch (error) {
+    console.warn('[assets:remote] 数据胶囊资源读取失败：', error instanceof Error ? error.message : error)
+    throw createError({
+      statusCode: 503,
+      statusMessage: '资源读取失败，请稍后重试'
+    })
+  }
+
   if (!asset.body.byteLength) {
     throw createError({ statusCode: 404, statusMessage: '资源不存在' })
   }

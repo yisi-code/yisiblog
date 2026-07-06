@@ -9,12 +9,17 @@ import {
 import type { AdminDataRecord } from '~~/shared/adminData'
 
 export const recordsObjectKey = 'records.json'
-const recordsCacheTtlMs = 30 * 1000
+const recordsCacheTtlMs = 5 * 60 * 1000
+const recordsFailureCooldownMs = 60 * 1000
 let recordsCache: {
   records: AdminDataRecord[]
   expiresAt: number
 } | null = null
 let recordsReadPromise: Promise<AdminDataRecord[]> | null = null
+let recordsLastFailure: {
+  message: string
+  retryAfter: number
+} | null = null
 
 function cloneRecords(records: AdminDataRecord[]): AdminDataRecord[] {
   return records.map((record) => ({
@@ -30,10 +35,29 @@ function setRecordsCache(records: AdminDataRecord[]) {
     records: cloneRecords(records),
     expiresAt: Date.now() + recordsCacheTtlMs
   }
+  recordsLastFailure = null
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
+}
+
+function failureCooldownMessage(now = Date.now()) {
+  if (!recordsLastFailure || recordsLastFailure.retryAfter <= now) return ''
+
+  const waitSeconds = Math.ceil((recordsLastFailure.retryAfter - now) / 1000)
+  return `records.json 读取暂缓，${waitSeconds} 秒后重试：${recordsLastFailure.message}`
 }
 
 export async function readDataCapsuleRecords() {
-  if (recordsCache && recordsCache.expiresAt > Date.now()) return cloneRecords(recordsCache.records)
+  const now = Date.now()
+  if (recordsCache && recordsCache.expiresAt > now) return cloneRecords(recordsCache.records)
+
+  const cooldownMessage = failureCooldownMessage(now)
+  if (cooldownMessage) {
+    if (recordsCache) return cloneRecords(recordsCache.records)
+    throw new Error(cooldownMessage)
+  }
 
   recordsReadPromise ||= (async () => {
     try {
@@ -41,6 +65,20 @@ export async function readDataCapsuleRecords() {
       const records = (JSON.parse(source || '[]') as AdminDataRecord[]).map(normalizeRecordForRead)
       setRecordsCache(records)
       return records
+    } catch (error) {
+      const message = errorMessage(error)
+      recordsLastFailure = {
+        message,
+        retryAfter: Date.now() + recordsFailureCooldownMs
+      }
+
+      if (recordsCache) {
+        recordsCache.expiresAt = recordsLastFailure.retryAfter
+        console.warn('[records:data-capsule] records.json 读取失败，使用最近一次成功读取的数据胶囊缓存：', message)
+        return recordsCache.records
+      }
+
+      throw error
     } finally {
       recordsReadPromise = null
     }

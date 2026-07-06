@@ -15,13 +15,7 @@
 <script setup lang="ts">
 import {
   siteConfig,
-  useAlbumsData,
-  useChattersData,
-  useFriendsData,
-  useMomentsData,
-  usePostsData,
-  useProjectsData,
-  useSongsData
+  useHomePageData
 } from '~/data'
 import {
   buildHomeSearchItems,
@@ -32,44 +26,59 @@ import {
   buildLatestPosts
 } from '~/data/home'
 
-const postItems = await usePostsData('home-posts')
-const chatterItems = await useChattersData('home-chatters')
-const momentItems = await useMomentsData('home-moments')
-const albumItems = await useAlbumsData()
-const friendItems = await useFriendsData()
-const projectItems = await useProjectsData()
-const songItems = await useSongsData()
+const { data: homeData, refresh, status } = useHomePageData()
 
 const defaultChatterCover = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
 
-const latestPosts = computed(() => buildLatestPosts(postItems.value))
-const latestChatters = computed(() => buildLatestChatters(chatterItems.value, defaultChatterCover))
+const safePostItems = computed(() => homeData.value?.posts || [])
+const safeChatterItems = computed(() => homeData.value?.chatters || [])
+const safeMomentItems = computed(() => homeData.value?.moments || [])
+const safeAlbumItems = computed(() => homeData.value?.albums || [])
+const safeFriendItems = computed(() => homeData.value?.friends || [])
+const safeProjectItems = computed(() => homeData.value?.projects || [])
+const safeSongItems = computed(() => homeData.value?.songs || [])
+
+function refreshEmptyHomeData() {
+  const hasCoreContent = safePostItems.value.length > 0
+      || safeChatterItems.value.length > 0
+      || safeMomentItems.value.length > 0
+
+  if (!hasCoreContent && status.value === 'idle') {
+    void refresh()
+  }
+}
+
+onMounted(refreshEmptyHomeData)
+onActivated(refreshEmptyHomeData)
+
+const latestPosts = computed(() => buildLatestPosts(safePostItems.value))
+const latestChatters = computed(() => buildLatestChatters(safeChatterItems.value, defaultChatterCover))
 
 const homeSearchItems = computed(() => buildHomeSearchItems({
-  posts: postItems.value,
-  chatters: chatterItems.value,
-  moments: momentItems.value,
-  friends: friendItems.value,
-  albums: albumItems.value,
-  projects: projectItems.value,
-  songs: songItems.value
+  posts: safePostItems.value,
+  chatters: safeChatterItems.value,
+  moments: safeMomentItems.value,
+  friends: safeFriendItems.value,
+  albums: safeAlbumItems.value,
+  projects: safeProjectItems.value,
+  songs: safeSongItems.value
 }))
 
-const latestAlbum = computed(() => buildLatestAlbum(albumItems.value))
-const latestMomentCard = computed(() => buildLatestMomentCard(momentItems.value))
+const latestAlbum = computed(() => buildLatestAlbum(safeAlbumItems.value))
+const latestMomentCard = computed(() => buildLatestMomentCard(safeMomentItems.value))
 
 const stats = computed(() => buildHomeStats({
-  postsCount: postItems.value.length,
-  chattersCount: chatterItems.value.length,
-  albums: albumItems.value,
-  momentCount: momentItems.value.length,
-  projects: projectItems.value,
+  postsCount: safePostItems.value.length,
+  chattersCount: safeChatterItems.value.length,
+  albums: safeAlbumItems.value,
+  momentCount: safeMomentItems.value.length,
+  projects: safeProjectItems.value,
 }))
 
 useHead(() => ({
   title: `${siteConfig.navTitle}${siteConfig.navSuffix}${siteConfig.navAfter}`,
   meta: [
-    { name: 'description', content: '欢迎光顾！' }
+    {name: 'description', content: '欢迎光顾！'}
   ]
 }))
 </script>

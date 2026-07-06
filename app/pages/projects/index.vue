@@ -79,7 +79,7 @@ import { highlightSearchParts } from '~/utils/searchHighlight'
 type ProjectSourceType = 'github' | 'gitee' | 'website'
 
 const searchQuery = ref('')
-const projects = await useProjectsData()
+const projects = useProjectsData()
 const lucideIconMap = LucideIcons as unknown as Record<string, Component | undefined>
 const fallbackProjectIcon = LucideIcons.Code2
 const projectIconAliases: Record<string, Component> = {

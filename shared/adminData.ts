@@ -103,7 +103,6 @@ export type AdminDataRecord = {
 
 export type AdminManagedRecord = AdminDataRecord & {
   content?: string
-  contentFile?: string
   lrc?: string
   lrcFile?: string
 }
@@ -148,17 +147,6 @@ export type AdminSyncRecordsResponse = {
 
 export function adminRecordNeedsMarkdown(type: AdminRecordType) {
   return type === 'post' || type === 'chatter' || type === 'moment' || type === 'about'
-}
-
-export function adminContentFile(type: AdminRecordType, id: string) {
-  const baseByType: Partial<Record<AdminRecordType, string>> = {
-    post: 'posts',
-    chatter: 'chatters',
-    moment: 'moments',
-    about: 'about'
-  }
-  const base = baseByType[type]
-  return base ? `${base}/${id}.md` : ''
 }
 
 export function adminLyricFileName(url?: string, fallbackTitle?: string, fallbackId?: string) {

@@ -41,6 +41,14 @@
           <Save :size="17" aria-hidden="true"/>
           保存草稿
         </button>
+        <button
+            class="admin-data-button"
+            type="button"
+            :disabled="!canSaveCloudDraft"
+            @click="saveCloudDraft">
+          <CloudUpload :size="17" aria-hidden="true"/>
+          保存云端草稿
+        </button>
       </div>
 
       <aside class="admin-data-sidebar glass-panel">
@@ -137,7 +145,7 @@
                 @click="syncDataCapsule"
             >
               <CloudUpload :size="17" aria-hidden="true"/>
-              同步数据胶囊
+              同步 GitHub
             </button>
           </div>
 
@@ -208,7 +216,7 @@
                           class="admin-data-select__button admin-data-folder-select__input"
                           :placeholder="target.placeholder"
                           @focus="openFolderDropdown(target.key)"
-                          @input="openFolderDropdown(target.key)"
+                          @input="handleUploadFolderInput(target.key)"
                           @keydown.escape="closeFolderDropdown">
                     </template>
                     <button
@@ -282,10 +290,7 @@
 
             <label v-if="showCoverField" class="admin-data-field admin-data-field--wide">
               <span>封面</span>
-              <div class="admin-data-media-row">
-                <input v-model="draft.cover" class="admin-data-input" placeholder="选择图片后自动填入远程地址">
-                <AdminFilePicker label="选择图片" accept="image/*" @change="handleCoverImageSelected"/>
-              </div>
+              <input v-model="draft.cover" class="admin-data-input" placeholder="输入图片链接">
               <img v-if="draft.cover" class="admin-data-preview-image" :src="previewAssetUrl(draft.cover)" alt="封面预览">
             </label>
 
@@ -295,7 +300,7 @@
                 <input
                     v-model="draft.url"
                     class="admin-data-input"
-                    :placeholder="draft.type === 'music' ? '/music/song.m4a 或 https://...' : 'https://...'">
+                    :placeholder="draft.type === 'music' ? '选择音乐后自动填入远程地址' : 'https://...'">
                 <AdminFilePicker v-if="draft.type === 'music'" label="选择音乐" accept="audio/*" @change="handleMusicSelected"/>
               </div>
               <div v-if="musicFile" class="admin-data-file-pill">
@@ -324,10 +329,7 @@
               </label>
               <label v-if="showImagesField" class="admin-data-field admin-data-field--wide">
                 <span>图片</span>
-                <div class="admin-data-media-row">
-                  <textarea v-model="imagesText" class="admin-data-textarea" placeholder="选择图片后自动追加远程地址"/>
-                  <AdminFilePicker label="选择图片" accept="image/*" multiple @change="handleMomentImagesSelected"/>
-                </div>
+                <textarea v-model="imagesText" class="admin-data-textarea" placeholder="一行一个图片链接"/>
                 <div v-if="momentImages.length" class="admin-data-image-grid">
                   <img v-for="image in momentPreviewImages" :key="image" :src="image" alt="动态图片">
                 </div>
@@ -347,10 +349,7 @@
 
             <div v-if="showPhotosField" class="admin-data-field admin-data-field--wide">
               <span>相册图片</span>
-              <div class="admin-data-media-row">
-                <textarea v-model="albumPhotoUrlsText" class="admin-data-textarea" placeholder="选择图片后自动追加远程地址"/>
-                <AdminFilePicker label="选择图片" accept="image/*" multiple @change="handleAlbumImagesSelected"/>
-              </div>
+              <textarea v-model="albumPhotoUrlsText" class="admin-data-textarea" placeholder="一行一个图片链接"/>
               <div v-if="albumPhotoDrafts.length" class="admin-data-photo-rows">
                 <div
                     v-for="(photo, index) in albumPhotoDrafts"
@@ -459,6 +458,10 @@ import {
 type EditorMode = 'idle' | 'create' | 'edit'
 type DraftSaveMode = 'manual' | 'auto' | 'sync'
 type DraftSaveResult = 'saved' | 'unchanged' | 'invalid' | 'error'
+type AdminCloudDraftState = {
+  drafts: Record<string, EditorDraftCache>
+  pendingChanges: AdminPendingChange[]
+}
 type AdminSession = {
   session: string
   expiresAt: number
@@ -491,7 +494,7 @@ type AdminUploadedFilePayload = {
   size?: number
   mimeType?: string
 }
-type UploadFolderTarget = 'music' | 'lyric' | 'image'
+type UploadFolderTarget = 'music' | 'lyric'
 type UploadFolderConfig = {
   key: UploadFolderTarget
   label: string
@@ -531,6 +534,7 @@ const activeFolderTarget = ref<UploadFolderTarget | ''>('')
 const isVerifying = ref(false)
 const isLoading = ref(false)
 const isSyncing = ref(false)
+const isSavingCloudDraft = ref(false)
 const isTypeSelectOpen = ref(false)
 const statusMessage = ref('')
 const statusType = ref<'info' | 'success' | 'error'>('info')
@@ -559,24 +563,27 @@ const typeFields = reactive({
 })
 const uploadFolders = reactive({
   music: '',
-  lyric: '',
-  image: ''
+  lyric: ''
+})
+const uploadFolderTouched = reactive<Record<UploadFolderTarget, boolean>>({
+  music: false,
+  lyric: false
 })
 const uploadFolderConfigs: UploadFolderConfig[] = [
   { key: 'music', label: '音乐', placeholder: '音乐文件夹' },
-  { key: 'lyric', label: '歌词', placeholder: '音乐歌词文件夹' },
-  { key: 'image', label: '图片', placeholder: '图片文件夹' }
+  { key: 'lyric', label: '歌词', placeholder: '音乐歌词文件夹' }
 ]
 let hasTriedLoadingFolders = false
 const isLoadingFolders = ref(false)
 const folderLoadError = ref('')
 
-const isBusy = computed(() => isVerifying.value || isLoading.value || isSyncing.value)
+const isBusy = computed(() => isVerifying.value || isLoading.value || isSyncing.value || isSavingCloudDraft.value)
 const isAuthenticated = computed(() => Boolean(adminSession.value && adminSession.value.expiresAt > Date.now()))
 const isCreating = computed(() => editorMode.value === 'create')
 const hasEditorDraft = computed(() => editorMode.value !== 'idle')
 const needsMarkdown = computed(() => adminRecordNeedsMarkdown(draft.type))
 const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type))
+const canSaveCloudDraft = computed(() => !isBusy.value && isAuthenticated.value && Boolean(pendingChanges.value.length || canSave.value))
 const canDeleteDraft = computed(() => !isCreating.value && draft.type !== 'about')
 const canCreateSelectedType = computed(() => selectedType.value !== 'about')
 const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length || canSave.value))
@@ -597,7 +604,7 @@ const showIconField = computed(() => hasDraftField('icon'))
 const showLrcField = computed(() => draft.type === 'music')
 const visibleUploadTargets = computed(() => uploadFolderConfigs.filter((target) => {
   if (target.key === 'music' || target.key === 'lyric') return draft.type === 'music'
-  return showCoverField.value || showImagesField.value || showPhotosField.value
+  return false
 }))
 const defaultUploadFolder = computed(() => recordUploadFolder())
 const momentImages = computed(() => splitLines(imagesText.value))
@@ -637,6 +644,11 @@ useScrollSticky(adminDataActionsRef, {
 
 watch(() => draft.type, (type) => {
   if (hasEditorDraft.value) selectedType.value = type
+  updateAutoUploadFolders()
+})
+
+watch(() => [draft.id, draft.title], () => {
+  updateAutoUploadFolders()
 })
 
 watch(albumPhotoUrlsText, () => {
@@ -653,8 +665,10 @@ watch(editorDrafts, () => {
 
 onMounted(() => {
   restoreSession()
-  restorePendingChanges()
-  restoreEditorDrafts()
+  if (!isAuthenticated.value) {
+    restorePendingChanges()
+    restoreEditorDrafts()
+  }
   if (isAuthenticated.value) void loadRecords()
 })
 
@@ -709,6 +723,11 @@ function normalizeFolderInput(value: string) {
   return value.trim().replace(/^\/+|\/+$/g, '')
 }
 
+function resetUploadFolderTouched() {
+  uploadFolderTouched.music = false
+  uploadFolderTouched.lyric = false
+}
+
 function safePathPart(value: string | undefined, fallback: string) {
   const clean = Array.from(String(value || ''))
       .filter((char) => {
@@ -716,7 +735,7 @@ function safePathPart(value: string | undefined, fallback: string) {
         return code > 31 && code !== 127
       })
       .join('')
-      .replace(/[\\/]/g, '-')
+      .replace(/[<>:"/\\|?*#%&{}^~[\]`]/g, '_')
       .trim()
 
   return clean || fallback
@@ -724,6 +743,42 @@ function safePathPart(value: string | undefined, fallback: string) {
 
 function recordUploadFolder() {
   return `${dataFolderByType[draft.type]}/${safePathPart(draft.id.trim() || draft.title?.trim(), '未命名')}`
+}
+
+function folderFromAssetUrl(value?: string) {
+  if (!value) return ''
+
+  try {
+    const url = new URL(value)
+    const parts = url.pathname
+        .split('/')
+        .filter(Boolean)
+        .map((part) => decodeURIComponent(part))
+
+    parts.pop()
+    if (/^s3\.cstcloud\.cn$/i.test(url.hostname) && parts.length > 1) parts.shift()
+    return normalizeFolderInput(parts.join('/'))
+  } catch {
+    const parts = value.split(/[?#]/)[0]?.split('/').filter(Boolean) || []
+    parts.pop()
+    return normalizeFolderInput(parts.join('/'))
+  }
+}
+
+function uploadFolderDefaultForTarget(target: UploadFolderTarget, record: AdminDataRecord = draft) {
+  if (target === 'music') return folderFromAssetUrl(record.url) || recordUploadFolder()
+  return folderFromAssetUrl(record.lrcUrl) || folderFromAssetUrl(record.url) || recordUploadFolder()
+}
+
+function setAutoUploadFolders(record: AdminDataRecord = draft) {
+  uploadFolders.music = uploadFolderDefaultForTarget('music', record)
+  uploadFolders.lyric = uploadFolderDefaultForTarget('lyric', record)
+}
+
+function updateAutoUploadFolders() {
+  if (!hasEditorDraft.value) return
+  if (!uploadFolderTouched.music) uploadFolders.music = uploadFolderDefaultForTarget('music')
+  if (!uploadFolderTouched.lyric) uploadFolders.lyric = uploadFolderDefaultForTarget('lyric')
 }
 
 function uploadFolder(target: UploadFolderTarget) {
@@ -767,8 +822,14 @@ function setFolderDropdownOpen(target: UploadFolderTarget, isOpen: boolean) {
 }
 
 function selectUploadFolder(target: UploadFolderTarget, folder: string) {
+  uploadFolderTouched[target] = true
   uploadFolders[target] = folder
   closeFolderDropdown()
+}
+
+function handleUploadFolderInput(target: UploadFolderTarget) {
+  uploadFolderTouched[target] = true
+  openFolderDropdown(target)
 }
 
 async function loadDataCapsuleFolders() {
@@ -861,6 +922,28 @@ function restoreEditorDrafts() {
     if (parsed && typeof parsed === 'object') editorDrafts.value = parsed
   } catch {
     window.localStorage.removeItem(editorDraftsStorageKey)
+  }
+}
+
+async function restoreCloudDraftState() {
+  if (!isAuthenticated.value) return false
+
+  try {
+    const cloudState = await $fetch<AdminCloudDraftState>('/api/admin/drafts', {
+      headers: requestHeaders()
+    })
+    const cloudPendingChanges = Array.isArray(cloudState.pendingChanges) ? cloudState.pendingChanges : []
+    const cloudDrafts = cloudState.drafts && typeof cloudState.drafts === 'object' ? cloudState.drafts : {}
+    const hasCloudState = cloudPendingChanges.length || Object.keys(cloudDrafts).length
+    if (!hasCloudState) return false
+
+    pendingChanges.value = cloudPendingChanges
+    editorDrafts.value = cloudDrafts
+    setStatus('已恢复云端草稿和待同步数据', 'success')
+    return true
+  } catch (error) {
+    console.warn('[admin-data:cloud-drafts]', error)
+    return false
   }
 }
 
@@ -965,6 +1048,8 @@ function syncDraftFromRecord(record: AdminManagedRecord) {
   typeFields.error = String(record.error || '')
   typeFields.icon = String(record.icon || '')
   originalId.value = record.id
+  resetUploadFolderTouched()
+  setAutoUploadFolders(record)
 }
 
 function clearEditorDraft(type: AdminRecordType = selectedType.value) {
@@ -985,6 +1070,8 @@ function clearEditorDraft(type: AdminRecordType = selectedType.value) {
   typeFields.artist = ''
   typeFields.error = ''
   typeFields.icon = ''
+  resetUploadFolderTouched()
+  setAutoUploadFolders()
 }
 
 function currentEditorCache(): EditorDraftCache {
@@ -1034,6 +1121,8 @@ function restoreEditorCache(key: string) {
   albumPhotoDrafts.value = cache.albumPhotoDrafts || []
   albumPhotoUrlsText.value = cache.albumPhotoUrlsText || albumPhotoDrafts.value.map((photo) => photo.url).join('\n')
   Object.assign(typeFields, cache.typeFields || {})
+  resetUploadFolderTouched()
+  setAutoUploadFolders(cache.record)
   return true
 }
 
@@ -1218,7 +1307,6 @@ function applyPendingChanges(baseRecords: AdminManagedRecord[], changes = pendin
         ...change.record,
         content: change.content,
         lrc: change.lrc,
-        contentFile: change.snapshot?.contentFile,
         lrcFile: change.snapshot?.lrcFile
       }
       const index = nextRecords.findIndex((record) => record.type === nextRecord.type && record.id === (change.originalId || nextRecord.id))
@@ -1370,6 +1458,37 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
   }
 }
 
+async function saveCloudDraft() {
+  if (hasEditorDraft.value) {
+    const result = saveDraftChange('sync')
+    if (result === 'invalid' || result === 'error') return
+  }
+
+  if (!pendingChanges.value.length && !Object.keys(editorDrafts.value).length) {
+    setStatus('暂无需要保存的云端草稿', 'info')
+    return
+  }
+
+  isSavingCloudDraft.value = true
+  showTask('正在保存云端草稿', '正在将草稿和待同步数据写入数据胶囊暂存区。')
+  try {
+    await $fetch('/api/admin/drafts', {
+      method: 'POST',
+      headers: requestHeaders(),
+      body: {
+        drafts: editorDrafts.value,
+        pendingChanges: pendingChanges.value
+      }
+    })
+    setStatus('云端草稿已保存', 'success')
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : '保存云端草稿失败', 'error')
+  } finally {
+    isSavingCloudDraft.value = false
+    hideTask()
+  }
+}
+
 function deleteRecord(deleteAssociatedFiles: boolean) {
   if (!selectedRecordKey.value || draft.type === 'about') return
   const target = records.value.find((record) => recordKey(record) === selectedRecordKey.value)
@@ -1494,6 +1613,11 @@ async function loadRecords() {
     const response = await $fetch<AdminRecordsResponse>('/api/admin/records', {
       headers: requestHeaders()
     })
+    const hasCloudDraft = await restoreCloudDraftState()
+    if (!hasCloudDraft) {
+      restorePendingChanges()
+      restoreEditorDrafts()
+    }
     void loadDataCapsuleFolders()
     sourceRecords.value = response.records
     persistRecordsCache(response.records)
@@ -1526,9 +1650,9 @@ async function syncDataCapsule() {
   }
 
   isSyncing.value = true
-  showTask('正在同步数据胶囊', `正在提交 ${pendingChanges.value.length} 项变更，请不要关闭页面。`)
+  showTask('正在同步 GitHub', `正在提交 ${pendingChanges.value.length} 项变更，请不要关闭页面。`)
   try {
-    const response = await $fetch<AdminSyncRecordsResponse>('/api/admin/records/sync', {
+    const response = await $fetch<AdminSyncRecordsResponse>('/api/admin/records/sync-github', {
       method: 'POST',
       headers: requestHeaders(),
       body: payload
@@ -1541,9 +1665,9 @@ async function syncDataCapsule() {
     const currentRecord = records.value.find((record) => recordKey(record) === selectedRecordKey.value)
     if (currentRecord) editRecord(currentRecord)
     else clearEditorDraft(selectedType.value)
-    setStatus(`已同步 ${response.syncedCount} 项变更到数据胶囊`, 'success')
+    setStatus(`已同步 ${response.syncedCount} 项变更到 GitHub`, 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '同步数据胶囊失败', 'error')
+    setStatus(error instanceof Error ? error.message : '同步 GitHub 失败', 'error')
   } finally {
     isSyncing.value = false
     hideTask()
@@ -1597,71 +1721,6 @@ async function handleLyricSelected(files: File[]) {
     setStatus(error instanceof Error ? error.message : '上传歌词失败', 'error')
   } finally {
     hideTask()
-  }
-}
-
-function uploadBaseName(suffix?: string | number) {
-  const baseName = draft.id.trim() || draft.title?.trim() || 'image'
-  if (!suffix) return baseName
-  return `${baseName}-${suffix}`
-}
-
-async function uploadImageFile(file: File, fileName: string) {
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('folder', uploadFolder('image'))
-  formData.append('fileName', fileName)
-
-  return await $fetch<AdminUploadedFilePayload>('/api/admin/image', {
-    method: 'POST',
-    headers: requestHeaders(),
-    body: formData
-  })
-}
-
-async function uploadSelectedImages(files: File[], fileNameForIndex: (index: number) => string) {
-  const selectedFiles = files
-  if (!selectedFiles.length) return []
-
-  showTask('正在上传图片', `正在上传 ${selectedFiles.length} 张图片到 ${uploadFolder('image')} 目录。`)
-  try {
-    return await Promise.all(selectedFiles.map((file, index) => uploadImageFile(file, fileNameForIndex(index))))
-  } catch (error) {
-    setStatus(error instanceof Error ? error.message : '上传图片失败', 'error')
-    return []
-  } finally {
-    hideTask()
-  }
-}
-
-async function handleCoverImageSelected(files: File[]) {
-  const uploaded = await uploadSelectedImages(files, () => uploadBaseName())
-  if (uploaded[0]?.publicUrl) {
-    draft.cover = uploaded[0].publicUrl
-    setStatus('封面已上传，保存草稿后进入待同步区', 'success')
-  }
-}
-
-async function handleMomentImagesSelected(files: File[]) {
-  const startIndex = splitLines(imagesText.value).length
-  const uploaded = await uploadSelectedImages(files, (index) => uploadBaseName(startIndex + index + 1))
-  const urls = uploaded.map((file) => file.publicUrl).filter(Boolean)
-  if (urls.length) {
-    imagesText.value = [...splitLines(imagesText.value), ...urls].join('\n')
-    setStatus(`已上传 ${urls.length} 张动态图片，保存草稿后进入待同步区`, 'success')
-  }
-}
-
-async function handleAlbumImagesSelected(files: File[]) {
-  const startIndex = albumPhotoDrafts.value.length
-  const uploaded = await uploadSelectedImages(files, (index) => {
-    const caption = albumPhotoDrafts.value[startIndex + index]?.caption?.trim()
-    return uploadBaseName(caption || startIndex + index + 1)
-  })
-  const urls = uploaded.map((file) => file.publicUrl).filter(Boolean)
-  if (urls.length) {
-    albumPhotoUrlsText.value = [...splitLines(albumPhotoUrlsText.value), ...urls].join('\n')
-    setStatus(`已上传 ${urls.length} 张相册图片，保存草稿后进入待同步区`, 'success')
   }
 }
 

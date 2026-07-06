@@ -65,15 +65,15 @@ if (!slug) {
   throw createError({statusCode: 404, statusMessage: '未找到博文'})
 }
 
-const {data} = await usePostData(slug)
-const recentPosts = await useRecentPosts(slug)
+const {data, status} = usePostData(slug)
+const recentPosts = useRecentPosts(slug)
 
 useAdaptiveSticky(sidebarRef)
 useScrollSticky(backButtonStickyRef, {
   top: '7rem',
 })
 
-if (!data.value) {
+if (status.value === 'success' && !data.value) {
   throw createError({statusCode: 404, statusMessage: '未找到博文'})
 }
 

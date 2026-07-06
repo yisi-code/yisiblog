@@ -32,7 +32,8 @@
                   class="group/stat block w-fit rounded-2xl px-chip-inline text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ring-accent-soft)]"
                   :aria-label="`查看${stat.label}`"
               >
-                <div class="text-size-card-title-lg font-black group-hover/stat:scale-110" :style="`color: ${stat.color}`">
+                <div class="text-size-card-title-lg font-black group-hover/stat:scale-110"
+                     :style="`color: ${stat.color}`">
                   {{ stat.value }}
                 </div>
                 <div
@@ -48,9 +49,11 @@
     </div>
 
     <div class="mt-stack-md flex flex-row justify-between items-center">
-      <div class="relative overflow-hidden text-size-section-heading font-black">
-        {{ timeText || '00:00:00' }}
-      </div>
+      <ClientOnly>
+        <div class="relative overflow-hidden text-size-section-heading font-black">
+          {{ timeText || '00:00:00' }}
+        </div>
+      </ClientOnly>
 
       <div class="flex w-auto gap-3" @click.stop>
         <a
@@ -83,11 +86,13 @@
 
 <script setup lang="ts">
 import {siteConfig} from '~/data'
-import type { HomeStatItem } from '~/data/home'
+import type {HomeStatItem} from '~/data/home'
 
-defineProps<{
-  stats: HomeStatItem[]
-}>()
+withDefaults(defineProps<{
+  stats?: HomeStatItem[]
+}>(), {
+  stats: () => []
+})
 
 const copied = ref('')
 const {showToast} = useToast()

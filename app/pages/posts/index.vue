@@ -43,7 +43,7 @@
 import { usePostsData, type SiteContentItem } from '~/data'
 import { formatDisplayDate } from '~/utils/dateFormat'
 
-const data = await usePostsData('posts-page')
+const data = usePostsData('posts-page')
 
 const allTag = '全部'
 const searchQuery = ref('')

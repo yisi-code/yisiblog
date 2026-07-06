@@ -42,9 +42,11 @@ type SearchItem = {
   cover?: string
 }
 
-const props = defineProps<{
-  items: SearchItem[]
-}>()
+const props = withDefaults(defineProps<{
+  items?: SearchItem[]
+}>(), {
+  items: () => []
+})
 
 const query = ref('')
 

@@ -1,6 +1,7 @@
 export {
   recordsByType,
   findRecordBySlug,
+  fetchSongsData,
   normalizeDataRecord,
   normalizeRecords,
   recordMatchesSlug,
@@ -15,6 +16,7 @@ export {
 export {
   collectContentText,
   extractContentText,
+  useHomePageData,
   useAboutPage,
   useChatterData,
   useChattersData,

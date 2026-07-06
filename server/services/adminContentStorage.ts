@@ -1,5 +1,4 @@
 import {
-  adminContentFile,
   adminRecordNeedsMarkdown,
   type AdminDataRecord,
   type AdminManagedRecord,
@@ -124,8 +123,6 @@ export async function readAdminManagedRecordsFromDataCapsule(): Promise<AdminMan
     const managedRecord: AdminManagedRecord = { ...record }
 
     if (adminRecordNeedsMarkdown(record.type)) {
-      const contentFile = adminContentFile(record.type, record.id)
-      managedRecord.contentFile = contentFile
       if (record.contentUrl) {
         try {
           managedRecord.content = (await readDataCapsuleObject(record.contentUrl)).toString('utf8')

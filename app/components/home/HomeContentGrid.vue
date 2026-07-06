@@ -37,10 +37,25 @@
 <script setup lang="ts">
 import type { HomeCardItem, HomeMomentCard } from '~/data/home'
 
-defineProps<{
-  latestAlbum: HomeCardItem
-  latestChatters: HomeCardItem[]
-  latestPosts: HomeCardItem[]
-  latestMomentCard: HomeMomentCard
-}>()
+withDefaults(defineProps<{
+  latestAlbum?: HomeCardItem
+  latestChatters?: HomeCardItem[]
+  latestPosts?: HomeCardItem[]
+  latestMomentCard?: HomeMomentCard
+}>(), {
+  latestAlbum: () => ({
+    path: '/albums',
+    title: '',
+    description: '',
+    date: '',
+    cover: ''
+  }),
+  latestChatters: () => [],
+  latestPosts: () => [],
+  latestMomentCard: () => ({
+    description: '',
+    date: '',
+    path: '/moments'
+  })
+})
 </script>

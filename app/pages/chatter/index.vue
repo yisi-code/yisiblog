@@ -94,7 +94,7 @@
 import {extractContentText, useChattersData, type SiteContentItem} from '~/data'
 import {Sparkles} from "@lucide/vue";
 
-const items = await useChattersData('chatters-list')
+const items = useChattersData('chatters-list')
 const allTag = '全部'
 const searchQuery = ref('')
 const activeTag = ref(allTag)

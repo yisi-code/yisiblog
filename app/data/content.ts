@@ -1,14 +1,19 @@
 import {
     compareRecordsByLatest,
+    albumsFromRecords,
+    fetchNormalizedRecords,
     findRecordBySlug,
+    friendsFromRecords,
+    projectsFromRecords,
     recordMatchesSlug,
     recordSlugText,
     recordsByType,
-    useRecordsData,
+    songsFromRecords,
     type DataRecordType,
     type NormalizedDataRecord
 } from '~/data/records'
 import {formatDisplayDate} from '~/utils/dateFormat'
+import { parseMarkdown } from '@nuxtjs/mdc/runtime'
 
 type ContentBodyNode = string | number | boolean | null | undefined | {
     type?: string
@@ -26,7 +31,6 @@ export type ContentItem = {
     date?: string
     cover?: string
     tags?: string[]
-    contentFile?: string
     contentUrl?: string
     mood?: string
     location?: string
@@ -55,6 +59,26 @@ export type SiteContentItem = ContentItem & {
     tags: string[]
 }
 
+export type HomePageData = {
+    posts: SiteContentItem[]
+    chatters: SiteContentItem[]
+    moments: SiteContentItem[]
+    albums: ReturnType<typeof albumsFromRecords>
+    friends: ReturnType<typeof friendsFromRecords>
+    projects: ReturnType<typeof projectsFromRecords>
+    songs: ReturnType<typeof songsFromRecords>
+}
+
+const emptyHomePageData = (): HomePageData => ({
+    posts: [],
+    chatters: [],
+    moments: [],
+    albums: [],
+    friends: [],
+    projects: [],
+    songs: []
+})
+
 function mergeRecordContent(record: NormalizedDataRecord, item?: ContentItem | null): SiteContentItem {
     return {
         ...record,
@@ -66,39 +90,46 @@ function mergeRecordContent(record: NormalizedDataRecord, item?: ContentItem | n
     }
 }
 
-function contentPath(record: NormalizedDataRecord) {
-    return record.contentFile ? `/${record.contentFile}` : ''
-}
-
 function sortedRecords(records: NormalizedDataRecord[], type: DataRecordType) {
     return recordsByType(records, type)
-        .filter((record) => Boolean(record.contentFile))
+        .filter((record) => Boolean(record.contentUrl))
         .sort(compareRecordsByLatest)
 }
 
-async function loadRecordContent(record: NormalizedDataRecord) {
-    if (record.contentUrl) {
-        const data = await $fetch<ContentItem>('/api/content/remote', {
-            query: {
-                url: record.contentUrl,
-                path: record.path
-            }
-        })
-        return mergeRecordContent(record, data)
-    }
-
-    const path = contentPath(record)
-    if (!path) return mergeRecordContent(record)
-    const collection = record.type === 'about' ? 'about' : `${record.type}s` as 'posts' | 'chatters' | 'moments'
-    const data = await queryCollection(collection)
-        .where('stem', '=', record.contentFile)
-        .first()
-    return mergeRecordContent(record, data as ContentItem | null)
+function recordsAsContentItems(records: NormalizedDataRecord[], type: DataRecordType): SiteContentItem[] {
+    return sortedRecords(records, type).map((record) => mergeRecordContent(record))
 }
 
-async function loadContentRecords(type: DataRecordType, key: string) {
-    const records = await useRecordsData(`${key}-records`)
-    const {data} = await useAsyncData(key, () => Promise.all(sortedRecords(records.value, type).map(loadRecordContent)))
+async function loadRecordContent(record: NormalizedDataRecord) {
+    if (!record.contentUrl) return mergeRecordContent(record)
+
+    if (record.contentUrl.startsWith('/content-data/')) {
+        const markdown = await $fetch<string>(record.contentUrl)
+        const parsed = await parseMarkdown(markdown)
+        return mergeRecordContent(record, {
+            path: record.path,
+            body: parsed.body,
+            title: parsed.data?.title,
+            description: parsed.data?.description
+        })
+    }
+
+    const data = await $fetch<ContentItem>('/api/content/remote', {
+        query: {
+            url: record.contentUrl,
+            path: record.path
+        }
+    })
+    return mergeRecordContent(record, data)
+}
+
+function loadContentRecords(type: DataRecordType, key: string) {
+    const {data} = useAsyncData(key, async () => {
+        const records = await fetchNormalizedRecords()
+        return Promise.all(sortedRecords(records, type).map(loadRecordContent))
+    }, {
+        default: () => []
+    })
     return computed(() => data.value || [])
 }
 
@@ -106,24 +137,44 @@ function contentDataKey(type: DataRecordType, slug: string | string[]) {
     return `${type}-${recordSlugText(slug)}`
 }
 
-async function loadContentRecordBySlug(type: DataRecordType, slug: string | string[]) {
-    const records = await useRecordsData(`${contentDataKey(type, slug)}-records`)
+function loadContentRecordBySlug(type: DataRecordType, slug: string | string[]) {
     return useAsyncData(contentDataKey(type, slug), async () => {
-        const record = findRecordBySlug(records.value, type, slug)
+        const records = await fetchNormalizedRecords()
+        const record = findRecordBySlug(records, type, slug)
         if (!record) return null
         return loadRecordContent(record)
     })
 }
 
-async function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {
+export function useHomePageData() {
+    return useAsyncData('home-page-data', async () => {
+        const records = await fetchNormalizedRecords()
+
+        return {
+            posts: recordsAsContentItems(records, 'post'),
+            chatters: recordsAsContentItems(records, 'chatter'),
+            moments: recordsAsContentItems(records, 'moment'),
+            albums: albumsFromRecords(records),
+            friends: friendsFromRecords(records),
+            projects: projectsFromRecords(records),
+            songs: songsFromRecords(records)
+        }
+    }, {
+        default: emptyHomePageData
+    })
+}
+
+function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {
     const slugText = recordSlugText(currentSlug)
-    const records = await useRecordsData(`recent-${type}-${slugText}-records`)
-    const {data} = await useAsyncData(`recent-${type}-${slugText}`, () => Promise.all(
-        sortedRecords(records.value, type)
+    const {data} = useAsyncData(`recent-${type}-${slugText}`, async () => {
+        const records = await fetchNormalizedRecords()
+        return Promise.all(sortedRecords(records, type)
             .filter((item) => !recordMatchesSlug(item, currentSlug))
             .slice(0, limit)
-            .map(loadRecordContent)
-    ))
+            .map(loadRecordContent))
+    }, {
+        default: () => []
+    })
     return computed(() => data.value || [])
 }
 
@@ -200,38 +251,38 @@ export function extractContentText(item: ContentItem, options: { preserveLineBre
         .trim()
 }
 
-export async function usePostsData(key = 'posts-data') {
+export function usePostsData(key = 'posts-data') {
     return loadContentRecords('post', key)
 }
 
-export async function useChattersData(key = 'chatters-data') {
+export function useChattersData(key = 'chatters-data') {
     return loadContentRecords('chatter', key)
 }
 
-export async function useMomentsData(key = 'moments-data') {
+export function useMomentsData(key = 'moments-data') {
     return loadContentRecords('moment', key)
 }
 
-export async function usePostData(slug: string | string[]) {
+export function usePostData(slug: string | string[]) {
     return loadContentRecordBySlug('post', slug)
 }
 
-export async function useRecentPosts(currentSlug: string | string[], limit = 3) {
+export function useRecentPosts(currentSlug: string | string[], limit = 3) {
     return loadRecentContentRecords('post', currentSlug, limit)
 }
 
-export async function useChatterData(slug: string | string[]) {
+export function useChatterData(slug: string | string[]) {
     return loadContentRecordBySlug('chatter', slug)
 }
 
-export async function useRecentChatters(currentSlug: string | string[], limit = 3) {
+export function useRecentChatters(currentSlug: string | string[], limit = 3) {
     return loadRecentContentRecords('chatter', currentSlug, limit)
 }
 
-export async function useAboutPage() {
-    const records = await useRecordsData('about-records')
+export function useAboutPage() {
     return useAsyncData('about-page', async () => {
-        const record = findRecordBySlug(records.value, 'about', 'about')
+        const records = await fetchNormalizedRecords()
+        const record = findRecordBySlug(records, 'about', 'about')
         if (!record) return null
         return loadRecordContent(record)
     })

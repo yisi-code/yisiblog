@@ -158,10 +158,10 @@ type ActivityRecord = {
 
 const route = useRoute()
 const router = useRouter()
-const { data} = await useAboutPage()
-const posts = await usePostsData('about-posts')
-const chatters = await useChattersData('about-chatters')
-const moments = await useMomentsData('about-moments')
+const { data} = useAboutPage()
+const posts = usePostsData('about-posts')
+const chatters = useChattersData('about-chatters')
+const moments = useMomentsData('about-moments')
 
 const fallbackCover = 'https://bu.dusays.com/2026/03/24/69c23dc278c78.jpg'
 const heatmapScrollRef = ref<HTMLElement | null>(null)

@@ -81,10 +81,10 @@ if (!slug) {
   throw createError({ statusCode: 404, statusMessage: '未找到杂谈' })
 }
 
-const { data } = await useChatterData(slug)
-const recentChatters = await useRecentChatters(slug)
+const { data, status } = useChatterData(slug)
+const recentChatters = useRecentChatters(slug)
 
-if (!data.value) {
+if (status.value === 'success' && !data.value) {
   throw createError({ statusCode: 404, statusMessage: '未找到杂谈' })
 }
 

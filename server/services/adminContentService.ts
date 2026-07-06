@@ -7,6 +7,7 @@ import {
   applyAdminChangesToDataCapsule,
   readAdminManagedRecordsFromDataCapsule
 } from './adminContentStorage'
+import { readStaticManagedRecords } from './staticContentStorage'
 
 const adminRecordsCacheTtlMs = 60 * 1000
 let adminRecordsCache: {
@@ -37,7 +38,7 @@ export async function readAdminManagedRecords() {
   }
 
   adminRecordsReadPromise ||= (async () => {
-    const records = await readAdminManagedRecordsFromDataCapsule()
+    const records = await readStaticManagedRecords().catch(() => readAdminManagedRecordsFromDataCapsule())
     setAdminRecordsCache(records)
     adminRecordsReadPromise = null
     return records

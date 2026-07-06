@@ -31,7 +31,15 @@
 import type {HomeCardItem} from '~/data/home'
 import {siteConfig} from "#shared/siteConfig";
 
-defineProps<{
-  album: HomeCardItem
-}>()
+withDefaults(defineProps<{
+  album?: HomeCardItem
+}>(), {
+  album: () => ({
+    path: '/albums',
+    title: '',
+    description: '',
+    date: '',
+    cover: ''
+  })
+})
 </script>

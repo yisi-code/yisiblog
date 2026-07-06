@@ -78,7 +78,7 @@ type MomentViewItem = SiteContentItem & {
   rawDate?: string
 }
 
-const moments = await useMomentsData('moments-list')
+const moments = useMomentsData('moments-list')
 const searchQuery = ref('')
 const sortOrder = ref<'desc' | 'asc'>('desc')
 const openCommentId = ref<string | null>(null)

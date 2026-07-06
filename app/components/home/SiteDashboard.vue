@@ -1,12 +1,15 @@
 <template>
   <section
       class="glass-panel w-fit group flex h-20 origin-center flex-row items-stretch overflow-hidden rounded-3xl shadow-xl">
-    <div class="text-title flex flex-1 flex-wrap items-center justify-between gap-6 px-panel-inline py-0 text-size-content-body font-black">
-      <div class="flex items-center gap-2">
-        <span class="h-3 w-3 animate-pulse rounded-full" style="background-color: var(--color-red-luoxiahong)"/>
-        <span class="text-center">已稳定运行</span>
-        <span class="text-accent text-center">{{ uptimeText }}</span>
-      </div>
+    <div
+        class="text-title flex flex-1 flex-wrap items-center justify-between gap-6 px-panel-inline py-0 text-size-content-body font-black">
+      <ClientOnly>
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 animate-pulse rounded-full" style="background-color: var(--color-red-luoxiahong)"/>
+          <span class="text-center">已稳定运行</span>
+          <span class="text-accent text-center">{{ uptimeText }}</span>
+        </div>
+      </ClientOnly>
 
       <div class="flex flex-wrap gap-3">
         <span

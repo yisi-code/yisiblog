@@ -10,7 +10,7 @@
       ref="audioRef"
       :src="currentSong.url"
       class="hidden"
-      preload="metadata"
+      preload="none"
       @timeupdate="syncTime"
       @loadedmetadata="handleLoadedMetadata"
       @ended="handleEnded"
