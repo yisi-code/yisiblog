@@ -3,12 +3,16 @@
     <HomeSearch :items="homeSearchItems" class="hover:scale-[1.02] z-10"/>
     <HomeMusicOverview :stats="stats"/>
     <HomeContentGrid
-        v-if="!isLoadingHomeData || hasHomeContent"
+        v-if="hasHomeContent"
         :latest-album="latestAlbum"
         :latest-chatters="latestChatters"
         :latest-posts="latestPosts"
         :latest-moment-card="latestMomentCard"
     />
+    <section v-else class="glass-panel empty-state empty-state-panel w-full">
+      <strong>{{ isLoadingHomeData ? '正在加载内容...' : '暂无内容' }}</strong>
+      <span>{{ isLoadingHomeData ? '正在读取静态内容数据。' : '请稍后再试。' }}</span>
+    </section>
     <SiteDashboard/>
   </div>
 </template>

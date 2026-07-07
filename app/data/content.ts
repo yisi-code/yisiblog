@@ -188,7 +188,8 @@ export function useHomePageData() {
             songs: songsFromRecords(records)
         }
     }, {
-        default: emptyHomePageData
+        default: emptyHomePageData,
+        server: false
     })
 
     if (import.meta.client) {
