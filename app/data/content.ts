@@ -5,6 +5,7 @@ import {
     findRecordBySlug,
     friendsFromRecords,
     projectsFromRecords,
+    publicContentAssetUrl,
     recordMatchesSlug,
     recordSlugText,
     recordsByType,
@@ -14,6 +15,7 @@ import {
 } from '~/data/records'
 import {formatDisplayDate} from '~/utils/dateFormat'
 import type { MDCRoot } from '@nuxtjs/mdc'
+import { parseMarkdown } from '@nuxtjs/mdc/runtime'
 
 type ContentBodyNode = string | number | boolean | null | undefined | {
     type?: string
@@ -124,13 +126,16 @@ async function loadRecordContent(record: NormalizedDataRecord) {
     if (!record.contentUrl) return mergeRecordContent(record)
 
     if (record.contentUrl.startsWith('/content-data/')) {
-        const data = await $fetch<ContentItem>('/api/content/static', {
-            query: {
-                url: record.contentUrl,
-                path: record.path
-            }
+        const markdown = await $fetch<string>(publicContentAssetUrl(record.contentUrl), { responseType: 'text' })
+        const parsed = await parseMarkdown(markdown)
+        return mergeRecordContent(record, {
+            path: record.path,
+            body: parsed.body,
+            bodyRaw: markdown,
+            title: parsed.data?.title,
+            description: parsed.data?.description,
+            toc: parsed.toc
         })
-        return mergeRecordContent(record, data)
     }
 
     throw createError({ statusCode: 400, statusMessage: 'contentUrl 必须指向 /content-data/ 静态 Markdown' })

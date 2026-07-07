@@ -10,7 +10,7 @@ import {normalizeRecordForRead} from './adminContentCore'
 
 function publicAssetUrl(path: string) {
     const cleanPath = path.startsWith('/') ? path : `/${path}`
-    if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
+    if (process.env.NODE_ENV === 'development') return cleanPath
     const siteUrl = useRuntimeConfig().public.siteUrl
     if (!siteUrl) return cleanPath
     return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`

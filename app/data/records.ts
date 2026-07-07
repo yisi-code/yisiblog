@@ -60,11 +60,6 @@ export type Song = NormalizedDataRecord & {
   error?: string
 }
 
-type RecordsResponse = {
-  records: DataRecord[]
-  error?: string
-}
-
 const normalizedRecordsCacheTtlMs = 60 * 1000
 let normalizedRecordsCache: {
   records: NormalizedDataRecord[]
@@ -76,6 +71,16 @@ const routeBaseByType: Partial<Record<DataRecordType, string>> = {
   post: 'posts',
   chatter: 'chatter',
   album: 'albums'
+}
+
+export function publicContentAssetUrl(path: string) {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  if (import.meta.client) return cleanPath
+  if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
+
+  const siteUrl = useRuntimeConfig().public.siteUrl
+  if (!siteUrl) return cleanPath
+  return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
 }
 
 function recordPath(record: DataRecord) {
@@ -189,14 +194,15 @@ export async function fetchNormalizedRecords() {
   }
 
   normalizedRecordsPromise ||= (async () => {
-    const response = await $fetch<RecordsResponse>('/api/records')
-    const records = normalizeRecords(Array.isArray(response.records) ? response.records : [])
+    const sourceRecords = await $fetch<DataRecord[]>(publicContentAssetUrl('/content-data/records.json')).catch((error) => {
+      console.warn('[records] records.json 读取失败', error instanceof Error ? error.message : error)
+      return []
+    })
+    const records = normalizeRecords(Array.isArray(sourceRecords) ? sourceRecords : [])
 
-    if (!response.error) {
-      normalizedRecordsCache = {
-        records: cloneNormalizedRecords(records),
-        expiresAt: Date.now() + normalizedRecordsCacheTtlMs
-      }
+    normalizedRecordsCache = {
+      records: cloneNormalizedRecords(records),
+      expiresAt: Date.now() + normalizedRecordsCacheTtlMs
     }
 
     return records
