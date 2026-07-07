@@ -1,8 +1,4 @@
-import {readFile} from 'node:fs/promises'
-import {join} from 'node:path'
-import {useStorage} from 'nitropack/runtime'
 import {
-    contentDataPublicBase,
     contentMarkdownPath,
     contentRecordsPath
 } from '~~/shared/contentDataPaths'
@@ -12,36 +8,16 @@ import {
 } from '~~/shared/adminData'
 import {normalizeRecordForRead} from './adminContentCore'
 
-function publicContentPath(path: string) {
-    const relativePath = path
-        .replace(/^\/+/, '')
-        .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
-    return join(process.cwd(), 'public', 'content-data', relativePath)
-}
-
-function isFileNotFound(error: unknown) {
-    return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT'
-}
-
-function relativeContentPath(path: string) {
-    return path
-        .replace(/^\/+/, '')
-        .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
+function publicAssetUrl(path: string) {
+    const cleanPath = path.startsWith('/') ? path : `/${path}`
+    if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
+    const siteUrl = useRuntimeConfig().public.siteUrl
+    if (!siteUrl) return cleanPath
+    return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
 }
 
 export async function readStaticTextContent(path: string) {
-    const relativePath = relativeContentPath(path)
-    const storageContent = await useStorage('public').getItem(`content-data/${relativePath}`)
-    if (typeof storageContent === 'string') return storageContent
-    if (storageContent instanceof Uint8Array) return Buffer.from(storageContent).toString('utf8')
-    if (storageContent !== null && storageContent !== undefined) return String(storageContent)
-
-    try {
-        return await readFile(publicContentPath(path), 'utf8')
-    } catch (error) {
-        if (!isFileNotFound(error)) throw error
-        throw error
-    }
+    return await $fetch<string>(publicAssetUrl(path), {responseType: 'text'})
 }
 
 export async function readStaticRecords() {
@@ -49,11 +25,8 @@ export async function readStaticRecords() {
         const source = await readStaticTextContent(contentRecordsPath())
         return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
     } catch (error) {
-        // 如果文件不存在，返回空数组
-        if (isFileNotFound(error)) {
-            return []
-        }
-        throw error
+        console.warn('[static-content] records.json 读取失败', error instanceof Error ? error.message : error)
+        return []
     }
 }
 

@@ -1,7 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
 
-const defaultSiteUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''
-
 export default defineNuxtConfig({
     compatibilityDate: '2026-06-22',
     devtools: {enabled: process.env.NODE_ENV !== 'production'},
@@ -53,7 +51,7 @@ export default defineNuxtConfig({
             clientSecret: process.env.GITALK_CLIENT_SECRET || ''
         },
         public: {
-            siteUrl: process.env.NUXT_PUBLIC_SITE_URL || defaultSiteUrl,
+            siteUrl: process.env.NUXT_PUBLIC_SITE_URL,
             gitalk: {
                 clientID: process.env.NUXT_PUBLIC_GITALK_CLIENT_ID || '',
                 clientSecretConfigured: Boolean(process.env.GITALK_CLIENT_SECRET),
