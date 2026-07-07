@@ -7,17 +7,10 @@ import {
     type AdminManagedRecord
 } from '~~/shared/adminData'
 import {normalizeRecordForRead} from './adminContentCore'
-
-function publicAssetUrl(path: string) {
-    const cleanPath = path.startsWith('/') ? path : `/${path}`
-    if (process.env.NODE_ENV === 'development') return cleanPath
-    const siteUrl = useRuntimeConfig().public.siteUrl
-    if (!siteUrl) return cleanPath
-    return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
-}
+import {fetchPublicContentText} from '~~/app/data/contentAssets'
 
 export async function readStaticTextContent(path: string) {
-    return await $fetch<string>(publicAssetUrl(path), {responseType: 'text'})
+    return await fetchPublicContentText(path)
 }
 
 export async function readStaticRecords() {
@@ -40,6 +33,13 @@ export async function readStaticManagedRecords(): Promise<AdminManagedRecord[]> 
                 managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
             } catch {
                 managedRecord.content = ''
+            }
+        }
+        if (record.type === 'music' && record.lrcUrl) {
+            try {
+                managedRecord.lrc = await readStaticTextContent(record.lrcUrl)
+            } catch {
+                managedRecord.lrc = ''
             }
         }
         return managedRecord

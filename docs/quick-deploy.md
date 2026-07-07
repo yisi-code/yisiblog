@@ -1,182 +1,149 @@
 # 快速部署说明
 
-本文用于把 yisiblog 快速部署到服务器或静态托管平台。
+本文用于把 yisiblog 部署到 Vercel、Node 服务器或纯静态托管平台。
 
-## 部署前准备
-
-- Node.js 22
-- npm
-- 已复制并配置 `.env`
-- 如果需要 Gitalk、AI 聊天或管理页面，先准备对应密钥和仓库配置
+## 准备
 
 ```powershell
 npm install
 copy .env.example .env
 ```
 
-`.env` 中至少确认：
+至少确认以下变量：
 
 ```text
 NUXT_PUBLIC_SITE_URL=https://你的域名
 ADMIN_TOKEN=替换为强令牌
-AI_PROVIDER=deepseek
-AI_BASE_URL=https://api.deepseek.com
-AI_MODEL=deepseek-v4-flash
-AI_MAX_OUTPUT_TOKENS=150
-AI_TEMPERATURE=0.85
-AI_API_KEY=
-GITALK_CLIENT_SECRET=
+
+GITHUB_DATA_OWNER=
+GITHUB_DATA_REPO=
+GITHUB_DATA_BRANCH=main
+GITHUB_DATA_TOKEN=
+GITHUB_DATA_BASE_PATH=public/content-data
+
 DATA_CAPSULE_ENDPOINT=https://s3.cstcloud.cn
 DATA_CAPSULE_BUCKET=
 DATA_CAPSULE_ACCESS_KEY_ID=
 DATA_CAPSULE_SECRET_ACCESS_KEY=
 ```
 
-只展示给浏览器的配置使用 `NUXT_PUBLIC_*`。真实密钥只放在服务端变量中，不要提交到仓库。
+`GITHUB_DATA_*` 用于管理页同步内容到 GitHub 数据目录。`DATA_CAPSULE_*` 用于保存云端草稿，以及音乐/歌词上传中转。
 
-管理页面点击“同步数据胶囊”时需要完整的数据胶囊 S3 访问变量。
+## Vercel / Node SSR 部署
 
-`node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 都已加入 Git 忽略。服务器部署时通常只需要源码、配置和构建产物，不需要提交这些本地目录。
+适合需要管理页、AI 接口、Gitalk 代理和 GitHub 同步的部署方式。
 
-## 方式一：Node 服务端部署
-
-适合需要 AI 接口、Gitalk 代理、数据胶囊内容读取和管理页面等服务端能力的部署方式。
-
-### 1. 构建
+### 构建
 
 ```powershell
 npm run build
 ```
 
-构建完成后，部署产物位于 `.output/`。
-
-### 2. 上传产物
-
-把以下内容上传到服务器：
-
-```text
-.output/
-.env
-public/        # 如果服务器运行目录需要保留 CNAME、.nojekyll 等静态托管文件
-```
-
-如果你直接在服务器上拉取完整仓库，可以省略手动上传这些源文件，直接在服务器构建和运行。
-
-`public/CNAME` 和 `public/.nojekyll` 是静态托管相关文件，使用 GitHub Pages 或类似平台时建议保留。
-
-### 3. 启动
-
-Linux / macOS：
+### Node 启动
 
 ```bash
 node .output/server/index.mjs
 ```
 
-Windows PowerShell：
-
-```powershell
-node .output/server/index.mjs
-```
-
-默认监听端口由 Nuxt / Nitro 环境变量控制。常用配置：
+生产环境常用：
 
 ```text
 HOST=0.0.0.0
 PORT=3000
 ```
 
-生产环境建议使用进程管理工具守护 Node 进程，并在 Nginx 中反向代理到 `http://127.0.0.1:3000`。
+Vercel 部署时，把 `.env.example` 中需要的变量配置到 Vercel 环境变量中。`NODE_ENV` 由平台设置，不需要手动配置。
 
-### 4. Nginx 反向代理示例
-
-```nginx
-server {
-    listen 80;
-    server_name example.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-```
-
-## 方式二：纯静态部署
-
-适合部署到 GitHub Pages、静态对象存储、Nginx 静态目录等平台。
+## 纯静态部署
 
 ```powershell
 npm run generate
 ```
 
-生成产物位于：
+产物位于：
 
 ```text
 .output/public/
 ```
 
-把 `.output/public/` 上传到静态托管平台即可。
+纯静态部署可以展示构建时包含的 `public/content-data` 内容，但不能在线使用管理页同步、AI 接口或 Gitalk 服务端代理。内容更新后需要重新生成并上传产物。
 
-限制：
+## 内容更新流程
 
-- 不能直接在线使用管理页面，因为管理页面依赖 Nitro 服务端 API。
-- 依赖服务端 API 的功能不可用或需要单独部署 API。
-- 内容更新后需要重新执行 `npm run generate` 并重新上传。
+使用管理页更新内容：
 
-## 更新内容后的部署流程
+1. 打开 `/admin/data` 并使用 `ADMIN_TOKEN` 登录。
+2. 编辑记录，保存后进入待同步区。
+3. 需要跨设备保留时，点击“保存云端草稿”，草稿会写入数据胶囊。
+4. 确认待同步内容后点击“同步 GitHub”。
+5. 服务端把 `records.json`、Markdown、音乐和歌词写入 `GITHUB_DATA_BASE_PATH`。
+6. 同步成功后，触发线上重新部署。
+7. 公开页面读取新的 `/content-data/records.json` 和静态资源。
 
-常规内容更新：
-
-1. 在 `/admin/data` 修改记录并保存草稿。
-2. 按需上传 Markdown、音乐、歌词和图片资源到中国科技云数据胶囊，并在记录中保存远程地址。
-3. 本地运行 `npm run dev` 检查页面。
-4. 服务端部署执行 `npm run build`，静态部署执行 `npm run generate`。
-5. 上传新产物并重启服务或刷新静态文件。
-
-使用 `/admin/data` 更新内容：
-
-1. 确认已配置 `ADMIN_TOKEN` 和中国科技云数据胶囊变量。
-2. 在 SSR / Node 服务端环境打开 `/admin/data`。
-3. 编辑内容并点击“保存草稿”，变更会进入右侧待同步区。
-4. 确认待同步内容后点击“同步数据胶囊”，服务端会写回数据胶囊根目录 `records.json`，并把最新 records 返回给管理页。
-5. 公开页面后续请求会读取数据胶囊中的最新内容。
-
-音乐音频、LRC 歌词、Markdown 正文和图片文件会上传到数据胶囊；`records.json` 保存在数据集根目录。
+图片不上传，记录里只保存图片链接。
 
 ## 部署后检查
 
-- 首页是否能正常打开
-- `/posts`、`/chatter`、`/moments` 是否能读取列表
-- 详情页是否能打开 Markdown 正文
-- 图片和音乐资源是否能访问
-- 需要评论时，检查 Gitalk 登录和评论加载
-- 需要 AI 聊天时，检查 `/api/chat` 是否能正常响应
-- 需要管理页面时，检查 `/admin/data` 登录和保存是否正常
+- 首页刷新后是否显示博文、杂谈、动态、相册等数据。
+- `/content-data/records.json` 是否能直接访问。
+- `/posts`、`/chatter`、`/moments` 是否能读取列表。
+- 详情页是否能读取对应 Markdown。
+- 音乐页面是否能加载音乐列表并播放。
+- `/admin/data` 是否能登录、保存草稿、同步 GitHub。
 
 ## 常见问题
 
-### 页面能打开，但内容为空
+### 首页或列表为空
 
-检查数据胶囊根目录 `records.json` 是否存在、JSON 是否合法，以及记录中的 `contentUrl` 是否能通过服务端接口读取。
+检查线上是否能访问：
 
-### 管理页面提示未配置令牌
+```text
+https://你的域名/content-data/records.json
+```
 
-检查服务端环境变量或 `.env` 中是否设置了 `ADMIN_TOKEN`，设置后需要重启服务。
+如果 404，说明 `public/content-data/records.json` 没有进入部署产物，或同步 GitHub 后没有重新部署。
 
-### 线上图片或音乐 404
+### 详情页 Markdown 404
 
-检查资源是否能被线上环境访问。音乐记录中的 `url` 和 `lrcUrl`、封面、动态图片和相册图片都应是数据胶囊统一桶中的公开地址。如果桶没有公开读权限，页面会出现资源 404 或跨域读取失败。
+检查 `records.json` 中的 `contentUrl` 是否与仓库文件一致，例如：
 
-### 静态部署后管理页面不能保存
+```text
+/content-data/posts/{id}.md
+/content-data/chatter/{id}.md
+/content-data/moments/{id}.md
+```
 
-这是纯静态部署的限制。管理页面同步数据胶囊需要 Nitro 服务端接口。请使用 SSR / Node 环境运行管理页。
+文件名中的空格、中文、`+` 等字符会由项目读取逻辑统一编码，但实际文件必须存在。
 
-### 管理页面已保存，但首页没有立即更新
+### 本地开发读取了线上地址
 
-管理页面“保存草稿”只会更新待同步区，不会触发公开页面更新。点击“同步数据胶囊”成功后，根目录 `records.json` 和相关资源对象会更新，公开页面后续请求会读取最新数据。
+本地服务端读取静态内容时会强制使用 `http://localhost:3000`。浏览器端读取使用相对路径 `/content-data/...`。如果仍读取线上地址，检查是否在自定义代码中直接使用了 `NUXT_PUBLIC_SITE_URL`。
+
+### 管理页提示未配置 GitHub 数据仓库变量
+
+检查服务端环境变量：
+
+```text
+GITHUB_DATA_OWNER
+GITHUB_DATA_REPO
+GITHUB_DATA_BRANCH
+GITHUB_DATA_TOKEN
+GITHUB_DATA_BASE_PATH
+```
+
+`GITHUB_DATA_TOKEN` 需要有目标仓库内容写入权限。
+
+### 管理页无法保存云端草稿或上传音乐歌词
+
+检查数据胶囊变量：
+
+```text
+DATA_CAPSULE_ENDPOINT
+DATA_CAPSULE_BUCKET
+DATA_CAPSULE_ACCESS_KEY_ID
+DATA_CAPSULE_SECRET_ACCESS_KEY
+```
+
+### 同步成功但线上没变化
+
+同步 GitHub 只更新数据仓库文件，不会让已经部署的静态产物自动变化。需要触发 Vercel/GitHub Pages/服务器重新部署。

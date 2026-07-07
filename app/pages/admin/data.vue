@@ -338,14 +338,10 @@
               </label>
             </template>
 
-            <template v-if="showArtistField || showErrorField">
+            <template v-if="showArtistField">
               <label class="admin-data-field">
                 <span>歌手</span>
                 <input v-model="typeFields.artist" class="admin-data-input" placeholder="歌手">
-              </label>
-              <label v-if="showErrorField" class="admin-data-field">
-                <span>错误提示</span>
-                <input v-model="typeFields.error" class="admin-data-input" placeholder="不可播放原因，可留空">
               </label>
             </template>
 
@@ -485,7 +481,6 @@ type EditorDraftCache = {
     mood: string
     location: string
     artist: string
-    error: string
     icon: string
   }
 }
@@ -561,7 +556,6 @@ const typeFields = reactive({
   mood: '',
   location: '',
   artist: '',
-  error: '',
   icon: ''
 })
 const uploadFolders = reactive({
@@ -601,7 +595,6 @@ const showMoodField = computed(() => hasDraftField('mood'))
 const showLocationField = computed(() => hasDraftField('location'))
 const showImagesField = computed(() => hasDraftField('images'))
 const showArtistField = computed(() => hasDraftField('artist'))
-const showErrorField = computed(() => hasDraftField('error'))
 const showPhotosField = computed(() => hasDraftField('photos'))
 const showIconField = computed(() => hasDraftField('icon'))
 const showLrcField = computed(() => draft.type === 'music')
@@ -704,6 +697,27 @@ function createDraftKey(type: AdminRecordType) {
 function setStatus(message: string, type: 'info' | 'success' | 'error' = 'info') {
   statusMessage.value = message
   statusType.value = type
+}
+
+function errorMessage(error: unknown) {
+  if (error && typeof error === 'object') {
+    const source = error as {
+      data?: { message?: unknown; statusMessage?: unknown }
+      message?: unknown
+      statusMessage?: unknown
+      statusText?: unknown
+    }
+    return String(
+      source.data?.message
+      || source.data?.statusMessage
+      || source.statusMessage
+      || source.message
+      || source.statusText
+      || error
+    )
+  }
+
+  return String(error)
 }
 
 function showTask(title: string, description: string) {
@@ -848,7 +862,7 @@ async function loadDataCapsuleFolders() {
     folderLoadError.value = response.error || ''
   } catch (error) {
     console.warn('[admin-data:load-folders]', error)
-    folderLoadError.value = error instanceof Error ? error.message : '目录加载失败'
+    folderLoadError.value = errorMessage(error)
   } finally {
     isLoadingFolders.value = false
   }
@@ -1065,7 +1079,6 @@ function syncDraftFromRecord(record: AdminManagedRecord) {
   typeFields.mood = String(record.mood || '')
   typeFields.location = String(record.location || '')
   typeFields.artist = String(record.artist || '')
-  typeFields.error = String(record.error || '')
   typeFields.icon = String(record.icon || '')
   originalId.value = record.id
   resetUploadFolderTouched()
@@ -1088,7 +1101,6 @@ function clearEditorDraft(type: AdminRecordType = selectedType.value) {
   typeFields.mood = ''
   typeFields.location = ''
   typeFields.artist = ''
-  typeFields.error = ''
   typeFields.icon = ''
   resetUploadFolderTouched()
   setAutoUploadFolders()
@@ -1217,35 +1229,84 @@ function buildRecordPayload() {
     location: hasDraftField('location') ? typeFields.location.trim() || undefined : undefined,
     images: hasDraftField('images') ? splitLines(imagesText.value) : undefined,
     artist: hasDraftField('artist') ? typeFields.artist.trim() || undefined : undefined,
-    error: hasDraftField('error') ? typeFields.error.trim() || undefined : undefined,
     photos,
     icon: hasDraftField('icon') ? typeFields.icon.trim() || undefined : undefined
   } satisfies AdminDataRecord
 }
 
-function normalizedRecordValue(record?: AdminDataRecord) {
-  if (!record) return ''
-  return JSON.stringify({
-    id: record.id || '',
+function emptyToUndefined(value?: string) {
+  const text = String(value || '').trim()
+  return text || undefined
+}
+
+function sortedTextList(values?: string[]) {
+  return (values || []).map((value) => String(value || '').trim()).filter(Boolean)
+}
+
+function markdownFirstParagraph(content = '') {
+  const withoutFrontmatter = content
+      .replace(/^---\s*[\s\S]*?\r?\n---\s*/, '')
+      .replace(/```[\s\S]*?```/g, ' ')
+  const paragraph = withoutFrontmatter
+      .split(/\r?\n\s*\r?\n/)
+      .map((block) => block
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .join(' '))
+      .find(Boolean) || ''
+
+  return paragraph
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^>\s?/gm, '')
+      .replace(/^[\s-]*[-*+]\s+/gm, '')
+      .replace(/^\s*\d+\.\s+/gm, '')
+      .replace(/!\[[^\]]*]\([^)]*\)/g, '')
+      .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/[*_~]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+}
+
+function comparableDescription(record: AdminDataRecord, content?: string) {
+  if (record.type === 'moment') {
+    return emptyToUndefined(record.description) || emptyToUndefined(markdownFirstParagraph(content))
+  }
+
+  return emptyToUndefined(record.description)
+}
+
+function comparableContentUrl(record: AdminDataRecord) {
+  if (!adminRecordNeedsMarkdown(record.type)) return undefined
+  return emptyToUndefined(record.contentUrl) || `/content-data/${record.type === 'post' ? 'posts' : record.type === 'chatter' ? 'chatter' : record.type === 'moment' ? 'moments' : 'about'}/${record.type === 'about' ? 'about' : record.id}.md`
+}
+
+function syncComparableRecord(record?: AdminDataRecord, content?: string) {
+  if (!record) return null
+
+  return {
+    id: emptyToUndefined(record.id) || '',
     type: record.type,
-    title: record.title || '',
-    description: record.description || '',
-    date: record.date || '',
-    cover: record.cover || '',
-    url: record.url || '',
-    lrcUrl: record.lrcUrl || '',
-    tags: record.tags || [],
-    mood: record.mood || '',
-    location: record.location || '',
-    images: record.images || [],
-    artist: record.artist || '',
-    error: record.error || '',
+    title: emptyToUndefined(record.title),
+    description: comparableDescription(record, content),
+    date: emptyToUndefined(record.date),
+    cover: emptyToUndefined(record.cover),
+    url: emptyToUndefined(record.url),
+    lrcUrl: record.type === 'music' ? emptyToUndefined(record.lrcUrl) : undefined,
+    contentUrl: comparableContentUrl(record),
+    path: emptyToUndefined(record.path),
+    tags: sortedTextList(record.tags),
+    mood: emptyToUndefined(record.mood),
+    location: emptyToUndefined(record.location),
+    images: sortedTextList(record.images),
+    artist: emptyToUndefined(record.artist),
     photos: (record.photos || []).map((photo) => ({
-      url: photo.url || '',
-      caption: photo.caption || ''
-    })),
-    icon: record.icon || ''
-  })
+      url: emptyToUndefined(photo.url) || '',
+      caption: emptyToUndefined(photo.caption)
+    })).filter((photo) => photo.url),
+    icon: emptyToUndefined(record.icon)
+  }
 }
 
 function normalizedChangeValue(params: {
@@ -1255,10 +1316,10 @@ function normalizedChangeValue(params: {
   musicPath?: string
 }) {
   return JSON.stringify({
-    record: normalizedRecordValue(params.record),
-    content: params.content || '',
-    lrc: params.lrc || '',
-    musicPath: params.musicPath || ''
+    record: syncComparableRecord(params.record, params.content),
+    content: emptyToUndefined(params.content),
+    lrc: emptyToUndefined(params.lrc),
+    musicPath: emptyToUndefined(params.musicPath)
   })
 }
 
@@ -1571,7 +1632,7 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
     else setStatus('已自动保存草稿并加入待同步区', 'success')
     return 'saved'
   } catch (error) {
-    if (mode === 'manual' || mode === 'sync') setStatus(error instanceof Error ? error.message : '保存草稿失败', 'error')
+    if (mode === 'manual' || mode === 'sync') setStatus(errorMessage(error), 'error')
     return 'error'
   }
 }
@@ -1598,7 +1659,7 @@ async function saveCloudDraft() {
     })
     setStatus(`云端草稿已保存：${Object.keys(editorDrafts.value).length} 份草稿，${pendingChanges.value.length} 项待同步`, 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '保存云端草稿失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     isSavingCloudDraft.value = false
     hideTask()
@@ -1708,7 +1769,7 @@ async function verifyToken() {
     setStatus('验证通过', 'success')
     await loadRecords()
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '验证失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     isVerifying.value = false
     hideTask()
@@ -1745,7 +1806,7 @@ async function loadRecords() {
     else clearEditorDraft(selectedType.value)
   } catch (error) {
     clearSession()
-    setStatus(error instanceof Error ? error.message : '加载失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     isLoading.value = false
     if (!hasCachedRecords) hideTask()
@@ -1784,7 +1845,7 @@ async function syncDataCapsule() {
     else clearEditorDraft(selectedType.value)
     setStatus(`已同步 ${response.syncedCount} 项变更到 GitHub`, 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '同步 GitHub 失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     isSyncing.value = false
     hideTask()
@@ -1810,7 +1871,7 @@ async function handleMusicSelected(files: File[]) {
     draft.url = uploaded.publicUrl
     setStatus('音乐文件已上传，保存草稿后进入待同步区', 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '上传音乐文件失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     hideTask()
   }
@@ -1835,7 +1896,7 @@ async function handleLyricSelected(files: File[]) {
     draft.lrcUrl = uploaded.publicUrl
     setStatus('歌词已上传，保存草稿后进入待同步区', 'success')
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : '上传歌词失败', 'error')
+    setStatus(errorMessage(error), 'error')
   } finally {
     hideTask()
   }

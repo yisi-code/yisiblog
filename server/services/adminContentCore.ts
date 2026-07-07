@@ -28,7 +28,42 @@ export function normalizeRecordForRead(record: AdminDataRecord): AdminDataRecord
   })
 }
 
-export function normalizeRecordForWrite(record: AdminDataRecord): AdminDataRecord {
+function markdownFirstParagraph(content = '') {
+  const withoutFrontmatter = content
+    .replace(/^---\s*[\s\S]*?\r?\n---\s*/, '')
+    .replace(/```[\s\S]*?```/g, ' ')
+
+  const paragraph = withoutFrontmatter
+    .split(/\r?\n\s*\r?\n/)
+    .map((block) => block
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .join(' '))
+    .find(Boolean) || ''
+
+  return paragraph
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^>\s?/gm, '')
+    .replace(/^[\s-]*[-*+]\s+/gm, '')
+    .replace(/^\s*\d+\.\s+/gm, '')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/[*_~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function recordDescriptionForWrite(record: AdminDataRecord, content?: string) {
+  if (record.type === 'post' || record.type === 'chatter' || record.type === 'moment') {
+    return record.description?.trim() || markdownFirstParagraph(content)
+  }
+
+  return adminRecordHasField(record.type, 'description') ? record.description?.trim() : undefined
+}
+
+export function normalizeRecordForWrite(record: AdminDataRecord, options: { content?: string } = {}): AdminDataRecord {
   assertAdminId(record.id)
 
   if (record.type === 'about' && record.id !== 'about') {
@@ -39,7 +74,7 @@ export function normalizeRecordForWrite(record: AdminDataRecord): AdminDataRecor
     id: record.type === 'about' ? 'about' : record.id.trim(),
     type: record.type,
     title: adminRecordHasField(record.type, 'title') ? record.title?.trim() : undefined,
-    description: adminRecordHasField(record.type, 'description') ? record.description?.trim() : undefined,
+    description: recordDescriptionForWrite(record, options.content),
     date: adminRecordHasField(record.type, 'date') ? record.date?.trim() : undefined,
     cover: adminRecordHasField(record.type, 'cover') ? record.cover?.trim() : undefined,
     url: adminRecordHasField(record.type, 'url') ? record.url?.trim() : undefined,
@@ -51,7 +86,6 @@ export function normalizeRecordForWrite(record: AdminDataRecord): AdminDataRecor
     location: adminRecordHasField(record.type, 'location') ? record.location?.trim() : undefined,
     images: adminRecordHasField(record.type, 'images') && Array.isArray(record.images) ? record.images.map((image) => String(image).trim()).filter(Boolean) : [],
     artist: adminRecordHasField(record.type, 'artist') ? record.artist?.trim() : undefined,
-    error: adminRecordHasField(record.type, 'error') ? record.error?.trim() : undefined,
     photos: adminRecordHasField(record.type, 'photos') && Array.isArray(record.photos) ? record.photos.map((photo) => ({
       url: String(photo.url || '').trim(),
       caption: photo.caption?.trim()

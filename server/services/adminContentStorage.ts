@@ -134,6 +134,14 @@ export async function readAdminManagedRecordsFromDataCapsule(): Promise<AdminMan
       }
     }
 
+    if (record.type === 'music' && record.lrcUrl) {
+      try {
+        managedRecord.lrc = (await readDataCapsuleObject(record.lrcUrl)).toString('utf8')
+      } catch {
+        managedRecord.lrc = ''
+      }
+    }
+
     return managedRecord
   }))
 }
@@ -145,7 +153,7 @@ export async function saveAdminRecordToDataCapsule(params: {
   lrc?: string
 }) {
   const originalId = params.originalId?.trim()
-  const nextRecord = normalizeRecordForWrite(params.record)
+  const nextRecord = normalizeRecordForWrite(params.record, { content: params.content })
   const records = await readAdminRecords()
   const currentIndex = records.findIndex((record) => record.type === nextRecord.type && record.id === (originalId || nextRecord.id))
   const duplicateIndex = records.findIndex((record, index) => record.type === nextRecord.type && record.id === nextRecord.id && index !== currentIndex)

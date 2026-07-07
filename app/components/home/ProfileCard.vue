@@ -51,7 +51,7 @@
 
     <div class="mt-stack-md flex flex-row justify-between items-center">
       <ClientOnly>
-        <div class="relative overflow-hidden text-size-section-heading font-black">
+        <div class="relative overflow-hidden text-size-card-title-lg font-black">
           {{ timeText || '00:00:00' }}
         </div>
       </ClientOnly>

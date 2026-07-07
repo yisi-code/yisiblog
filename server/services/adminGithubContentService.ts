@@ -67,7 +67,7 @@ function applyChanges(baseRecords: AdminDataRecord[], changes: AdminPendingChang
 
     if (!change.record) continue
 
-    const nextRecord = normalizeRecordForWrite(change.record)
+    const nextRecord = normalizeRecordForWrite(change.record, { content: change.content })
     const currentIndex = nextRecords.findIndex((record) => record.type === nextRecord.type && record.id === (change.originalId || nextRecord.id))
     const duplicateIndex = nextRecords.findIndex((record, index) => record.type === nextRecord.type && record.id === nextRecord.id && index !== currentIndex)
     if (duplicateIndex >= 0) {
@@ -127,6 +127,15 @@ export async function syncAdminRecordsToGitHub(changes: AdminPendingChange[]) {
     `${record.type}:${record.id}`,
     'content' in record ? String(record.content || '') : ''
   ]))
+  const lrcByRecordKey = new Map(baseRecords.map((record) => [
+    `${record.type}:${record.id}`,
+    'lrc' in record ? String(record.lrc || '') : ''
+  ]))
+  changes.forEach((change) => {
+    if (change.action === 'save' && change.record?.type === 'music' && change.lrc !== undefined) {
+      lrcByRecordKey.set(`${change.record.type}:${change.record.id}`, change.lrc)
+    }
+  })
   const syncResult = applyChanges(baseRecords, changes)
   const textFiles: Record<string, string> = {}
   const binaryFiles: Record<string, Buffer> = {}
@@ -156,6 +165,9 @@ export async function syncAdminRecordsToGitHub(changes: AdminPendingChange[]) {
     ...normalizeRecordForRead(record),
     content: adminRecordNeedsMarkdown(record.type)
       ? syncResult.markdownFiles[record.contentUrl || ''] ?? contentByRecordKey.get(`${record.type}:${record.id}`) ?? ''
+      : undefined,
+    lrc: record.type === 'music'
+      ? lrcByRecordKey.get(`${record.type}:${record.id}`) ?? ''
       : undefined
   })).map(cloneManagedRecord)
 

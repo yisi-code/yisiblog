@@ -88,7 +88,7 @@ const searchQuery = ref('')
 const isClientReady = ref(false)
 const currentSong = computed(() => music.currentSong)
 const playableSongs = computed(() => {
-  return props.songs.filter((song) => !song.error && song.url)
+  return props.songs.filter((song) => song.url)
 })
 const filteredSongs = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()

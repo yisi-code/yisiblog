@@ -58,7 +58,7 @@
                 {{ chatter.title || '未命名记录' }}
               </h2>
               <p class="text-secondary mt-stack-xs line-clamp-2 text-size-content-body leading-6">
-                {{ chatter.description || chatterText(chatter) }}
+                {{ chatter.description || '' }}
               </p>
 
               <div v-if="chatter.tags?.length" class="mt-stack-md flex items-center flex-wrap gap-1.5">
@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import {extractContentText, useChattersData, type SiteContentItem} from '~/data'
+import {useChattersData, type SiteContentItem} from '~/data'
 import {Sparkles} from "@lucide/vue";
 
 const { items, pending: isLoadingChatters } = await useChattersData('chatters-list')
@@ -130,12 +130,10 @@ const searchMatchedChatters = computed(() => {
   if (!query) return []
 
   return items.value.filter((item) => {
-    const text = chatterText(item)
     const tagText = (item.tags || []).join(' ')
     return (
         (item.title || '').toLowerCase().includes(query) ||
         (item.description || '').toLowerCase().includes(query) ||
-        text.toLowerCase().includes(query) ||
         tagText.toLowerCase().includes(query)
     )
   })
@@ -145,7 +143,7 @@ const searchResults = computed(() => searchMatchedChatters.value.map((chatter) =
   key: chatter.path,
   path: chatter.path,
   title: chatter.title || '未命名记录',
-  description: chatter.description || chatterText(chatter) || '',
+  description: chatter.description || '',
   date: chatter.date,
   tags: chatter.tags
 })))
@@ -154,14 +152,10 @@ function chatterMood(item: SiteContentItem) {
   return item.mood || ''
 }
 
-function chatterText(item: SiteContentItem) {
-  return extractContentText(item)
-}
-
 function estimateChatterHeight(item: SiteContentItem) {
   const coverHeight = item.cover ? 10 : 0
   const baseContentHeight = 5
-  const text = `${item.title || ''}${chatterText(item) || item.description || ''}`
+  const text = `${item.title || ''}${item.description || ''}`
   const textRows = Math.ceil(text.length / 28)
   const tagRows = Math.ceil((item.tags?.length || 0) / 3)
 

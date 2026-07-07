@@ -54,12 +54,14 @@
       "博客"
     ],
     "mood": "思考",
-    "contentUrl": "/content-data/chatter/20260701杂谈.md"
+    "contentUrl": "/content-data/chatter/20260701杂谈.md",
+    "description": "下一步方向：整理项目结构，为后面主题、移动端适配做准备。"
   },
   {
     "id": "20260701凌晨",
     "type": "moment",
     "date": "2026-07-01",
+    "description": "博客雏形定好了...",
     "contentUrl": "/content-data/moments/20260701凌晨.md"
   },
   {

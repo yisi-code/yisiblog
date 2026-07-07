@@ -112,14 +112,10 @@ function mergeRecordContent(record: NormalizedDataRecord, item?: ContentItem | n
     }
 }
 
-function sortedRecords(records: NormalizedDataRecord[], type: DataRecordType) {
+function recordsAsHomeContentItems(records: NormalizedDataRecord[], type: DataRecordType): SiteContentItem[] {
     return recordsByType(records, type)
-        .filter((record) => Boolean(record.contentUrl))
         .sort(compareRecordsByLatest)
-}
-
-function recordsAsContentItems(records: NormalizedDataRecord[], type: DataRecordType): SiteContentItem[] {
-    return sortedRecords(records, type).map((record) => mergeRecordContent(record))
+        .map((record) => mergeRecordContent(record))
 }
 
 async function loadRecordContent(record: NormalizedDataRecord) {
@@ -149,7 +145,7 @@ async function loadRecordContent(record: NormalizedDataRecord) {
 async function loadContentRecords(type: DataRecordType, key: string) {
     const {data, pending, status} = await useAsyncData(key, async () => {
         const records = await fetchNormalizedRecords()
-        return Promise.all(sortedRecords(records, type).map(loadRecordContent))
+        return recordsAsHomeContentItems(records, type)
     }, {
         default: () => []
     })
@@ -174,43 +170,32 @@ async function loadContentRecordBySlug(type: DataRecordType, slug: string | stri
 }
 
 export function useHomePageData() {
-    const state = useAsyncData('home-page-data', async () => {
+    return useAsyncData('home-page-data', async () => {
         const records = await fetchNormalizedRecords()
-        const moments = await Promise.all(sortedRecords(records, 'moment').map(loadRecordContent))
 
         return {
-            posts: recordsAsContentItems(records, 'post'),
-            chatters: recordsAsContentItems(records, 'chatter'),
-            moments,
+            posts: recordsAsHomeContentItems(records, 'post'),
+            chatters: recordsAsHomeContentItems(records, 'chatter'),
+            moments: recordsAsHomeContentItems(records, 'moment'),
             albums: albumsFromRecords(records),
             friends: friendsFromRecords(records),
             projects: projectsFromRecords(records),
             songs: songsFromRecords(records)
         }
     }, {
-        default: emptyHomePageData,
-        server: false
+        default: emptyHomePageData
     })
-
-    if (import.meta.client) {
-        onMounted(() => {
-            const data = state.data.value
-            const hasContent = Boolean(data?.posts.length || data?.chatters.length || data?.moments.length || data?.albums.length)
-            if (!hasContent) void state.refresh()
-        })
-    }
-
-    return state
 }
 
 async function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {
     const slugText = recordSlugText(currentSlug)
     const {data, pending, status} = await useAsyncData(`recent-${type}-${slugText}`, async () => {
         const records = await fetchNormalizedRecords()
-        return Promise.all(sortedRecords(records, type)
+        return recordsByType(records, type)
+            .sort(compareRecordsByLatest)
             .filter((item) => !recordMatchesSlug(item, currentSlug))
             .slice(0, limit)
-            .map(loadRecordContent))
+            .map((record) => mergeRecordContent(record))
     }, {
         default: () => []
     })

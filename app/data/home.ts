@@ -70,21 +70,21 @@ export function buildHomeSearchItems(params: {
   return [
     ...posts.map((item) => ({
       title: item.title || '未命名博文',
-      description: item.description || extractBodyText(item),
+      description: item.description || '',
       date: formatDisplayDate(item.date),
       tags: ['博文', ...(item.tags || [])],
       path: item.path || ''
     })),
     ...chatters.map((item) => ({
       title: item.title || '未命名杂谈',
-      description: item.description || extractBodyText(item),
+      description: item.description || '',
       date: formatDisplayDate(item.date),
       tags: ['杂谈', ...(item.tags || [])],
       path: item.path || ''
     })),
     ...moments.map((item) => ({
-      title: extractBodyText(item) || formatMomentDate(item.date) || '动态',
-      description: extractBodyText(item),
+      title: item.description || formatMomentDate(item.date) || '动态',
+      description: item.description || '',
       date: formatMomentDate(item.date),
       tags: ['动态'],
       path: '/moments'
@@ -138,8 +138,16 @@ export function buildLatestMomentCard(moments: HomeContentItem[]) {
   }
 
   const dateText = formatMomentDate(moment.date)
+  if (moment.description) {
+    return {
+      description: moment.description,
+      date: dateText,
+      path: '/moments'
+    }
+  }
+
   return {
-    description: extractBodyText(moment) || '打开最新动态。',
+    description: '打开最新动态。',
     date: dateText,
     path: '/moments'
   }

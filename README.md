@@ -1,97 +1,87 @@
 # yisiblog
 
-一个基于 Nuxt 4 的个人博客与内容管理项目。项目把博客文章、杂谈、动态、相册、音乐、友链、项目展示等内容统一组织在前端应用内，并提供管理页面通过中国科技云数据胶囊维护元数据、Markdown 正文、歌词和媒体资源。
+一个基于 Nuxt 4 的个人博客与内容管理项目。公开页面以仓库中的 `public/content-data` 作为唯一内容源，管理页负责编辑草稿、暂存到数据胶囊，并在确认同步时把内容提交到 GitHub 数据目录。
 
 ## 技术栈
 
 - Nuxt 4 / Vue 3 / TypeScript
-- @nuxtjs/mdc Markdown 渲染
+- Nitro Server API
 - Pinia
 - Tailwind CSS 4
-- Nitro Server API
-- Gitalk 评论代理
-- OpenAI 兼容格式的 AI 聊天接口
-- Markdown 数学公式渲染（remark-math / KaTeX）
+- @nuxtjs/mdc / KaTeX
+- GitHub Contents / Git Data API 内容同步
+- 中国科技云数据胶囊草稿暂存与上传中转
 
-## 功能总览
+## 功能
 
-- 首页信息流、搜索入口和个人资料展示
-- 博文列表与详情页：`/posts`、`/posts/{id}`
-- 杂谈列表与详情页：`/chatter`、`/chatter/{id}`
-- 动态页面：`/moments`
-- 关于页面：`/about`
-- 项目、友链、相册、音乐页面：`/projects`、`/friends`、`/albums`、`/music`
-- 全局音乐播放组件与歌词读取
-- 文章、杂谈、动态评论组件
-- 内容管理页面：`/admin/data`
-- Nitro 接口：
-  - `/api/chat`：AI 聊天
-  - `/api/github`：GitHub OAuth 代理
-  - `/api/github-rest/**`：GitHub REST 代理
-  - `/api/admin/**`：管理数据读取、数据胶囊同步与媒体上传接口
+- 首页、搜索入口、个人资料与全局音乐播放器
+- 博文、杂谈、动态、相册、音乐、友链、项目与关于页面
+- Markdown 详情页渲染和文章/杂谈评论
+- 管理页 `/admin/data`
+  - 云端草稿保存到数据胶囊
+  - 本地草稿与待同步区
+  - Markdown、音乐、歌词同步到 GitHub 数据目录
+  - 图片按链接维护
 
-## 目录结构
+## 目录
 
 ```text
-app/
-  assets/css/          页面与组件样式
-  components/          业务组件与通用 UI 组件
-  composables/         前端复用状态和交互逻辑
-  data/                静态数据读取、归一化与内容合并逻辑
-  layouts/             页面布局
-  pages/               Nuxt 路由页面
-  stores/              Pinia 状态
-  utils/               通用工具函数
-docs/                  项目文档
-public/
-  CNAME                GitHub Pages 自定义域名配置
-  .nojekyll            GitHub Pages 静态资源保留配置
-  orange-cat-sprite.png 页面橘猫精灵图资源
-server/
-  api/                 Nitro API
-  services/            服务端业务逻辑
-shared/                前后端共享类型与配置
+app/                    Nuxt 页面、组件、状态、样式和数据读取逻辑
+server/                 Nitro API 与服务端同步逻辑
+shared/                 前后端共享类型与路径规则
+public/content-data/    运行时公开内容数据
+docs/                   项目文档
 ```
 
-## 数据与内容
+## 内容数据
 
-项目采用“统一元数据 JSON + 按需 Markdown / LRC 文件”的内容组织方式。
+公开页面读取以下静态资源：
 
-- 元数据入口：数据胶囊数据集根目录 `records.json`
-- 内容读取入口：`app/data/records.ts`、`app/data/content.ts`
-- 内容维护说明：[`docs/data-guide.md`](docs/data-guide.md)
+- `public/content-data/records.json`
+- `public/content-data/posts/{id}.md`
+- `public/content-data/chatter/{id}.md`
+- `public/content-data/moments/{id}.md`
+- `public/content-data/about/about.md`
+- `public/content-data/music/{id}.{ext}`
+- `public/content-data/music/{id}.lrc`
 
-Markdown 正文不需要写 frontmatter。标题、日期、封面、标签等元数据统一放在 `records.json` 中，再由页面和内容读取逻辑合并使用。
+首页和列表页只读取 `records.json` 元数据；详情页才读取并解析对应 Markdown。音乐播放器在客户端加载，音乐数据仍来自 `records.json`。
 
-公开页面（首页、列表页、详情页）通过服务端接口读取数据胶囊根目录的 `records.json`，Markdown 正文、音乐、歌词和图片也从数据胶囊读取。管理页面 `/admin/data` 的保存、删除会先进入浏览器待同步区，点击“同步数据胶囊”后批量写回数据胶囊；同步完成后公开页面无需等待 GitHub commit 或重新部署即可读取最新数据。
+`post`、`chatter` 的 `description` 为可编辑摘要。`moment` 的 `description` 在同步时由正文第一段自动生成。
 
-## 本地开发
+## 管理与同步
 
-建议使用 Node.js 22。
+管理页的数据流程：
 
-```powershell
-npm install
-copy .env.example .env
-npm run dev
-```
+1. 首次进入管理页时读取 `public/content-data/records.json` 和对应内容文件。
+2. 编辑内容后，保存会进入本地待同步区。
+3. 点击“保存云端草稿”会把草稿和待同步数据保存到数据胶囊。
+4. 上传音乐或歌词时，文件先上传到数据胶囊作为同步中转。
+5. 点击“同步 GitHub”后，服务端把 `records.json`、Markdown、音乐和歌词写入配置的 GitHub 数据目录。
+6. 同步成功后清空数据胶囊中的云端草稿。
+7. 重新部署后，公开页面读取新的静态内容。
 
-启动后打开 Nuxt 输出的本地地址，通常是 `http://localhost:3000`。
-
-常用脚本：
-
-```powershell
-npm run dev       # 本地开发
-npm run build     # 构建服务端部署产物
-npm run generate  # 生成静态站点
-npm run preview   # 预览构建产物
-npm run lint      # 代码检查
-```
+图片不上传，管理页只保存手动输入的图片链接。
 
 ## 环境变量
 
-复制 `.env.example` 为 `.env` 后按需填写。`.env` 不应提交到 Git。
+复制 `.env.example` 为 `.env`，按需填写：
 
 ```text
+NUXT_PUBLIC_SITE_URL=http://localhost:3000
+ADMIN_TOKEN=
+
+DATA_CAPSULE_ENDPOINT=https://s3.cstcloud.cn
+DATA_CAPSULE_BUCKET=
+DATA_CAPSULE_ACCESS_KEY_ID=
+DATA_CAPSULE_SECRET_ACCESS_KEY=
+
+GITHUB_DATA_OWNER=
+GITHUB_DATA_REPO=
+GITHUB_DATA_BRANCH=main
+GITHUB_DATA_TOKEN=
+GITHUB_DATA_BASE_PATH=public/content-data
+
 AI_PROVIDER=deepseek
 AI_API_KEY=
 AI_BASE_URL=https://api.deepseek.com
@@ -99,42 +89,48 @@ AI_MODEL=deepseek-v4-flash
 AI_MAX_OUTPUT_TOKENS=150
 AI_TEMPERATURE=0.85
 
-NUXT_PUBLIC_SITE_URL=http://localhost:3000
-ADMIN_TOKEN=
-
 NUXT_PUBLIC_GITALK_CLIENT_ID=
-GITALK_CLIENT_SECRET=
 NUXT_PUBLIC_GITALK_REPO=
 NUXT_PUBLIC_GITALK_OWNER=
 NUXT_PUBLIC_GITALK_ADMIN=
-
-DATA_CAPSULE_ENDPOINT=https://s3.cstcloud.cn
-DATA_CAPSULE_BUCKET=
-DATA_CAPSULE_ACCESS_KEY_ID=
-DATA_CAPSULE_SECRET_ACCESS_KEY=
+GITALK_CLIENT_SECRET=
 ```
 
 说明：
 
-- `AI_API_KEY`、`GITALK_CLIENT_SECRET`、`ADMIN_TOKEN`、`DATA_CAPSULE_ACCESS_KEY_ID`、`DATA_CAPSULE_SECRET_ACCESS_KEY` 是服务端变量，不要暴露到浏览器或公开仓库。
-- `AI_PROVIDER` 当前支持 `deepseek` 和 `openai`，请求格式使用 OpenAI 兼容的 `/chat/completions`。
-- `NUXT_PUBLIC_*` 会进入浏览器运行时，只能放可公开配置。
-- `ADMIN_TOKEN` 配置后，管理页面 `/admin/data` 才能登录。
-- `DATA_CAPSULE_BUCKET` 是统一数据胶囊桶；管理页可分别指定音乐、歌词和图片上传目录，目录不存在时会随对象上传自然出现。
-- `AI_MAX_OUTPUT_TOKENS` 会作为 OpenAI 兼容接口请求中的 `max_tokens`，`AI_TEMPERATURE` 会被限制在 `0` 到 `2` 之间。
+- `ADMIN_TOKEN` 用于管理页登录。
+- `DATA_CAPSULE_*` 用于云端草稿和音乐/歌词上传中转。
+- `GITHUB_DATA_*` 用于把待同步内容提交到 GitHub 仓库。
+- `GITHUB_DATA_BASE_PATH` 默认是 `public/content-data`。
+- `NUXT_PUBLIC_SITE_URL` 线上应配置为站点地址，本地开发代码会使用 `http://localhost:3000` 读取静态内容。
+
+## 本地开发
+
+```powershell
+npm install
+copy .env.example .env
+npm run dev
+```
+
+常用命令：
+
+```powershell
+npm run dev
+npm run build
+npm run generate
+npm run preview
+npm run lint
+```
 
 ## 部署
 
-服务端部署推荐使用 `npm run build`，产物位于 `.output/`，通过 Node 运行 `.output/server/index.mjs`。
+推荐部署到支持 Nitro 服务端的环境，例如 Vercel 或 Node 服务。公开页面需要 `public/content-data` 静态资源随项目一起部署；管理页同步 GitHub 需要服务端环境变量。
 
-纯静态平台可以使用 `npm run generate`，产物位于 `.output/public/`。纯静态部署没有 Nitro 服务端接口，不能直接在线读取私有数据胶囊资源，也不能在线使用管理页面、AI 接口或 Gitalk 服务端代理；需要使用 SSR / Node 部署才能完整支持动态内容读取和管理。
-
-快速部署步骤见 [`docs/quick-deploy.md`](docs/quick-deploy.md)。
+纯静态部署可以展示当前构建时包含的 `public/content-data` 内容，但不能在线使用管理页同步、AI 接口或 Gitalk 服务端代理。
 
 ## 维护注意
 
-- 不要提交 `.env`、本地日志、构建产物和真实密钥。
-- `node_modules/`、`.nuxt/`、`.output/`、`.data/`、`.idea/` 是依赖、生成缓存或本地 IDE 配置，已加入 Git 忽略。
-- 修改已有记录的 `id` 会影响页面路径和关联 Markdown / LRC 文件名。
-- 管理页面保存/删除会先进入待同步区；点击“同步数据胶囊”后会写回数据胶囊根目录 `records.json` 并同步相关资源对象。
-- 管理页面删除记录时需要谨慎处理关联文件，避免误删正文或歌词。
+- 不要提交 `.env`、真实密钥、构建产物和本地缓存。
+- 修改记录 `id` 会改变页面路径和对应内容文件名。
+- 管理页只有在内容与原始数据不同的时候才会进入待同步区。
+- 同步 GitHub 后需要触发部署，公开页面才会读取新的静态内容。

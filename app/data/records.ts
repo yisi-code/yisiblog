@@ -18,7 +18,6 @@ export type DataRecord = {
   location?: string
   images?: string[]
   artist?: string
-  error?: string
   photos?: Photo[]
   icon?: string
 }
@@ -59,7 +58,6 @@ export type Song = NormalizedDataRecord & {
   lrcUrl?: string
   title: string
   artist?: string
-  error?: string
 }
 
 const normalizedRecordsCacheTtlMs = 60 * 1000
@@ -174,8 +172,7 @@ export function songsFromRecords(records: NormalizedDataRecord[]) {
     .filter((record): record is NormalizedDataRecord & { type: 'music'; url: string; title: string } => Boolean(record.url && record.title))
     .map((record) => ({
       ...record,
-      artist: record.artist,
-      error: record.error
+      artist: record.artist
     }))
 }
 

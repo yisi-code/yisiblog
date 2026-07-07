@@ -3,16 +3,11 @@
     <HomeSearch :items="homeSearchItems" class="hover:scale-[1.02] z-10"/>
     <HomeMusicOverview :stats="stats"/>
     <HomeContentGrid
-        v-if="hasHomeContent"
         :latest-album="latestAlbum"
         :latest-chatters="latestChatters"
         :latest-posts="latestPosts"
         :latest-moment-card="latestMomentCard"
     />
-    <section v-else class="glass-panel empty-state empty-state-panel w-full">
-      <strong>{{ isLoadingHomeData ? '正在加载内容...' : '暂无内容' }}</strong>
-      <span>{{ isLoadingHomeData ? '正在读取静态内容数据。' : '请稍后再试。' }}</span>
-    </section>
     <SiteDashboard/>
   </div>
 </template>
@@ -31,7 +26,7 @@ import {
   buildLatestPosts
 } from '~/data/home'
 
-const { data: homeData, pending: isLoadingHomeData } = await useHomePageData()
+const {data: homeData} = await useHomePageData()
 
 const defaultChatterCover = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
 
@@ -42,13 +37,6 @@ const safeAlbumItems = computed(() => homeData.value?.albums || [])
 const safeFriendItems = computed(() => homeData.value?.friends || [])
 const safeProjectItems = computed(() => homeData.value?.projects || [])
 const safeSongItems = computed(() => homeData.value?.songs || [])
-
-const hasHomeContent = computed(() => {
-  return safePostItems.value.length > 0
-      || safeChatterItems.value.length > 0
-      || safeMomentItems.value.length > 0
-      || safeAlbumItems.value.length > 0
-})
 
 const latestPosts = computed(() => buildLatestPosts(safePostItems.value))
 const latestChatters = computed(() => buildLatestChatters(safeChatterItems.value, defaultChatterCover))

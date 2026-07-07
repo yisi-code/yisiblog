@@ -233,7 +233,7 @@ export const useMusicStore = defineStore('music', () => {
     loadPromise ||= (async () => {
       const songItems = await fetchSongsData()
       songsList.value = songItems
-          .filter((song) => !song.error && song.url)
+          .filter((song) => song.url)
           .map((song, index) => ({
             ...song,
             id: song.id || `${song.title || 'local'}-${index}`

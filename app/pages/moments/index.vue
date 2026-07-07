@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import type { PreviewImage } from '~/components/ui/ImagePreview.vue'
-import { siteConfig, extractContentText, useMomentsData, type SiteContentItem } from '~/data'
+import { siteConfig, useMomentsData, type SiteContentItem } from '~/data'
 
 type MomentViewItem = SiteContentItem & {
   rawDate?: string
@@ -121,7 +121,7 @@ function rawDateFromItem(item: SiteContentItem) {
 }
 
 function momentText(item: SiteContentItem) {
-  return extractContentText(item, { preserveLineBreaks: true })
+  return item.description || ''
 }
 
 function momentLocation(item: SiteContentItem) {

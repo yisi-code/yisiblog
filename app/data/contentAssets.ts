@@ -12,8 +12,16 @@ function encodeContentPath(path: string) {
   const cleanPath = path.startsWith('/') ? path : `/${path}`
   return cleanPath
     .split('/')
-    .map((part, index) => index === 0 ? '' : encodeURIComponent(decodeURIComponent(part)))
+    .map((part, index) => index === 0 ? '' : encodeURIComponent(safeDecodePathPart(part)))
     .join('/')
+}
+
+function safeDecodePathPart(part: string) {
+  try {
+    return decodeURIComponent(part)
+  } catch {
+    return part
+  }
 }
 
 export async function fetchPublicContentText(path: string) {

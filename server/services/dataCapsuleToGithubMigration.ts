@@ -6,7 +6,7 @@ import {
   contentRecordsPath,
   githubPathFromContentPath
 } from '~~/shared/contentDataPaths'
-import { compactRecord, normalizeRecordForRead } from './adminContentCore'
+import { compactRecord, normalizeRecordForRead, normalizeRecordForWrite } from './adminContentCore'
 import { readDataCapsuleRecords } from './adminRecordsDataCapsule'
 import { readDataCapsuleObject } from './dataCapsuleStorage'
 import { commitGitHubContent, githubDataBasePath } from './githubContentStorage'
@@ -36,10 +36,12 @@ export async function migrateDataCapsuleContentToGitHub(): Promise<DataCapsuleMi
 
   for (const sourceRecord of sourceRecords) {
     const record = normalizeRecordForRead(sourceRecord)
+    let markdownContent = ''
 
     if ((record.type === 'post' || record.type === 'chatter' || record.type === 'moment' || record.type === 'about') && record.contentUrl) {
       const nextPath = contentMarkdownPath(record)
-      textFiles[githubPathFromContentPath(nextPath, basePath)] = (await readDataCapsuleObject(record.contentUrl)).toString('utf8')
+      markdownContent = (await readDataCapsuleObject(record.contentUrl)).toString('utf8')
+      textFiles[githubPathFromContentPath(nextPath, basePath)] = markdownContent
       record.contentUrl = nextPath
     }
 
@@ -55,7 +57,9 @@ export async function migrateDataCapsuleContentToGitHub(): Promise<DataCapsuleMi
       record.lrcUrl = nextPath
     }
 
-    nextRecords.push(record)
+    nextRecords.push(record.type === 'post' || record.type === 'chatter' || record.type === 'moment'
+      ? normalizeRecordForWrite(record, { content: markdownContent })
+      : record)
   }
 
   textFiles[githubPathFromContentPath(contentRecordsPath(), basePath)] = `${JSON.stringify(nextRecords.map(compactRecord), null, 2)}\n`
