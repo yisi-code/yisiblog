@@ -1,3 +1,5 @@
+import { fetchPublicContentJson } from './contentAssets'
+
 export type DataRecordType = 'post' | 'chatter' | 'moment' | 'music' | 'friend' | 'album' | 'project' | 'about'
 
 export type DataRecord = {
@@ -71,16 +73,6 @@ const routeBaseByType: Partial<Record<DataRecordType, string>> = {
   post: 'posts',
   chatter: 'chatter',
   album: 'albums'
-}
-
-export function publicContentAssetUrl(path: string) {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`
-  if (import.meta.client) return cleanPath
-  if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
-
-  const siteUrl = useRuntimeConfig().public.siteUrl
-  if (!siteUrl) return cleanPath
-  return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
 }
 
 function recordPath(record: DataRecord) {
@@ -194,7 +186,7 @@ export async function fetchNormalizedRecords() {
   }
 
   normalizedRecordsPromise ||= (async () => {
-    const sourceRecords = await $fetch<DataRecord[]>(publicContentAssetUrl('/content-data/records.json')).catch((error) => {
+    const sourceRecords = await fetchPublicContentJson<DataRecord[]>('/content-data/records.json').catch((error) => {
       console.warn('[records] records.json 读取失败', error instanceof Error ? error.message : error)
       return []
     })

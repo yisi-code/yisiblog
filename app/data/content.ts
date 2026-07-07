@@ -5,7 +5,6 @@ import {
     findRecordBySlug,
     friendsFromRecords,
     projectsFromRecords,
-    publicContentAssetUrl,
     recordMatchesSlug,
     recordSlugText,
     recordsByType,
@@ -16,6 +15,7 @@ import {
 import {formatDisplayDate} from '~/utils/dateFormat'
 import type { MDCRoot } from '@nuxtjs/mdc'
 import { parseMarkdown } from '@nuxtjs/mdc/runtime'
+import { fetchPublicContentText } from './contentAssets'
 
 type ContentBodyNode = string | number | boolean | null | undefined | {
     type?: string
@@ -126,16 +126,21 @@ async function loadRecordContent(record: NormalizedDataRecord) {
     if (!record.contentUrl) return mergeRecordContent(record)
 
     if (record.contentUrl.startsWith('/content-data/')) {
-        const markdown = await $fetch<string>(publicContentAssetUrl(record.contentUrl), { responseType: 'text' })
-        const parsed = await parseMarkdown(markdown)
-        return mergeRecordContent(record, {
-            path: record.path,
-            body: parsed.body,
-            bodyRaw: markdown,
-            title: parsed.data?.title,
-            description: parsed.data?.description,
-            toc: parsed.toc
-        })
+        try {
+            const markdown = await fetchPublicContentText(record.contentUrl)
+            const parsed = await parseMarkdown(markdown)
+            return mergeRecordContent(record, {
+                path: record.path,
+                body: parsed.body,
+                bodyRaw: markdown,
+                title: parsed.data?.title,
+                description: parsed.data?.description,
+                toc: parsed.toc
+            })
+        } catch (error) {
+            console.warn('[content] Markdown 读取失败', record.contentUrl, error instanceof Error ? error.message : error)
+            return mergeRecordContent(record)
+        }
     }
 
     throw createError({ statusCode: 400, statusMessage: 'contentUrl 必须指向 /content-data/ 静态 Markdown' })
