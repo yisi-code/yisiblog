@@ -1,6 +1,4 @@
-import { readFile } from 'node:fs/promises'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { useStorage } from 'nitropack/runtime' // [reference:7]
 import {
   contentDataPublicBase,
   contentMarkdownPath,
@@ -12,26 +10,24 @@ import {
 } from '~~/shared/adminData'
 import { normalizeRecordForRead } from './adminContentCore'
 
-// 获取当前文件的绝对路径
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-// 从 server/services/ 向上两级到达项目根目录
-const PROJECT_ROOT = join(__dirname, '../..')
-
-function publicContentPath(path: string) {
+// 使用 useStorage 来读取 public 目录下的文件
+export async function readStaticTextContent(path: string) {
+  // 从路径中提取相对于 content-data 的文件名
   const relativePath = path
       .replace(/^\/+/, '')
       .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
-  // 使用项目根目录，而非 process.cwd()
-  return join(PROJECT_ROOT, 'public', 'content-data', relativePath)
-}
 
-export async function readStaticTextContent(path: string) {
-  return readFile(publicContentPath(path), 'utf8')
+  // 通过 useStorage 读取 public 存储中的文件[reference:8]
+  const content = await useStorage('public').getItem(`content-data/${relativePath}`)
+  if (content === null || content === undefined) {
+    throw new Error(`File not found: content-data/${relativePath}`)
+  }
+  // 注意：useStorage 返回的是 Buffer 或字符串，可能需要根据情况处理
+  return content as string
 }
 
 export async function readStaticRecords() {
+  // 直接使用重写后的 readStaticTextContent
   const source = await readStaticTextContent(contentRecordsPath())
   return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
 }
