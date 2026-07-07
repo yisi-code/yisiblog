@@ -1275,7 +1275,7 @@ async function ensureCurrentRecordDetailLoaded() {
   await loadRecordDetail(record)
 }
 
-function resetDraft() {
+async function resetDraft() {
   if (!hasEditorDraft.value) return
 
   if (isCreating.value) {
@@ -1283,7 +1283,7 @@ function resetDraft() {
     return
   }
 
-  restoreOriginalRecord(selectedRecordKey.value || editorDraftKey.value, '内容已重置，并已退出待同步区')
+  await restoreOriginalRecord(selectedRecordKey.value || editorDraftKey.value, '内容已重置，并已退出待同步区')
 }
 
 function applyPendingChanges(baseRecords: AdminManagedRecord[], changes = pendingChanges.value) {
@@ -1322,21 +1322,28 @@ function resolveDraftSourceKey(record: AdminDataRecord) {
   return selectedRecordKey.value || recordKey(record)
 }
 
-function removePendingChange(key: string) {
-  pendingChanges.value = pendingChanges.value.filter((item) => item.key !== key)
-}
-
 function sourceRecordByKey(key: string) {
   return sourceRecords.value.find((record) => recordKey(record) === key)
 }
 
-function restoreOriginalRecord(key: string, message = '已撤销变更') {
+async function restoreOriginalRecord(key: string, message = '已撤销变更') {
   if (!key) return
   const change = pendingChanges.value.find((item) => item.key === key)
   const snapshot = change?.snapshot || sourceRecordByKey(key)
   const targetType = change?.record?.type || change?.type || snapshot?.type || selectedType.value
+  const nextChanges = pendingChanges.value.filter((item) => item.key !== key)
 
-  removePendingChange(key)
+  isSavingCloudDraft.value = true
+  try {
+    await persistCloudPendingChanges(nextChanges)
+  } catch (error) {
+    setStatus(errorMessage(error), 'error')
+    return
+  } finally {
+    isSavingCloudDraft.value = false
+  }
+
+  pendingChanges.value = nextChanges
   applyPendingChanges(sourceRecords.value)
 
   if (snapshot) {
@@ -1484,8 +1491,8 @@ function deleteRecord(deleteAssociatedFiles: boolean) {
   setStatus('删除操作已加入待同步区', 'success')
 }
 
-function undoChange(key: string) {
-  restoreOriginalRecord(key, '已撤销变更')
+async function undoChange(key: string) {
+  await restoreOriginalRecord(key, '已撤销变更')
 }
 
 function openPendingChange(change: AdminPendingChange) {
