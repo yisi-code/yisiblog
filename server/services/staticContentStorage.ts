@@ -1,49 +1,74 @@
-import { useStorage } from 'nitropack/runtime' // [reference:7]
+import {readFile} from 'node:fs/promises'
+import {join} from 'node:path'
+import {useStorage} from 'nitropack/runtime'
 import {
-  contentDataPublicBase,
-  contentMarkdownPath,
-  contentRecordsPath
+    contentDataPublicBase,
+    contentMarkdownPath,
+    contentRecordsPath
 } from '~~/shared/contentDataPaths'
 import {
-  adminRecordNeedsMarkdown,
-  type AdminManagedRecord
+    adminRecordNeedsMarkdown,
+    type AdminManagedRecord
 } from '~~/shared/adminData'
-import { normalizeRecordForRead } from './adminContentCore'
+import {normalizeRecordForRead} from './adminContentCore'
 
-// 使用 useStorage 来读取 public 目录下的文件
+function publicContentPath(path: string) {
+    const relativePath = path
+        .replace(/^\/+/, '')
+        .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
+    return join(process.cwd(), 'public', 'content-data', relativePath)
+}
+
+function isFileNotFound(error: unknown) {
+    return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT'
+}
+
+function relativeContentPath(path: string) {
+    return path
+        .replace(/^\/+/, '')
+        .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
+}
+
 export async function readStaticTextContent(path: string) {
-  // 从路径中提取相对于 content-data 的文件名
-  const relativePath = path
-      .replace(/^\/+/, '')
-      .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
+    const relativePath = relativeContentPath(path)
+    const storageContent = await useStorage('public').getItem(`content-data/${relativePath}`)
+    if (typeof storageContent === 'string') return storageContent
+    if (storageContent instanceof Uint8Array) return Buffer.from(storageContent).toString('utf8')
+    if (storageContent !== null && storageContent !== undefined) return String(storageContent)
 
-  // 通过 useStorage 读取 public 存储中的文件[reference:8]
-  const content = await useStorage('public').getItem(`content-data/${relativePath}`)
-  if (content === null || content === undefined) {
-    throw new Error(`File not found: content-data/${relativePath}`)
-  }
-  // 注意：useStorage 返回的是 Buffer 或字符串，可能需要根据情况处理
-  return content as string
+    try {
+        return await readFile(publicContentPath(path), 'utf8')
+    } catch (error) {
+        if (!isFileNotFound(error)) throw error
+        throw error
+    }
 }
 
 export async function readStaticRecords() {
-  // 直接使用重写后的 readStaticTextContent
-  const source = await readStaticTextContent(contentRecordsPath())
-  return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
+    try {
+        const source = await readStaticTextContent(contentRecordsPath())
+        return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
+    } catch (error) {
+        // 如果文件不存在，返回空数组
+        if (isFileNotFound(error)) {
+            return []
+        }
+        throw error
+    }
 }
 
 export async function readStaticManagedRecords(): Promise<AdminManagedRecord[]> {
-  const records = await readStaticRecords()
+    const records = await readStaticRecords()
 
-  return Promise.all(records.map(async (record) => {
-    const managedRecord: AdminManagedRecord = { ...record }
-    if (adminRecordNeedsMarkdown(record.type)) {
-      try {
-        managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
-      } catch {
-        managedRecord.content = ''
-      }
-    }
-    return managedRecord
-  }))
+    return Promise.all(records.map(async (record) => {
+        const managedRecord: AdminManagedRecord = {...record}
+        if (adminRecordNeedsMarkdown(record.type)) {
+            try {
+                managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
+            } catch {
+                managedRecord.content = ''
+            }
+        }
+        return managedRecord
+    }))
 }
