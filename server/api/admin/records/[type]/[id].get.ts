@@ -8,11 +8,11 @@ export default defineEventHandler(async (event): Promise<AdminRecordDetailRespon
   const type = getRouterParam(event, 'type') as AdminRecordType | undefined
   const id = safeDecodeParam(getRouterParam(event, 'id') || '')
   if (!type || !adminRecordTypes.includes(type) || !id) {
-    throw createError({ statusCode: 400, statusMessage: '记录类型或 ID 无效' })
+    throw createError({ statusCode: 400, message: '记录类型或 ID 无效' })
   }
 
   return {
-    record: await readStaticManagedRecordDetail(type, id)
+    record: await readStaticManagedRecordDetail(type, id, event)
   }
 })
 

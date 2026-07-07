@@ -11,6 +11,7 @@ import {
     type AdminManagedRecord
 } from '~~/shared/adminData'
 import {normalizeRecordForRead} from './adminContentCore'
+import type { H3Event } from 'h3'
 
 const publicContentDataPrefix = '/content-data/'
 
@@ -66,17 +67,17 @@ async function readStaticTextContentFromFile(path: string) {
     return null
 }
 
-function requestOrigin() {
+function requestOrigin(event?: H3Event) {
     try {
-        const origin = useRequestURL().origin
+        const origin = event ? getRequestURL(event).origin : useRequestURL().origin
         return origin && origin !== 'null' ? origin.replace(/\/+$/, '') : ''
     } catch {
         return ''
     }
 }
 
-function configuredSiteOrigin() {
-    const siteUrl = useRuntimeConfig().public.siteUrl
+function configuredSiteOrigin(event?: H3Event) {
+    const siteUrl = useRuntimeConfig(event).public.siteUrl
     if (typeof siteUrl === 'string' && siteUrl) return siteUrl.replace(/\/+$/, '')
 
     const vercelUrl = process.env.VERCEL_URL
@@ -85,10 +86,10 @@ function configuredSiteOrigin() {
     return ''
 }
 
-function staticContentOrigins() {
+function staticContentOrigins(event?: H3Event) {
     return [...new Set([
-        configuredSiteOrigin(),
-        requestOrigin()
+        configuredSiteOrigin(event),
+        requestOrigin(event)
     ].filter(Boolean))]
 }
 
@@ -99,12 +100,12 @@ function encodeStaticContentPath(path: string) {
         .join('/')
 }
 
-export async function readStaticTextContent(path: string) {
+export async function readStaticTextContent(path: string, event?: H3Event) {
     const fileContent = await readStaticTextContentFromFile(path)
     if (fileContent !== null) return fileContent
 
     let lastError: unknown
-    for (const origin of staticContentOrigins()) {
+    for (const origin of staticContentOrigins(event)) {
         try {
             return await $fetch<string>(`${origin}${encodeStaticContentPath(path)}`, {responseType: 'text'})
         } catch (error) {
@@ -126,28 +127,44 @@ export async function readStaticRecords() {
     }
 }
 
+export async function readStaticRecordsForEvent(event: H3Event) {
+    try {
+        const source = await readStaticTextContent(contentRecordsPath(), event)
+        return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
+    } catch (error) {
+        console.warn('[static-content] records.json 读取失败', error instanceof Error ? error.message : error)
+        throw createError({ statusCode: 503, message: 'records.json 读取失败' })
+    }
+}
+
 export async function readStaticManagedRecords(): Promise<AdminManagedRecord[]> {
     const records = await readStaticRecords()
 
     return records.map((record) => ({...record}))
 }
 
-export async function readStaticManagedRecordDetail(type: AdminRecordType, id: string): Promise<AdminManagedRecord | null> {
-    const records = await readStaticRecords()
+export async function readStaticManagedRecordsForEvent(event: H3Event): Promise<AdminManagedRecord[]> {
+    const records = await readStaticRecordsForEvent(event)
+
+    return records.map((record) => ({...record}))
+}
+
+export async function readStaticManagedRecordDetail(type: AdminRecordType, id: string, event?: H3Event): Promise<AdminManagedRecord | null> {
+    const records = event ? await readStaticRecordsForEvent(event) : await readStaticRecords()
     const record = records.find((item) => item.type === type && item.id === id)
     if (!record) return null
 
     const managedRecord: AdminManagedRecord = {...record}
     if (adminRecordNeedsMarkdown(record.type)) {
         try {
-            managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
+            managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record), event)
         } catch {
             managedRecord.content = ''
         }
     }
     if (record.type === 'music' && record.lrcUrl) {
         try {
-            managedRecord.lrc = await readStaticTextContent(record.lrcUrl)
+            managedRecord.lrc = await readStaticTextContent(record.lrcUrl, event)
         } catch {
             managedRecord.lrc = ''
         }

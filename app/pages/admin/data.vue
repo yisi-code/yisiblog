@@ -403,9 +403,16 @@
         <strong>管理令牌验证</strong>
         <span>验证通过后 30 分钟内保持有效，到期后需要重新验证。</span>
         <input
+            type="hidden"
+            name="username"
+            autocomplete="username"
+            value="admin"
+        >
+        <input
             v-model="adminToken"
             class="admin-data-input"
             type="password"
+            name="admin-token"
             placeholder="输入管理令牌"
             autocomplete="current-password"
         >

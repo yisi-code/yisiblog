@@ -7,7 +7,8 @@ import {
   applyAdminChangesToDataCapsule,
   readAdminManagedRecordsFromDataCapsule
 } from './adminContentStorage'
-import { readStaticManagedRecords } from './staticContentStorage'
+import { readStaticManagedRecords, readStaticManagedRecordsForEvent } from './staticContentStorage'
+import type { H3Event } from 'h3'
 
 const adminRecordsCacheTtlMs = 60 * 1000
 let adminRecordsCache: {
@@ -39,6 +40,22 @@ export async function readAdminManagedRecords() {
 
   adminRecordsReadPromise ||= (async () => {
     const records = await readStaticManagedRecords()
+    setAdminRecordsCache(records)
+    return records
+  })().finally(() => {
+    adminRecordsReadPromise = null
+  })
+
+  return cloneAdminRecords(await adminRecordsReadPromise)
+}
+
+export async function readAdminManagedRecordsForEvent(event: H3Event) {
+  if (adminRecordsCache && adminRecordsCache.expiresAt > Date.now()) {
+    return cloneAdminRecords(adminRecordsCache.records)
+  }
+
+  adminRecordsReadPromise ||= (async () => {
+    const records = await readStaticManagedRecordsForEvent(event)
     setAdminRecordsCache(records)
     return records
   })().finally(() => {
