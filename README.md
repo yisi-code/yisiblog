@@ -102,7 +102,7 @@ GITALK_CLIENT_SECRET=
 - `DATA_CAPSULE_*` 用于云端草稿和音乐/歌词上传中转。
 - `GITHUB_DATA_*` 用于把待同步内容提交到 GitHub 仓库。
 - `GITHUB_DATA_BASE_PATH` 默认是 `public/content-data`。
-- `NUXT_PUBLIC_SITE_URL` 线上应配置为站点地址，本地开发代码会使用 `http://localhost:3000` 读取静态内容。
+- `NUXT_PUBLIC_SITE_URL` 线上应配置为站点地址；SSR 会优先使用当前请求地址读取静态内容，缺少请求上下文时才使用该配置。
 
 ## 本地开发
 

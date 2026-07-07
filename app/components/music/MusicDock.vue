@@ -10,7 +10,7 @@
       ref="audioRef"
       :src="currentSong.url"
       class="hidden"
-      preload="none"
+      preload="metadata"
       @timeupdate="syncTime"
       @loadedmetadata="handleLoadedMetadata"
       @ended="handleEnded"
@@ -230,6 +230,7 @@ watch(currentSong, async () => {
   syncAudioVolume()
   if (isRestoredSong) music.restoredSongKey = ''
   else music.resetPlaybackPosition()
+  audio.load()
   await music.syncLyrics()
   await syncAudioPlayback()
 }, { immediate: true })

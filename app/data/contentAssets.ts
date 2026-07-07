@@ -1,11 +1,24 @@
 export function publicContentAssetUrl(path: string) {
   const cleanPath = encodeContentPath(path)
   if (import.meta.client) return cleanPath
-  if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
 
+  const origin = currentRequestOrigin() || configuredSiteOrigin()
+  if (!origin) return cleanPath
+  return `${origin}${cleanPath}`
+}
+
+function currentRequestOrigin() {
+  try {
+    const origin = useRequestURL().origin
+    return origin && origin !== 'null' ? origin.replace(/\/+$/, '') : ''
+  } catch {
+    return ''
+  }
+}
+
+function configuredSiteOrigin() {
   const siteUrl = useRuntimeConfig().public.siteUrl
-  if (!siteUrl) return cleanPath
-  return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
+  return typeof siteUrl === 'string' && siteUrl ? siteUrl.replace(/\/+$/, '') : ''
 }
 
 function encodeContentPath(path: string) {
