@@ -2,7 +2,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
     compatibilityDate: '2026-06-22',
-    devtools: {enabled: true},
+    devtools: {enabled: process.env.NODE_ENV !== 'production'},
     modules: ['@nuxtjs/mdc', '@pinia/nuxt', '@nuxtjs/color-mode', '@nuxt/eslint'],
     components: [
         {
@@ -15,9 +15,7 @@ export default defineNuxtConfig({
         plugins: [tailwindcss()],
         optimizeDeps: {
             include: [
-                '@lucide/vue',
-                '@vue/devtools-core',
-                '@vue/devtools-kit'
+                '@lucide/vue'
             ]
         }
     },

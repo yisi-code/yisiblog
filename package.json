@@ -21,12 +21,13 @@
     "@tailwindcss/vite": "^4.1.17",
     "@vueuse/core": "^14.1.0",
     "gitalk": "^1.8.0",
-    "h3": "1.15.11",
+    "h3": "^1.15.11",
     "katex": "^0.17.0",
     "nuxt": "^4.2.2",
     "pinia": "^3.0.4",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
+    "unstorage": "^1.14.1",
     "vue": "^3.5.25"
   },
   "devDependencies": {
@@ -38,6 +39,6 @@
     "vue-tsc": "^3.1.8"
   },
   "overrides": {
-    "h3": "1.15.11"
+    "h3": "^1.15.11"
   }
 }
