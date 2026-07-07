@@ -673,8 +673,8 @@
 
 .admin-data-sync-head {
   display: flex;
-  flex-direction: column;
-  align-items: start;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   border-bottom: 1px solid var(--color-border-subtle);
@@ -692,13 +692,6 @@
   color: var(--color-text-normal);
   font-size: var(--font-size-normal-125);
   font-weight: 950;
-}
-
-.admin-data-sync-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem;
 }
 
 .admin-data-change-list {

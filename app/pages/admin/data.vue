@@ -130,25 +130,15 @@
         <template v-else>
           <div class="admin-data-sync-head">
             <strong>{{ pendingChanges.length }} 项待同步</strong>
-            <div class="admin-data-sync-actions">
-              <button
-                  class="admin-data-button"
-                  type="button"
-                  :disabled="!canSaveCloudDraft"
-                  @click="saveCloudDraft">
-                <CloudUpload :size="17" aria-hidden="true"/>
-                保存云端草稿
-              </button>
-              <button
-                  class="admin-data-button admin-data-button--primary"
-                  type="button"
-                  :disabled="!canSyncDataCapsule"
-                  @click="syncDataCapsule"
-              >
-                <CloudUpload :size="17" aria-hidden="true"/>
-                同步 GitHub
-              </button>
-            </div>
+            <button
+                class="admin-data-button admin-data-button--primary"
+                type="button"
+                :disabled="!canSyncDataCapsule"
+                @click="syncDataCapsule"
+            >
+              <CloudUpload :size="17" aria-hidden="true"/>
+              同步 GitHub
+            </button>
           </div>
 
           <div class="admin-data-change-list">
@@ -228,7 +218,8 @@
                         type="button"
                         @mousedown.prevent="selectUploadFolder(target.key, folder)">
                       <span class="admin-data-select__option-title">
-                        <template v-for="(part, index) in highlightFolderParts(folder, uploadFolders[target.key])" :key="`${folder}-${index}`">
+                        <template v-for="(part, index) in highlightFolderParts(folder, uploadFolders[target.key])"
+                                  :key="`${folder}-${index}`">
                           <mark v-if="part.match" class="search-highlight">{{ part.text }}</mark>
                           <span v-else>{{ part.text }}</span>
                         </template>
@@ -293,7 +284,8 @@
             <label v-if="showCoverField" class="admin-data-field admin-data-field--wide">
               <span>封面</span>
               <input v-model="draft.cover" class="admin-data-input" placeholder="输入图片链接">
-              <img v-if="draft.cover" class="admin-data-preview-image" :src="previewAssetUrl(draft.cover)" alt="封面预览">
+              <img v-if="draft.cover" class="admin-data-preview-image" :src="previewAssetUrl(draft.cover)"
+                   alt="封面预览">
             </label>
 
             <label v-if="showUrlField" class="admin-data-field admin-data-field--wide">
@@ -303,7 +295,8 @@
                     v-model="draft.url"
                     class="admin-data-input"
                     :placeholder="draft.type === 'music' ? '选择音乐后自动填入远程地址' : 'https://...'">
-                <AdminFilePicker v-if="draft.type === 'music'" label="选择音乐" accept="audio/*" @change="handleMusicSelected"/>
+                <AdminFilePicker v-if="draft.type === 'music'" label="选择音乐" accept="audio/*"
+                                 @change="handleMusicSelected"/>
               </div>
               <div v-if="musicFile" class="admin-data-file-pill">
                 <Music :size="16" aria-hidden="true"/>
@@ -311,7 +304,8 @@
                 <small v-if="musicFile.size">{{ formatBytes(musicFile.size) }}</small>
                 <button type="button" @click="clearMusicFile">移除</button>
               </div>
-              <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio" :src="previewAssetUrl(draft.url)" controls/>
+              <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio"
+                     :src="previewAssetUrl(draft.url)" controls/>
             </label>
 
             <label v-if="showTagsField" class="admin-data-field admin-data-field--wide">
@@ -444,7 +438,7 @@ import {
   Trash2,
   Undo2
 } from '@lucide/vue'
-import { highlightSearchParts } from '~/utils/searchHighlight'
+import {highlightSearchParts} from '~/utils/searchHighlight'
 import {
   adminRecordHasField,
   adminRecordNeedsMarkdown,
@@ -462,35 +456,14 @@ import {
 } from '~~/shared/adminData'
 
 type EditorMode = 'idle' | 'create' | 'edit'
-type DraftSaveMode = 'manual' | 'auto' | 'sync'
 type DraftSaveResult = 'saved' | 'unchanged' | 'invalid' | 'error'
 type AdminCloudDraftState = {
-  drafts: Record<string, EditorDraftCache>
   pendingChanges: AdminPendingChange[]
   updatedAt?: string
 }
 type AdminSession = {
   session: string
   expiresAt: number
-}
-type EditorDraftCache = {
-  mode: EditorMode
-  selectedKey: string
-  originalId: string
-  record: AdminDataRecord
-  content: string
-  lrc: string
-  musicFile?: AdminMusicFilePayload
-  tagsText: string
-  imagesText: string
-  albumPhotoUrlsText: string
-  albumPhotoDrafts: AdminPhoto[]
-  typeFields: {
-    mood: string
-    location: string
-    artist: string
-    icon: string
-  }
 }
 type AdminUploadedFilePayload = {
   fileName: string
@@ -509,7 +482,6 @@ type UploadFolderConfig = {
 
 const adminSessionStorageKey = 'yisiblog-admin-session'
 const pendingChangesStorageKey = 'yisiblog-admin-pending-changes'
-const editorDraftsStorageKey = 'yisiblog-admin-editor-drafts'
 const adminRecordsCacheStorageKey = 'yisiblog-admin-records-cache'
 const maxSyncPayloadBytes = 4 * 1024 * 1024
 const creatableTypes = adminRecordTypes.filter((type) => type !== 'about')
@@ -529,7 +501,6 @@ const adminSession = ref<AdminSession | null>(null)
 const sourceRecords = ref<AdminManagedRecord[]>([])
 const records = ref<AdminManagedRecord[]>([])
 const pendingChanges = ref<AdminPendingChange[]>([])
-const editorDrafts = ref<Record<string, EditorDraftCache>>({})
 const sidebarView = ref<'records' | 'sync'>('records')
 const selectedType = ref<AdminRecordType>('post')
 const selectedRecordKey = ref('')
@@ -575,8 +546,8 @@ const uploadFolderTouched = reactive<Record<UploadFolderTarget, boolean>>({
   lyric: false
 })
 const uploadFolderConfigs: UploadFolderConfig[] = [
-  { key: 'music', label: '音乐', placeholder: '音乐文件夹' },
-  { key: 'lyric', label: '歌词', placeholder: '音乐歌词文件夹' }
+  {key: 'music', label: '音乐', placeholder: '音乐文件夹'},
+  {key: 'lyric', label: '歌词', placeholder: '音乐歌词文件夹'}
 ]
 let hasTriedLoadingFolders = false
 const isLoadingFolders = ref(false)
@@ -588,10 +559,9 @@ const isCreating = computed(() => editorMode.value === 'create')
 const hasEditorDraft = computed(() => editorMode.value !== 'idle')
 const needsMarkdown = computed(() => adminRecordNeedsMarkdown(draft.type))
 const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type))
-const canSaveCloudDraft = computed(() => !isBusy.value && isAuthenticated.value && Boolean(pendingChanges.value.length || Object.keys(editorDrafts.value).length || hasEditorDraft.value))
 const canDeleteDraft = computed(() => !isCreating.value && draft.type !== 'about')
 const canCreateSelectedType = computed(() => selectedType.value !== 'about')
-const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length || canSave.value))
+const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length))
 const statusClass = computed(() => `admin-data-status--${statusType.value}`)
 const showTitleField = computed(() => hasDraftField('title'))
 const showDateField = computed(() => hasDraftField('date'))
@@ -663,21 +633,12 @@ watch(pendingChanges, () => {
   persistPendingChanges()
 }, {deep: true})
 
-watch(editorDrafts, () => {
-  persistEditorDrafts()
-}, {deep: true})
-
 onMounted(() => {
   restoreSession()
   if (!isAuthenticated.value) {
     restorePendingChanges()
-    restoreEditorDrafts()
   }
   if (isAuthenticated.value) void loadRecords()
-})
-
-onBeforeUnmount(() => {
-  stashEditorDraft()
 })
 
 function createEmptyRecord(type: AdminRecordType): AdminDataRecord {
@@ -716,12 +677,12 @@ function errorMessage(error: unknown) {
       statusText?: unknown
     }
     return String(
-      source.data?.message
-      || source.data?.statusMessage
-      || source.statusMessage
-      || source.message
-      || source.statusText
-      || error
+        source.data?.message
+        || source.data?.statusMessage
+        || source.statusMessage
+        || source.message
+        || source.statusText
+        || error
     )
   }
 
@@ -937,18 +898,6 @@ function persistPendingChanges() {
   }
 }
 
-function restoreEditorDrafts() {
-  if (!import.meta.client) return
-  const raw = window.localStorage.getItem(editorDraftsStorageKey)
-  if (!raw) return
-  try {
-    const parsed = JSON.parse(raw)
-    editorDrafts.value = normalizeEditorDrafts(parsed)
-  } catch {
-    window.localStorage.removeItem(editorDraftsStorageKey)
-  }
-}
-
 async function restoreCloudDraftState() {
   if (!isAuthenticated.value) return false
 
@@ -957,14 +906,10 @@ async function restoreCloudDraftState() {
       headers: requestHeaders()
     })
     const cloudPendingChanges = Array.isArray(cloudState.pendingChanges) ? cloudState.pendingChanges : []
-    const cloudDrafts = normalizeEditorDrafts(cloudState.drafts)
-    const hasCloudState = cloudPendingChanges.length || Object.keys(cloudDrafts).length
-    if (!hasCloudState) return false
+    if (!cloudPendingChanges.length) return false
 
     pendingChanges.value = cloudPendingChanges
-    editorDrafts.value = cloudDrafts
-    pruneEditorDrafts()
-    setStatus('已恢复云端草稿和待同步数据', 'success')
+    setStatus('已恢复云端待同步数据', 'success')
     return true
   } catch (error) {
     console.warn('[admin-data:cloud-drafts]', error)
@@ -1000,37 +945,6 @@ function persistRecordsCache(nextRecords: AdminManagedRecord[]) {
   } catch (error) {
     console.warn('[admin-data:persist-records-cache]', error)
   }
-}
-
-function persistEditorDrafts() {
-  if (!import.meta.client) return
-  try {
-    window.localStorage.setItem(editorDraftsStorageKey, JSON.stringify(editorDrafts.value))
-  } catch (error) {
-    console.warn('[admin-data:persist-drafts]', error)
-  }
-}
-
-function removeEditorDraft(key: string) {
-  const {[key]: _removed, ...nextDrafts} = editorDrafts.value
-  editorDrafts.value = nextDrafts
-}
-
-function isEditorDraftCache(value: unknown): value is EditorDraftCache {
-  if (!value || typeof value !== 'object') return false
-  const draftCache = value as Partial<EditorDraftCache>
-  return (draftCache.mode === 'create' || draftCache.mode === 'edit') && Boolean(draftCache.record?.type)
-}
-
-function normalizeEditorDrafts(value: unknown) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-  const drafts: Record<string, EditorDraftCache> = {}
-
-  Object.entries(value).forEach(([key, cache]) => {
-    if (isEditorDraftCache(cache)) drafts[key] = cache
-  })
-
-  return drafts
 }
 
 function splitLines(value: string) {
@@ -1112,106 +1026,6 @@ function clearEditorDraft(type: AdminRecordType = selectedType.value) {
   typeFields.icon = ''
   resetUploadFolderTouched()
   setAutoUploadFolders()
-}
-
-function currentEditorCache(): EditorDraftCache {
-  return {
-    mode: editorMode.value,
-    selectedKey: selectedRecordKey.value,
-    originalId: originalId.value,
-    record: buildRecordPayload(),
-    content: contentText.value,
-    lrc: lrcText.value,
-    musicFile: musicFile.value,
-    tagsText: tagsText.value,
-    imagesText: imagesText.value,
-    albumPhotoUrlsText: albumPhotoUrlsText.value,
-    albumPhotoDrafts: albumPhotoDrafts.value,
-    typeFields: {...typeFields}
-  }
-}
-
-function shouldKeepEditorDraft() {
-  if (!hasEditorDraft.value || !editorDraftKey.value || !draft.type) return false
-  if (pendingChanges.value.some((change) => change.key === editorDraftKey.value || change.key === selectedRecordKey.value)) return false
-
-  try {
-    const {
-      record,
-      sourceKey,
-      snapshot,
-      content,
-      lrc,
-      nextMusicFile
-    } = buildDraftChangePayload()
-
-    if (!record.id.trim()) {
-      return normalizedChangeValue({
-        record,
-        content,
-        lrc,
-        musicPath: nextMusicFile?.path
-      }) !== normalizedChangeValue({
-        record: createEmptyRecord(record.type),
-        content: '',
-        lrc: '',
-        musicPath: undefined
-      })
-    }
-
-    if (pendingChanges.value.some((change) => change.key === sourceKey)) return false
-
-    return hasDraftChanged({
-      base: snapshot,
-      record,
-      content,
-      lrc,
-      musicPath: nextMusicFile?.path
-    })
-  } catch {
-    return false
-  }
-}
-
-function stashEditorDraft() {
-  if (!hasEditorDraft.value || !editorDraftKey.value) return
-  if (!shouldKeepEditorDraft()) {
-    removeEditorDraft(editorDraftKey.value)
-    if (selectedRecordKey.value && selectedRecordKey.value !== editorDraftKey.value) removeEditorDraft(selectedRecordKey.value)
-    return
-  }
-
-  try {
-    editorDrafts.value[editorDraftKey.value] = currentEditorCache()
-  } catch {
-    removeEditorDraft(editorDraftKey.value)
-  }
-}
-
-async function stashOpenDraft() {
-  const result = await saveDraftChange('auto')
-  if (result === 'invalid' || result === 'error') stashEditorDraft()
-  return result
-}
-
-function restoreEditorCache(key: string) {
-  const cache = editorDrafts.value[key]
-  if (!cache) return false
-  editorMode.value = cache.mode
-  selectedRecordKey.value = cache.selectedKey
-  originalId.value = cache.originalId
-  Object.assign(draft, cache.record)
-  contentText.value = cache.content
-  lrcText.value = cache.lrc
-  musicFile.value = cache.musicFile
-  tagsText.value = cache.tagsText
-  imagesText.value = cache.imagesText
-  albumPhotoDrafts.value = cache.albumPhotoDrafts || []
-  albumPhotoUrlsText.value = cache.albumPhotoUrlsText || albumPhotoDrafts.value.map((photo) => photo.url).join('\n')
-  Object.assign(typeFields, cache.typeFields || {})
-  resetUploadFolderTouched()
-  setAutoUploadFolders(cache.record)
-  return true
 }
 
 function buildRecordPayload() {
@@ -1353,58 +1167,7 @@ function hasDraftChanged(params: {
   })
 }
 
-function isPendingEditorDraft(key: string, cache?: EditorDraftCache) {
-  const selectedKey = cache?.selectedKey || ''
-  const recordDraftKey = cache?.record?.id ? recordKey(cache.record) : ''
-  return pendingChanges.value.some((change) => change.key === key || change.key === selectedKey || change.key === recordDraftKey)
-}
-
-function editorDraftHasChanges(cache: EditorDraftCache) {
-  const record = cache.record
-  const content = adminRecordNeedsMarkdown(record.type) ? cache.content : undefined
-  const lrc = record.type === 'music' ? cache.lrc : undefined
-  const musicPath = record.type === 'music' ? cache.musicFile?.path : undefined
-
-  if (!record.id.trim()) {
-    return normalizedChangeValue({
-      record,
-      content,
-      lrc,
-      musicPath
-    }) !== normalizedChangeValue({
-      record: createEmptyRecord(record.type),
-      content: '',
-      lrc: '',
-      musicPath: undefined
-    })
-  }
-
-  const sourceKey = cache.selectedKey || recordKey(record)
-  const snapshot = sourceRecords.value.find((item) => recordKey(item) === sourceKey)
-  return hasDraftChanged({
-    base: snapshot,
-    record,
-    content,
-    lrc,
-    musicPath
-  })
-}
-
-function pruneEditorDrafts() {
-  const nextDrafts: Record<string, EditorDraftCache> = {}
-
-  Object.entries(editorDrafts.value).forEach(([key, cache]) => {
-    if (!isEditorDraftCache(cache)) return
-    if (isPendingEditorDraft(key, cache)) return
-    if (!editorDraftHasChanges(cache)) return
-    nextDrafts[key] = cache
-  })
-
-  editorDrafts.value = nextDrafts
-}
-
-async function selectType(type: AdminRecordType) {
-  await stashOpenDraft()
+function selectType(type: AdminRecordType) {
   closeFolderDropdown()
   selectedType.value = type
   clearEditorDraft(type)
@@ -1420,9 +1183,8 @@ function selectDraftType(type: AdminRecordType) {
   isTypeSelectOpen.value = false
 }
 
-async function createRecord() {
+function createRecord() {
   if (selectedType.value === 'about') return
-  await stashOpenDraft()
   startCreateRecord(selectedType.value)
 }
 
@@ -1441,8 +1203,7 @@ function startCreateRecord(type: AdminRecordType) {
   editorDraftKey.value = key
 }
 
-async function selectRecord(record: AdminManagedRecord) {
-  await stashOpenDraft()
+function selectRecord(record: AdminManagedRecord) {
   const key = recordKey(record)
   if (selectedRecordKey.value === key) {
     clearEditorDraft(record.type)
@@ -1450,9 +1211,7 @@ async function selectRecord(record: AdminManagedRecord) {
   }
 
   editorDraftKey.value = key
-  if (!restoreEditorCache(key)) {
-    editRecord(record)
-  }
+  editRecord(record)
 }
 
 function editRecord(record: AdminManagedRecord) {
@@ -1520,7 +1279,6 @@ function resetDraft() {
   if (!hasEditorDraft.value) return
 
   if (isCreating.value) {
-    if (editorDraftKey.value) removeEditorDraft(editorDraftKey.value)
     startCreateRecord(selectedType.value)
     return
   }
@@ -1579,7 +1337,6 @@ function restoreOriginalRecord(key: string, message = '已撤销变更') {
   const targetType = change?.record?.type || change?.type || snapshot?.type || selectedType.value
 
   removePendingChange(key)
-  removeEditorDraft(key)
   applyPendingChanges(sourceRecords.value)
 
   if (snapshot) {
@@ -1617,13 +1374,25 @@ function buildDraftChangePayload() {
   }
 }
 
-async function saveDraftChange(mode: DraftSaveMode = 'manual'): Promise<DraftSaveResult> {
+async function persistCloudPendingChanges(changes = pendingChanges.value) {
+  await $fetch('/api/admin/drafts', {
+    method: 'POST',
+    headers: requestHeaders(),
+    body: {
+      drafts: {},
+      pendingChanges: [...changes]
+    }
+  })
+}
+
+async function saveDraftChange(): Promise<DraftSaveResult> {
   if (!hasEditorDraft.value || !isAuthenticated.value || !draft.type) return 'invalid'
   if (!draft.id.trim()) {
-    if (mode === 'manual') setStatus('请先填写 ID 后再保存草稿', 'error')
+    setStatus('请先填写 ID 后再保存草稿', 'error')
     return 'invalid'
   }
 
+  isSavingCloudDraft.value = true
   try {
     await ensureCurrentRecordDetailLoaded()
     const {
@@ -1646,12 +1415,12 @@ async function saveDraftChange(mode: DraftSaveMode = 'manual'): Promise<DraftSav
       musicPath: nextMusicFile?.path
     })) {
       if (existingPending) {
-        removePendingChange(existingPending.key)
-        removeEditorDraft(existingPending.key)
+        const nextChanges = pendingChanges.value.filter((change) => change.key !== existingPending.key)
+        await persistCloudPendingChanges(nextChanges)
+        pendingChanges.value = nextChanges
         applyPendingChanges(sourceRecords.value)
       }
-      removeEditorDraft(sourceKey)
-      if (mode === 'manual') setStatus('内容没有变化，无需保存草稿', 'info')
+      setStatus('内容无变化，未加入待同步区', 'info')
       return 'unchanged'
     }
 
@@ -1667,54 +1436,22 @@ async function saveDraftChange(mode: DraftSaveMode = 'manual'): Promise<DraftSav
       updatedAt: new Date().toISOString()
     }
 
-    if (sourceKey && sourceKey !== key) {
-      removePendingChange(sourceKey)
-      removeEditorDraft(sourceKey)
-    }
-
-    upsertPendingChange(change)
+    const nextChanges = pendingChanges.value.filter((item) => item.key !== sourceKey && item.key !== key)
+    nextChanges.push(change)
+    await persistCloudPendingChanges(nextChanges)
+    pendingChanges.value = nextChanges
     editorDraftKey.value = key
     selectedRecordKey.value = key
     originalId.value = record.id
     editorMode.value = 'edit'
-    removeEditorDraft(key)
     applyPendingChanges(sourceRecords.value)
-    if (mode === 'manual') setStatus('已保存到待同步区，尚未同步数据胶囊', 'success')
-    else if (mode === 'sync') setStatus('已将当前编辑加入本次同步', 'success')
-    else setStatus('已自动保存草稿并加入待同步区', 'success')
+    setStatus('已保存草稿，加入待同步区并保存至云端', 'success')
     return 'saved'
   } catch (error) {
-    if (mode === 'manual' || mode === 'sync') setStatus(errorMessage(error), 'error')
-    return 'error'
-  }
-}
-
-async function saveCloudDraft() {
-  stashEditorDraft()
-  pruneEditorDrafts()
-
-  if (!pendingChanges.value.length && !Object.keys(editorDrafts.value).length) {
-    setStatus('暂无需要保存的云端草稿', 'info')
-    return
-  }
-
-  isSavingCloudDraft.value = true
-  showTask('正在保存云端草稿', '正在将草稿和待同步数据写入数据胶囊暂存区。')
-  try {
-    await $fetch('/api/admin/drafts', {
-      method: 'POST',
-      headers: requestHeaders(),
-      body: {
-        drafts: {...editorDrafts.value},
-        pendingChanges: [...pendingChanges.value]
-      }
-    })
-    setStatus(`云端草稿已保存：${Object.keys(editorDrafts.value).length} 份草稿，${pendingChanges.value.length} 项待同步`, 'success')
-  } catch (error) {
     setStatus(errorMessage(error), 'error')
+    return 'error'
   } finally {
     isSavingCloudDraft.value = false
-    hideTask()
   }
 }
 
@@ -1742,7 +1479,6 @@ function deleteRecord(deleteAssociatedFiles: boolean) {
     snapshot: existingPending?.snapshot || target,
     updatedAt: new Date().toISOString()
   })
-  removeEditorDraft(selectedRecordKey.value)
   applyPendingChanges(sourceRecords.value)
   clearEditorDraft(target.type)
   setStatus('删除操作已加入待同步区', 'success')
@@ -1752,9 +1488,7 @@ function undoChange(key: string) {
   restoreOriginalRecord(key, '已撤销变更')
 }
 
-async function openPendingChange(change: AdminPendingChange) {
-  await stashOpenDraft()
-
+function openPendingChange(change: AdminPendingChange) {
   if (activePendingChangeKey.value === change.key) {
     const targetType = change.record?.type || change.type || change.snapshot?.type || selectedType.value
     clearEditorDraft(targetType)
@@ -1843,13 +1577,9 @@ async function loadRecords() {
       headers: requestHeaders()
     })
     const hasCloudDraft = await restoreCloudDraftState()
-    if (!hasCloudDraft) {
-      restorePendingChanges()
-      restoreEditorDrafts()
-    }
+    if (!hasCloudDraft) restorePendingChanges()
     void loadDataCapsuleFolders()
     sourceRecords.value = response.records
-    pruneEditorDrafts()
     persistRecordsCache(response.records)
     applyPendingChanges(response.records)
     setStatus(`已加载 ${records.value.length} 条记录`, 'success')
@@ -1866,7 +1596,6 @@ async function loadRecords() {
 }
 
 async function syncDataCapsule() {
-  if (hasEditorDraft.value) await saveDraftChange('sync')
   if (!pendingChanges.value.length) {
     setStatus('暂无需要同步的变更', 'info')
     return
@@ -1890,7 +1619,6 @@ async function syncDataCapsule() {
     sourceRecords.value = response.records
     persistRecordsCache(response.records)
     pendingChanges.value = []
-    editorDrafts.value = {}
     records.value = response.records
     const currentRecord = records.value.find((record) => recordKey(record) === selectedRecordKey.value)
     if (currentRecord) editRecord(currentRecord)
