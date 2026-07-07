@@ -174,7 +174,7 @@ async function loadContentRecordBySlug(type: DataRecordType, slug: string | stri
 }
 
 export function useHomePageData() {
-    return useAsyncData('home-page-data', async () => {
+    const state = useAsyncData('home-page-data', async () => {
         const records = await fetchNormalizedRecords()
         const moments = await Promise.all(sortedRecords(records, 'moment').map(loadRecordContent))
 
@@ -190,6 +190,16 @@ export function useHomePageData() {
     }, {
         default: emptyHomePageData
     })
+
+    if (import.meta.client) {
+        onMounted(() => {
+            const data = state.data.value
+            const hasContent = Boolean(data?.posts.length || data?.chatters.length || data?.moments.length || data?.albums.length)
+            if (!hasContent) void state.refresh()
+        })
+    }
+
+    return state
 }
 
 async function loadRecentContentRecords(type: DataRecordType, currentSlug: string | string[], limit = 3) {

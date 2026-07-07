@@ -192,9 +192,11 @@ export async function fetchNormalizedRecords() {
     })
     const records = normalizeRecords(Array.isArray(sourceRecords) ? sourceRecords : [])
 
-    normalizedRecordsCache = {
-      records: cloneNormalizedRecords(records),
-      expiresAt: Date.now() + normalizedRecordsCacheTtlMs
+    if (records.length) {
+      normalizedRecordsCache = {
+        records: cloneNormalizedRecords(records),
+        expiresAt: Date.now() + normalizedRecordsCacheTtlMs
+      }
     }
 
     return records

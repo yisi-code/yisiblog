@@ -1,11 +1,19 @@
 export function publicContentAssetUrl(path: string) {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  const cleanPath = encodeContentPath(path)
   if (import.meta.client) return cleanPath
   if (process.env.NODE_ENV === 'development') return `http://localhost:3000${cleanPath}`
 
   const siteUrl = useRuntimeConfig().public.siteUrl
   if (!siteUrl) return cleanPath
   return `${siteUrl.replace(/\/+$/, '')}${cleanPath}`
+}
+
+function encodeContentPath(path: string) {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return cleanPath
+    .split('/')
+    .map((part, index) => index === 0 ? '' : encodeURIComponent(decodeURIComponent(part)))
+    .join('/')
 }
 
 export async function fetchPublicContentText(path: string) {
