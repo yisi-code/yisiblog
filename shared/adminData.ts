@@ -110,6 +110,10 @@ export type AdminRecordsResponse = {
   records: AdminManagedRecord[]
 }
 
+export type AdminRecordDetailResponse = {
+  record: AdminManagedRecord | null
+}
+
 export type AdminMusicFilePayload = {
   fileName: string
   path: string

@@ -444,6 +444,7 @@ import {
   adminRecordTypeLabels,
   adminRecordTypes,
   type AdminDataRecord,
+  type AdminRecordDetailResponse,
   type AdminManagedRecord,
   type AdminMusicFilePayload,
   type AdminPendingChange,
@@ -669,7 +670,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  stashOpenDraft()
+  stashEditorDraft()
 })
 
 function createEmptyRecord(type: AdminRecordType): AdminDataRecord {
@@ -1180,8 +1181,8 @@ function stashEditorDraft() {
   }
 }
 
-function stashOpenDraft() {
-  const result = saveDraftChange('auto')
+async function stashOpenDraft() {
+  const result = await saveDraftChange('auto')
   if (result === 'invalid' || result === 'error') stashEditorDraft()
   return result
 }
@@ -1395,8 +1396,8 @@ function pruneEditorDrafts() {
   editorDrafts.value = nextDrafts
 }
 
-function selectType(type: AdminRecordType) {
-  stashOpenDraft()
+async function selectType(type: AdminRecordType) {
+  await stashOpenDraft()
   closeFolderDropdown()
   selectedType.value = type
   clearEditorDraft(type)
@@ -1412,9 +1413,9 @@ function selectDraftType(type: AdminRecordType) {
   isTypeSelectOpen.value = false
 }
 
-function createRecord() {
+async function createRecord() {
   if (selectedType.value === 'about') return
-  stashOpenDraft()
+  await stashOpenDraft()
   startCreateRecord(selectedType.value)
 }
 
@@ -1433,8 +1434,8 @@ function startCreateRecord(type: AdminRecordType) {
   editorDraftKey.value = key
 }
 
-function selectRecord(record: AdminManagedRecord) {
-  stashOpenDraft()
+async function selectRecord(record: AdminManagedRecord) {
+  await stashOpenDraft()
   const key = recordKey(record)
   if (selectedRecordKey.value === key) {
     clearEditorDraft(record.type)
@@ -1452,17 +1453,60 @@ function editRecord(record: AdminManagedRecord) {
   editorDraftKey.value = recordKey(record)
   editorMode.value = 'edit'
   syncDraftFromRecord(record)
-  void loadRemoteLyricPreview(record)
+  void loadRecordDetail(record)
 }
 
-async function loadRemoteLyricPreview(record: AdminManagedRecord) {
-  if (record.type !== 'music' || record.lrc || !record.lrcUrl) return
+function upsertSourceRecordDetail(detail: AdminManagedRecord) {
+  const key = recordKey(detail)
+  const index = sourceRecords.value.findIndex((record) => recordKey(record) === key)
+  if (index >= 0) {
+    const currentRecord = sourceRecords.value[index]
+    if (!currentRecord) return
+    sourceRecords.value[index] = {
+      ...currentRecord,
+      content: detail.content,
+      lrc: detail.lrc
+    }
+  }
+}
+
+function applyRecordDetailToEditor(detail: AdminManagedRecord) {
+  if (selectedRecordKey.value !== recordKey(detail)) return
+
+  if (adminRecordNeedsMarkdown(detail.type)) {
+    contentText.value = detail.content || ''
+  }
+  if (detail.type === 'music') {
+    lrcText.value = detail.lrc || ''
+  }
+}
+
+async function loadRecordDetail(record: AdminManagedRecord) {
+  if (!adminRecordNeedsMarkdown(record.type) && record.type !== 'music') return
+  if (adminRecordNeedsMarkdown(record.type) && typeof record.content === 'string') return
+  if (record.type === 'music' && (typeof record.lrc === 'string' || !record.lrcUrl)) return
 
   try {
-    lrcText.value = await $fetch<string>(previewAssetUrl(record.lrcUrl), { responseType: 'text' })
-  } catch {
-    lrcText.value = ''
+    const response = await $fetch<AdminRecordDetailResponse>(`/api/admin/records/${record.type}/${encodeURIComponent(record.id)}`, {
+      headers: requestHeaders()
+    })
+    if (!response.record) return
+
+    upsertSourceRecordDetail(response.record)
+    applyRecordDetailToEditor(response.record)
+  } catch (error) {
+    setStatus(errorMessage(error), 'error')
   }
+}
+
+async function ensureCurrentRecordDetailLoaded() {
+  if (!hasEditorDraft.value || isCreating.value) return
+
+  const sourceKey = selectedRecordKey.value || editorDraftKey.value
+  const record = records.value.find((item) => recordKey(item) === sourceKey)
+  if (!record) return
+
+  await loadRecordDetail(record)
 }
 
 function resetDraft() {
@@ -1566,7 +1610,7 @@ function buildDraftChangePayload() {
   }
 }
 
-function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
+async function saveDraftChange(mode: DraftSaveMode = 'manual'): Promise<DraftSaveResult> {
   if (!hasEditorDraft.value || !isAuthenticated.value || !draft.type) return 'invalid'
   if (!draft.id.trim()) {
     if (mode === 'manual') setStatus('请先填写 ID 后再保存草稿', 'error')
@@ -1574,6 +1618,7 @@ function saveDraftChange(mode: DraftSaveMode = 'manual'): DraftSaveResult {
   }
 
   try {
+    await ensureCurrentRecordDetailLoaded()
     const {
       record,
       key,
@@ -1700,8 +1745,8 @@ function undoChange(key: string) {
   restoreOriginalRecord(key, '已撤销变更')
 }
 
-function openPendingChange(change: AdminPendingChange) {
-  stashOpenDraft()
+async function openPendingChange(change: AdminPendingChange) {
+  await stashOpenDraft()
 
   if (activePendingChangeKey.value === change.key) {
     const targetType = change.record?.type || change.type || change.snapshot?.type || selectedType.value
@@ -1814,7 +1859,7 @@ async function loadRecords() {
 }
 
 async function syncDataCapsule() {
-  if (hasEditorDraft.value) saveDraftChange('sync')
+  if (hasEditorDraft.value) await saveDraftChange('sync')
   if (!pendingChanges.value.length) {
     setStatus('暂无需要同步的变更', 'info')
     return

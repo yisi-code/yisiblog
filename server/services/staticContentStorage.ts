@@ -1,16 +1,94 @@
+import { existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+import { normalize, resolve, sep } from 'node:path'
 import {
     contentMarkdownPath,
     contentRecordsPath
 } from '~~/shared/contentDataPaths'
 import {
     adminRecordNeedsMarkdown,
+    type AdminRecordType,
     type AdminManagedRecord
 } from '~~/shared/adminData'
 import {normalizeRecordForRead} from './adminContentCore'
-import {fetchPublicContentText} from '~~/app/data/contentAssets'
+
+const publicContentDataPrefix = '/content-data/'
+
+function cleanStaticContentPath(path: string) {
+    const cleanPath = path.startsWith('/') ? path : `/${path}`
+    if (!cleanPath.startsWith(publicContentDataPrefix)) {
+        throw createError({ statusCode: 400, statusMessage: '静态内容路径必须位于 /content-data/' })
+    }
+
+    return cleanPath
+}
+
+function decodeStaticContentPath(path: string) {
+    return cleanStaticContentPath(path)
+        .split('/')
+        .map((part, index) => {
+            if (index === 0) return ''
+            try {
+                return decodeURIComponent(part)
+            } catch {
+                return part
+            }
+        })
+        .join('/')
+}
+
+function staticContentFileCandidates(path: string) {
+    const cleanPath = decodeStaticContentPath(path).replace(/^\/+/, '')
+    return [
+        resolve(process.cwd(), 'public', cleanPath),
+        resolve(process.cwd(), '.output', 'public', cleanPath)
+    ]
+}
+
+function assertStaticContentFilePath(filePath: string) {
+    const normalizedFilePath = normalize(filePath)
+    const allowedRoots = [
+        resolve(process.cwd(), 'public', 'content-data'),
+        resolve(process.cwd(), '.output', 'public', 'content-data')
+    ].map((root) => normalize(root))
+
+    if (!allowedRoots.some((root) => normalizedFilePath === root || normalizedFilePath.startsWith(`${root}${sep}`))) {
+        throw createError({ statusCode: 400, statusMessage: '静态内容路径无效' })
+    }
+}
+
+async function readStaticTextContentFromFile(path: string) {
+    for (const filePath of staticContentFileCandidates(path)) {
+        assertStaticContentFilePath(filePath)
+        if (existsSync(filePath)) return await readFile(filePath, 'utf8')
+    }
+
+    return null
+}
+
+function requestOrigin() {
+    try {
+        const origin = useRequestURL().origin
+        return origin && origin !== 'null' ? origin.replace(/\/+$/, '') : ''
+    } catch {
+        return ''
+    }
+}
+
+function encodeStaticContentPath(path: string) {
+    return cleanStaticContentPath(path)
+        .split('/')
+        .map((part, index) => index === 0 ? '' : encodeURIComponent(part))
+        .join('/')
+}
 
 export async function readStaticTextContent(path: string) {
-    return await fetchPublicContentText(path)
+    const fileContent = await readStaticTextContentFromFile(path)
+    if (fileContent !== null) return fileContent
+
+    const origin = requestOrigin()
+    if (!origin) throw createError({ statusCode: 404, statusMessage: '静态内容文件不存在' })
+    return await $fetch<string>(`${origin}${encodeStaticContentPath(path)}`, {responseType: 'text'})
 }
 
 export async function readStaticRecords() {
@@ -19,29 +97,36 @@ export async function readStaticRecords() {
         return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
     } catch (error) {
         console.warn('[static-content] records.json 读取失败', error instanceof Error ? error.message : error)
-        return []
+        throw createError({ statusCode: 503, statusMessage: 'records.json 读取失败' })
     }
 }
 
 export async function readStaticManagedRecords(): Promise<AdminManagedRecord[]> {
     const records = await readStaticRecords()
 
-    return Promise.all(records.map(async (record) => {
-        const managedRecord: AdminManagedRecord = {...record}
-        if (adminRecordNeedsMarkdown(record.type)) {
-            try {
-                managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
-            } catch {
-                managedRecord.content = ''
-            }
+    return records.map((record) => ({...record}))
+}
+
+export async function readStaticManagedRecordDetail(type: AdminRecordType, id: string): Promise<AdminManagedRecord | null> {
+    const records = await readStaticRecords()
+    const record = records.find((item) => item.type === type && item.id === id)
+    if (!record) return null
+
+    const managedRecord: AdminManagedRecord = {...record}
+    if (adminRecordNeedsMarkdown(record.type)) {
+        try {
+            managedRecord.content = await readStaticTextContent(record.contentUrl || contentMarkdownPath(record))
+        } catch {
+            managedRecord.content = ''
         }
-        if (record.type === 'music' && record.lrcUrl) {
-            try {
-                managedRecord.lrc = await readStaticTextContent(record.lrcUrl)
-            } catch {
-                managedRecord.lrc = ''
-            }
+    }
+    if (record.type === 'music' && record.lrcUrl) {
+        try {
+            managedRecord.lrc = await readStaticTextContent(record.lrcUrl)
+        } catch {
+            managedRecord.lrc = ''
         }
-        return managedRecord
-    }))
+    }
+
+    return managedRecord
 }
