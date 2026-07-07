@@ -17,7 +17,7 @@ const publicContentDataPrefix = '/content-data/'
 function cleanStaticContentPath(path: string) {
     const cleanPath = path.startsWith('/') ? path : `/${path}`
     if (!cleanPath.startsWith(publicContentDataPrefix)) {
-        throw createError({ statusCode: 400, statusMessage: '静态内容路径必须位于 /content-data/' })
+        throw createError({ statusCode: 400, message: '静态内容路径必须位于 /content-data/' })
     }
 
     return cleanPath
@@ -53,7 +53,7 @@ function assertStaticContentFilePath(filePath: string) {
     ].map((root) => normalize(root))
 
     if (!allowedRoots.some((root) => normalizedFilePath === root || normalizedFilePath.startsWith(`${root}${sep}`))) {
-        throw createError({ statusCode: 400, statusMessage: '静态内容路径无效' })
+        throw createError({ statusCode: 400, message: '静态内容路径无效' })
     }
 }
 
@@ -75,6 +75,23 @@ function requestOrigin() {
     }
 }
 
+function configuredSiteOrigin() {
+    const siteUrl = useRuntimeConfig().public.siteUrl
+    if (typeof siteUrl === 'string' && siteUrl) return siteUrl.replace(/\/+$/, '')
+
+    const vercelUrl = process.env.VERCEL_URL
+    if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '')}`
+
+    return ''
+}
+
+function staticContentOrigins() {
+    return [...new Set([
+        configuredSiteOrigin(),
+        requestOrigin()
+    ].filter(Boolean))]
+}
+
 function encodeStaticContentPath(path: string) {
     return cleanStaticContentPath(path)
         .split('/')
@@ -86,9 +103,17 @@ export async function readStaticTextContent(path: string) {
     const fileContent = await readStaticTextContentFromFile(path)
     if (fileContent !== null) return fileContent
 
-    const origin = requestOrigin()
-    if (!origin) throw createError({ statusCode: 404, statusMessage: '静态内容文件不存在' })
-    return await $fetch<string>(`${origin}${encodeStaticContentPath(path)}`, {responseType: 'text'})
+    let lastError: unknown
+    for (const origin of staticContentOrigins()) {
+        try {
+            return await $fetch<string>(`${origin}${encodeStaticContentPath(path)}`, {responseType: 'text'})
+        } catch (error) {
+            lastError = error
+        }
+    }
+
+    if (lastError) throw lastError
+    throw createError({ statusCode: 404, message: '静态内容文件不存在' })
 }
 
 export async function readStaticRecords() {
@@ -97,7 +122,7 @@ export async function readStaticRecords() {
         return (JSON.parse(source || '[]') as AdminManagedRecord[]).map(normalizeRecordForRead)
     } catch (error) {
         console.warn('[static-content] records.json 读取失败', error instanceof Error ? error.message : error)
-        throw createError({ statusCode: 503, statusMessage: 'records.json 读取失败' })
+        throw createError({ statusCode: 503, message: 'records.json 读取失败' })
     }
 }
 
