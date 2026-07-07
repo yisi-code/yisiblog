@@ -68,6 +68,12 @@ export default defineNuxtConfig({
         prerender: {
             crawlLinks: false,
             failOnError: false
-        }
+        },
+        publicAssets: [
+            {
+                dir: 'public',
+                baseURL: '/'
+            }
+        ]
     }
 })
