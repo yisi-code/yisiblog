@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import {
   contentDataPublicBase,
   contentMarkdownPath,
@@ -11,11 +12,19 @@ import {
 } from '~~/shared/adminData'
 import { normalizeRecordForRead } from './adminContentCore'
 
+// 获取当前文件的绝对路径
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// 从 server/services/ 向上两级到达项目根目录
+const PROJECT_ROOT = join(__dirname, '../..')
+
 function publicContentPath(path: string) {
   const relativePath = path
-    .replace(/^\/+/, '')
-    .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
-  return join(process.cwd(), 'public', 'content-data', relativePath)
+      .replace(/^\/+/, '')
+      .replace(new RegExp(`^${contentDataPublicBase.replace(/^\/+/, '')}/?`), '')
+  // 使用项目根目录，而非 process.cwd()
+  return join(PROJECT_ROOT, 'public', 'content-data', relativePath)
 }
 
 export async function readStaticTextContent(path: string) {
