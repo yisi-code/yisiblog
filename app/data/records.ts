@@ -19,7 +19,6 @@ export type DataRecord = {
   images?: string[]
   artist?: string
   photos?: Photo[]
-  icon?: string
 }
 
 export type NormalizedDataRecord = DataRecord & {
@@ -49,7 +48,6 @@ export type Project = NormalizedDataRecord & {
   type: 'project'
   title: string
   url: string
-  icon: string
 }
 
 export type Song = NormalizedDataRecord & {
@@ -161,10 +159,7 @@ export function friendsFromRecords(records: NormalizedDataRecord[]) {
 export function projectsFromRecords(records: NormalizedDataRecord[]) {
   return recordsByType(records, 'project')
     .filter((record): record is NormalizedDataRecord & { type: 'project'; title: string; url: string } => Boolean(record.title && record.url))
-    .map((record) => ({
-      ...record,
-      icon: record.icon || ''
-    }))
+    .map((record) => ({ ...record }))
 }
 
 export function songsFromRecords(records: NormalizedDataRecord[]) {

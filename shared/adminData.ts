@@ -1,7 +1,7 @@
 export const adminRecordTypes = ['post', 'chatter', 'moment', 'about', 'music', 'friend', 'album', 'project'] as const
 
 export type AdminRecordType = typeof adminRecordTypes[number]
-type AdminRecordField = 'title' | 'description' | 'date' | 'cover' | 'url' | 'tags' | 'mood' | 'location' | 'images' | 'artist' | 'photos' | 'icon'
+type AdminRecordField = 'title' | 'description' | 'date' | 'cover' | 'url' | 'tags' | 'mood' | 'location' | 'images' | 'artist' | 'photos'
 
 export const adminRecordTypeLabels: Record<AdminRecordType, string> = {
   post: '博文',
@@ -66,8 +66,7 @@ export const adminRecordFieldConfig: Record<AdminRecordType, Partial<Record<Admi
     description: true,
     cover: true,
     url: true,
-    tags: true,
-    icon: true
+    tags: true
   }
 }
 
@@ -97,7 +96,6 @@ export type AdminDataRecord = {
   images?: string[]
   artist?: string
   photos?: AdminPhoto[]
-  icon?: string
 }
 
 export type AdminManagedRecord = AdminDataRecord & {

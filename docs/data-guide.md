@@ -62,7 +62,7 @@
 | `music` | `title`、`description`、`cover`、`url`、`artist`、`lrcUrl` |
 | `friend` | `title`、`description`、`cover`、`url` |
 | `album` | `title`、`description`、`date`、`cover`、`tags`、`photos` |
-| `project` | `title`、`description`、`cover`、`url`、`tags`、`icon` |
+| `project` | `title`、`description`、`cover`、`url`、`tags` |
 | `about` | 固定 `id: "about"`，使用 `contentUrl` |
 
 `post` 和 `chatter` 的 `description` 支持手动编辑。如果保存时为空，会取 Markdown 第一段生成摘要。`moment` 不在表单中手动编辑 `description`，同步时总是按正文第一段生成。

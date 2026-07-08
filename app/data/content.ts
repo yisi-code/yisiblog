@@ -14,8 +14,6 @@ import {
 } from '~/data/records'
 import {formatDisplayDate} from '~/utils/dateFormat'
 import type { MDCRoot } from '@nuxtjs/mdc'
-import { parseMarkdown } from '@nuxtjs/mdc/runtime'
-import { fetchPublicContentText } from './contentAssets'
 
 type ContentBodyNode = string | number | boolean | null | undefined | {
     type?: string
@@ -123,16 +121,13 @@ async function loadRecordContent(record: NormalizedDataRecord) {
 
     if (record.contentUrl.startsWith('/content-data/')) {
         try {
-            const markdown = await fetchPublicContentText(record.contentUrl)
-            const parsed = await parseMarkdown(markdown)
-            return mergeRecordContent(record, {
-                path: record.path,
-                body: parsed.body,
-                bodyRaw: markdown,
-                title: parsed.data?.title,
-                description: parsed.data?.description,
-                toc: parsed.toc
+            const item = await $fetch<ContentItem>('/api/content/static', {
+                query: {
+                    url: record.contentUrl,
+                    path: record.path
+                }
             })
+            return mergeRecordContent(record, item)
         } catch (error) {
             console.warn('[content] Markdown 读取失败', record.contentUrl, error instanceof Error ? error.message : error)
             return mergeRecordContent(record)

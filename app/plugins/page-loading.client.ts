@@ -27,7 +27,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   router.beforeEach((to, from) => {
-    if (to.fullPath !== from.fullPath) startPageLoading()
+    if (to.path !== from.path) startPageLoading()
   })
 
   nuxtApp.hook('page:finish', finishPageLoading)

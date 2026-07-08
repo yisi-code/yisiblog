@@ -2,7 +2,7 @@
   <PageShell v-if="data" class="pt-page-top pb-page-bottom-loose" width="narrow">
     <article class="about-card">
       <div class="about-card__cover">
-        <img :src="data.cover || fallbackCover" alt="关于页封面">
+        <img :src="data.cover" alt="关于页封面">
         <div class="absolute -bottom-5 translate-y-50% w-full h-10 backdrop-blur-[2px]"/>
       </div>
 
@@ -157,16 +157,14 @@ type ActivityRecord = {
 }
 
 const route = useRoute()
-const router = useRouter()
 const { data} = await useAboutPage()
 const { items: posts } = await usePostsData('about-posts')
 const { items: chatters } = await useChattersData('about-chatters')
 const { items: moments } = await useMomentsData('about-moments')
 
-const fallbackCover = 'https://bu.dusays.com/2026/03/24/69c23dc278c78.jpg'
 const heatmapScrollRef = ref<HTMLElement | null>(null)
 
-const activeTab = computed<AboutTab>(() => route.query.tab === 'activity' ? 'activity' : 'intro')
+const activeTab = ref<AboutTab>(route.query.tab === 'activity' ? 'activity' : 'intro')
 
 const activities = computed<ActivityRecord[]>(() => [
   ...posts.value.map((item) => toActivity(item, '博文')),
@@ -208,7 +206,7 @@ const activityMap = computed(() => {
 })
 
 function setTab(tab: AboutTab) {
-  router.push({ path: route.path, query: tab === 'activity' ? { tab } : {} })
+  activeTab.value = tab
 }
 
 function toActivity(item: SiteContentItem, type: ActivityType): ActivityRecord {

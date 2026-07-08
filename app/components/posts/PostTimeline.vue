@@ -6,12 +6,12 @@
         <article
             v-for="post in column"
             :key="post.path"
-            class="relative flex min-w-0"
+            class="post-timeline__item relative flex min-w-0"
             :class="columnIndex === 0 ? 'justify-end' : 'justify-start'"
         >
           <NuxtLink
               :to="post.path"
-              class="glass-panel interactive-card group inline-grid w-fit max-w-[min(100%,28rem)] grid-cols-[minmax(0,max-content)] overflow-hidden rounded-2xl transition hover:-translate-y-2"
+              class="post-timeline__content glass-panel group inline-grid w-fit max-w-[min(100%,28rem)] grid-cols-[minmax(0,max-content)] rounded-2xl"
               :class="columnIndex === 0 ? 'text-right' : ''"
           >
             <div class="relative aspect-video w-full min-w-0 overflow-hidden">
@@ -38,12 +38,11 @@
                 ># {{ tag }}</span>
               </div>
             </div>
+            <div
+                class="post-timeline__dot absolute top-1/2"
+                :class="columnIndex === 0 ? 'right-[-3rem]' : 'left-[-3rem]'"
+            />
           </NuxtLink>
-
-          <div
-            class="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-4 timeline-dot shadow-lg"
-            :class="columnIndex === 0 ? '-right-[2.95rem]' : '-left-[2.95rem]'"
-          />
         </article>
       </div>
     </div>

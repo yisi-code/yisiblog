@@ -89,7 +89,6 @@ export function normalizeRecordForWrite(record: AdminDataRecord, options: { cont
     photos: adminRecordHasField(record.type, 'photos') && Array.isArray(record.photos) ? record.photos.map((photo) => ({
       url: String(photo.url || '').trim(),
       caption: photo.caption?.trim()
-    })).filter((photo) => photo.url) : [],
-    icon: adminRecordHasField(record.type, 'icon') ? record.icon?.trim() : undefined
+    })).filter((photo) => photo.url) : []
   })
 }

@@ -5,12 +5,10 @@ import {
 } from './dataCapsuleStorage'
 
 export type AdminCloudDraftState = {
-  drafts: Record<string, unknown>
   pendingChanges: AdminPendingChange[]
   updatedAt?: string
 }
 
-const cloudDraftsKey = 'admin-drafts/drafts.json'
 const cloudPendingKey = 'admin-drafts/pending.json'
 
 async function readJsonByKey<T>(key: string, fallback: T): Promise<T> {
@@ -31,30 +29,17 @@ async function writeJsonByKey(key: string, value: unknown) {
   })
 }
 
-function normalizeDrafts(value: unknown) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-  const { updatedAt: _updatedAt, ...drafts } = value as Record<string, unknown>
-  return drafts
-}
-
 export async function readAdminCloudDraftState(): Promise<AdminCloudDraftState> {
-  const [drafts, pendingChanges] = await Promise.all([
-    readJsonByKey<Record<string, unknown>>(cloudDraftsKey, {}),
-    readJsonByKey<AdminPendingChange[]>(cloudPendingKey, [])
-  ])
+  const pendingChanges = await readJsonByKey<AdminPendingChange[]>(cloudPendingKey, [])
 
   return {
-    drafts: normalizeDrafts(drafts),
     pendingChanges: Array.isArray(pendingChanges) ? pendingChanges : []
   }
 }
 
 export async function writeAdminCloudDraftState(state: AdminCloudDraftState) {
   const updatedAt = new Date().toISOString()
-  await Promise.all([
-    writeJsonByKey(cloudDraftsKey, normalizeDrafts(state.drafts)),
-    writeJsonByKey(cloudPendingKey, state.pendingChanges || [])
-  ])
+  await writeJsonByKey(cloudPendingKey, state.pendingChanges || [])
 
   return {
     ok: true as const,
@@ -63,8 +48,5 @@ export async function writeAdminCloudDraftState(state: AdminCloudDraftState) {
 }
 
 export async function clearAdminCloudDraftState() {
-  await Promise.all([
-    writeJsonByKey(cloudDraftsKey, {}),
-    writeJsonByKey(cloudPendingKey, [])
-  ])
+  await writeJsonByKey(cloudPendingKey, [])
 }

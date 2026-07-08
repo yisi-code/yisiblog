@@ -356,11 +356,6 @@
               </div>
             </div>
 
-            <label v-if="showIconField" class="admin-data-field">
-              <span>图标</span>
-              <input v-model="typeFields.icon" class="admin-data-input" placeholder="Rocket">
-            </label>
-
             <label v-if="needsMarkdown" class="admin-data-field admin-data-field--wide">
               <span>Markdown 正文</span>
               <textarea
@@ -534,8 +529,7 @@ const taskOverlay = reactive({
 const typeFields = reactive({
   mood: '',
   location: '',
-  artist: '',
-  icon: ''
+  artist: ''
 })
 const uploadFolders = reactive({
   music: '',
@@ -574,7 +568,6 @@ const showLocationField = computed(() => hasDraftField('location'))
 const showImagesField = computed(() => hasDraftField('images'))
 const showArtistField = computed(() => hasDraftField('artist'))
 const showPhotosField = computed(() => hasDraftField('photos'))
-const showIconField = computed(() => hasDraftField('icon'))
 const showLrcField = computed(() => draft.type === 'music')
 const visibleUploadTargets = computed(() => uploadFolderConfigs.filter((target) => {
   if (target.key === 'music' || target.key === 'lyric') return draft.type === 'music'
@@ -1001,7 +994,6 @@ function syncDraftFromRecord(record: AdminManagedRecord) {
   typeFields.mood = String(record.mood || '')
   typeFields.location = String(record.location || '')
   typeFields.artist = String(record.artist || '')
-  typeFields.icon = String(record.icon || '')
   originalId.value = record.id
   resetUploadFolderTouched()
   setAutoUploadFolders(record)
@@ -1023,7 +1015,6 @@ function clearEditorDraft(type: AdminRecordType = selectedType.value) {
   typeFields.mood = ''
   typeFields.location = ''
   typeFields.artist = ''
-  typeFields.icon = ''
   resetUploadFolderTouched()
   setAutoUploadFolders()
 }
@@ -1051,8 +1042,7 @@ function buildRecordPayload() {
     location: hasDraftField('location') ? typeFields.location.trim() || undefined : undefined,
     images: hasDraftField('images') ? splitLines(imagesText.value) : undefined,
     artist: hasDraftField('artist') ? typeFields.artist.trim() || undefined : undefined,
-    photos,
-    icon: hasDraftField('icon') ? typeFields.icon.trim() || undefined : undefined
+    photos
   } satisfies AdminDataRecord
 }
 
@@ -1126,8 +1116,7 @@ function syncComparableRecord(record?: AdminDataRecord, content?: string) {
     photos: (record.photos || []).map((photo) => ({
       url: emptyToUndefined(photo.url) || '',
       caption: emptyToUndefined(photo.caption)
-    })).filter((photo) => photo.url),
-    icon: emptyToUndefined(record.icon)
+    })).filter((photo) => photo.url)
   }
 }
 
@@ -1386,7 +1375,6 @@ async function persistCloudPendingChanges(changes = pendingChanges.value) {
     method: 'POST',
     headers: requestHeaders(),
     body: {
-      drafts: {},
       pendingChanges: [...changes]
     }
   })
