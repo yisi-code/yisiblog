@@ -30,7 +30,7 @@
 .project-card__identity h2 {
   display: -webkit-box;
   overflow: hidden;
-  color: var(--color-text-normal);
+  color: var(--color-white-yuese);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   font-size: clamp(var(--font-size-normal-125), 3vw, var(--font-size-normal-1625));
@@ -48,7 +48,7 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  color: var(--color-text-second);
+  color: var(--color-white-yuese);
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
@@ -57,14 +57,9 @@
   height: 1.9rem;
 }
 
-.project-card:hover .project-card__link-icon {
-  transform: translateY(-0.1rem);
-  color: var(--color-text-normal);
-}
-
 .project-card__description {
   display: -webkit-box;
-  color: var(--color-text-second);
+  color: var(--color-white-yuese);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   font-size: var(--font-size-normal);
