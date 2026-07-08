@@ -1,5 +1,18 @@
 [
   {
+    "id": "项目_yisiblog",
+    "type": "project",
+    "title": "yisiblog",
+    "description": "一个精美的现代化博客",
+    "cover": "https://bee-reg-ab.imagency.cn/e/5bc6fc107bd8001de5a7f77f59bb6cd7.png",
+    "url": "https://github.com/yisi-code/yisiblog",
+    "tags": [
+      "博客",
+      "Vue3",
+      "Nuxt4"
+    ]
+  },
+  {
     "id": "日常随录",
     "type": "album",
     "title": "日常随录",
