@@ -48,7 +48,7 @@ function updateTime() {
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
   const minutes = Math.floor((diff / (1000 * 60)) % 60)
   const seconds = Math.floor((diff / 1000) % 60)
-  uptimeText.value = `${days} 天 ${hours} 时 ${minutes} 分 ${seconds} 秒`
+  uptimeText.value = `${days} 天 ${String(hours).padStart(2, "0")} 时 ${String(minutes).padStart(2, "0")} 分 ${String(seconds).padStart(2, "0")} 秒`
 }
 
 onMounted(() => {
