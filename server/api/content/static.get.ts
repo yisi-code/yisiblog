@@ -1,8 +1,9 @@
 import { parseMarkdown } from '@nuxtjs/mdc/runtime'
-import { readStaticRecords, readStaticTextContent } from '#server/services/staticContentStorage'
+import { readStaticRecordsForEvent, readStaticTextContent } from '#server/services/staticContentStorage'
+import type { H3Event } from 'h3'
 
-async function allowedStaticContentUrls() {
-  const records = await readStaticRecords()
+async function allowedStaticContentUrls(event: H3Event) {
+  const records = await readStaticRecordsForEvent(event)
   return new Set(records
     .map((record) => record.contentUrl)
     .filter((url): url is string => Boolean(url?.startsWith('/content-data/'))))
@@ -13,13 +14,13 @@ export default defineEventHandler(async (event) => {
   const url = String(query.url || '')
   const path = String(query.path || '')
 
-  if (!url || !(await allowedStaticContentUrls()).has(url)) {
+  if (!url || !(await allowedStaticContentUrls(event)).has(url)) {
     throw createError({ statusCode: 404, statusMessage: '内容不存在' })
   }
 
   let markdown: string
   try {
-    markdown = await readStaticTextContent(url)
+    markdown = await readStaticTextContent(url, event)
   } catch (error) {
     console.warn('[content:static] 静态 Markdown 读取失败：', error instanceof Error ? error.message : error)
     throw createError({

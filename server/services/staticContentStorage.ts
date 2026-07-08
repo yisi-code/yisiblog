@@ -72,7 +72,11 @@ function requestOrigin(event?: H3Event) {
         const origin = event ? getRequestURL(event).origin : useRequestURL().origin
         return origin && origin !== 'null' ? origin.replace(/\/+$/, '') : ''
     } catch {
-        return ''
+        if (!event) return ''
+        const host = getHeader(event, 'x-forwarded-host') || getHeader(event, 'host')
+        if (!host) return ''
+        const protocol = getHeader(event, 'x-forwarded-proto') || 'https'
+        return `${protocol}://${host}`.replace(/\/+$/, '')
     }
 }
 
@@ -88,8 +92,8 @@ function configuredSiteOrigin(event?: H3Event) {
 
 function staticContentOrigins(event?: H3Event) {
     return [...new Set([
-        configuredSiteOrigin(event),
-        requestOrigin(event)
+        requestOrigin(event),
+        configuredSiteOrigin(event)
     ].filter(Boolean))]
 }
 

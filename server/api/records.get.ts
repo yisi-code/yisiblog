@@ -1,7 +1,7 @@
-import { readStaticRecords } from '#server/services/staticContentStorage'
+import { readStaticRecordsForEvent } from '#server/services/staticContentStorage'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   return {
-    records: await readStaticRecords()
+    records: await readStaticRecordsForEvent(event)
   }
 })
