@@ -9,19 +9,19 @@
           :key="`${line.time}-${index}`"
           :ref="(element) => setLyricLineRef(element, index)"
           type="button"
-          class="lyric-line mx-auto block w-fit max-w-full rounded-2xl px-content-inline text-center transition-all duration-300 cursor-pointer"
+          class="lyric-line mx-auto block w-fit max-w-full rounded-2xl px-content-inline text-center transition-all duration-150 cursor-pointer"
           :class="index === activeLyricIndex ? 'scale-105 py-content-block opacity-100' : 'opacity-25'"
           @click="music.seekToTime(line.time)"
         >
           <span
-            class="lyric-text music-lyric block max-w-full font-black leading-relaxed tracking-tight transition-[opacity,transform,font-size] duration-300"
+            class="lyric-text music-lyric block max-w-full font-black leading-relaxed tracking-tight transition-[opacity,transform,font-size] duration-150"
             :class="index === activeLyricIndex ? 'lyric-text--active text-size-card-title-lg' : 'text-size-content-lead'"
           >
             {{ line.text }}
           </span>
           <span
             v-if="line.translation"
-            class="lyric-translation mt-stack-xs block max-w-full font-bold leading-relaxed transition-[opacity,transform,font-size] duration-300"
+            class="lyric-translation mt-stack-xs block max-w-full font-bold leading-relaxed transition-[opacity,transform,font-size] duration-150"
             :class="index === activeLyricIndex ? 'lyric-translation--active text-size-content-body' : 'text-size-content-body'"
           >
             {{ line.translation }}

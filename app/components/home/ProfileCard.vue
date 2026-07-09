@@ -1,7 +1,7 @@
 <template>
   <section
       class="glass-panel interactive-card group relative flex h-full origin-center flex-col
-       overflow-hidden rounded-3xl p-profile-card-inset duration-300 hover:scale-[1.02] transition-transform"
+       overflow-hidden rounded-3xl p-profile-card-inset duration-150 hover:scale-[1.02] transition-transform"
   >
     <div class="relative z-10 flex items-center justify-between">
       <div class="flex w-fit items-center gap-6">
@@ -29,16 +29,16 @@
             <div v-for="(stat, index) in stats" :key="stat.label" class="contents">
               <NuxtLink
                   :to="stat.path"
-                  class="group/stat block w-fit rounded-2xl px-chip-inline text-center transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ring-accent-soft)]"
+                  class="block w-fit rounded-2xl px-chip-inline text-center focus-visible:outline focus-visible:outline-offset-4 focus-visible:outline-(--color-ring-accent-soft) transition duration-150 hover:-translate-y-0.5 hover:scale-110"
                   :aria-label="`查看${stat.label}`"
               >
                 <div
-                    class="text-size-card-title-lg font-black group-hover/stat:scale-110"
+                    class="text-size-card-title-lg font-black"
                     :style="`color: ${stat.color}`">
                   {{ stat.value }}
                 </div>
                 <div
-                    class="text-secondary mt-stack-xs text-size-helper-note font-black group-hover/stat:scale-110">
+                    class="text-secondary mt-stack-xs text-size-helper-note font-black">
                   {{ stat.label }}
                 </div>
               </NuxtLink>

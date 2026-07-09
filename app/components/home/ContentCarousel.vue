@@ -1,6 +1,6 @@
 <template>
   <section
-      class="glass-panel interactive-card group relative h-full origin-center flex-col overflow-hidden rounded-3xl shadow-xl transition duration-300 will-change-transform hover:scale-[1.02]"
+      class="glass-panel interactive-card group relative h-full origin-center flex-col overflow-hidden rounded-3xl shadow-xl transition duration-150 hover:scale-[1.02]"
       :style="tall ? 'aspect-ratio: 3 / 4' : 'aspect-ratio: 4 / 3'"
       @mouseenter="pauseTimer"
       @mouseleave="startTimer"
@@ -55,7 +55,7 @@
             v-for="(_, index) in items"
             :key="index"
             type="button"
-            class="cursor-pointer rounded-full transition duration-300"
+            class="cursor-pointer rounded-full transition duration-150"
             :class="index === currentIndex ? 'carousel-dot-active h-3 w-3' : 'carousel-dot h-2.5 w-2.5'"
             :aria-label="`切换到第 ${index + 1} 项`"
             @click.stop="goTo(index)"

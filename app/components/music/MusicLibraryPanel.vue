@@ -38,23 +38,11 @@
 
 <script setup lang="ts">
 import type { Song } from '~/data'
-
-type MusicPanel = 'lyrics' | 'playlist'
+import { clientLocalSettings } from '~~/shared/clientLocalSettings'
 
 defineProps<{
   songs: Song[]
 }>()
 
-const activeTabCookie = useCookie<MusicPanel>('xhblogs-music-active-panel', {
-  default: () => 'playlist'
-})
-const activeTab = ref<MusicPanel>('playlist')
-
-onMounted(() => {
-  activeTab.value = activeTabCookie.value === 'lyrics' ? 'lyrics' : 'playlist'
-})
-
-watch(activeTab, (value) => {
-  activeTabCookie.value = value
-})
+const activeTab = useClientLocalSetting(clientLocalSettings.musicActivePanel)
 </script>

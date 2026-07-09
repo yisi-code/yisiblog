@@ -24,5 +24,9 @@
     <ClientOnly>
       <PageLoadingOverlay/>
     </ClientOnly>
+
+    <ClientOnly>
+      <ExternalLinkConfirmDialog/>
+    </ClientOnly>
   </div>
 </template>

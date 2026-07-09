@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
+import { clientLocalSettings } from './shared/clientLocalSettings'
 
 export default defineNuxtConfig({
     compatibilityDate: '2026-06-22',
@@ -22,7 +23,9 @@ export default defineNuxtConfig({
     colorMode: {
         classSuffix: '',
         preference: 'system',
-        fallback: 'dark'
+        fallback: 'dark',
+        storage: 'localStorage',
+        storageKey: clientLocalSettings.colorMode.storageKey
     },
     runtimeConfig: {
         adminToken: process.env.ADMIN_TOKEN || '',

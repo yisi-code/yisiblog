@@ -2,7 +2,7 @@
   <NuxtLink
       :to="album.path"
       :title="album.title"
-      class="glass-panel interactive-card group relative origin-center overflow-hidden rounded-3xl shadow-xl transition duration-300 will-change-transform hover:scale-[1.02]"
+      class="glass-panel interactive-card group relative origin-center overflow-hidden rounded-3xl shadow-xl transition duration-150 hover:scale-[1.02]"
   >
     <img
         :src="album.cover || siteConfig.defaultImage"

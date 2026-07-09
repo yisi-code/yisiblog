@@ -4,7 +4,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   margin-bottom: var(--pm-size-normal-200);
-  border: 1px solid var(--color-border-panel);
+  border: var(--border-width-normal) solid var(--color-border-panel);
   background: var(--color-bg-muted);
   box-shadow: 0 24px 70px var(--color-shadow-panel);
   isolation: isolate;
@@ -43,13 +43,13 @@
 
 .detail-hero__content .detail-heading__description {
   max-width: 38rem;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--color-white-transparent-87_5);
 }
 
 .detail-hero__content .detail-heading__meta-item,
 .detail-hero__content .detail-heading__tag {
-  border-color: rgb(255 255 255 / 0.22);
-  background: rgb(255 255 255 / 0.14);
+  border-color: var(--color-white-transparent-12_5);
+  background: var(--color-white-transparent-12_5);
   color: var(--color-text-inverse);
   backdrop-filter: blur(14px);
 }
@@ -61,20 +61,20 @@
   width: fit-content;
   margin-top: var(--pm-size-normal-75);
   gap: 0.45rem;
-  border: 1px solid rgb(255 255 255 / 0.24);
-  border-radius: 1rem;
-  background: rgb(255 255 255 / 0.16);
-  color: rgb(255 255 255 / 0.82);
+  border: var(--border-width-normal) solid var(--color-white-transparent-12_5);
+  border-radius: var(--border-radius-normal-400);
+  background: var(--color-white-transparent-12_5);
+  color: var(--color-white-transparent-87_5);
   padding: var(--pm-size-normal-75) var(--pm-size-normal);
   font-size: var(--font-size-normal);
   font-weight: 900;
-  box-shadow: 0 18px 45px rgb(0 0 0 / 0.28);
+  box-shadow: 0 18px 45px var(--color-black-transparent-37_5);
   backdrop-filter: blur(18px);
 }
 
 .detail-hero__badge strong {
   color: var(--color-text-inverse);
-  font-size: var(--font-size-normal-1625);
+  font-size: var(--font-size-normal-162_5);
   line-height: 1;
 }
 
@@ -90,8 +90,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid var(--color-border-detail-meta);
-  border-radius: 0.65rem;
+  border: var(--border-width-normal) solid var(--color-border-detail-meta);
+  border-radius: var(--border-radius-normal-200);
   background: var(--color-bg-detail-meta);
   color: var(--color-text-hover);
   padding: var(--pm-size-normal-25) var(--pm-size-normal-50);
@@ -116,7 +116,7 @@
 .detail-heading__description {
   margin-top: var(--pm-size-normal-50);
   color: var(--color-text-second);
-  font-size: var(--font-size-normal-1125);
+  font-size: var(--font-size-normal-112_5);
   font-weight: 700;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -128,7 +128,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  border-radius: 0.5rem;
+  border-radius: var(--border-radius-normal-200);
   padding: var(--pm-size-normal-25) var(--pm-size-normal-50);
   font-size: var(--font-size-normal-75);
   font-weight: 800;

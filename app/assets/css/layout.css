@@ -4,6 +4,13 @@
   flex-direction: column;
 }
 
+.page-shell-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
 .page-shell--narrow {
   max-width: 64rem;
 }

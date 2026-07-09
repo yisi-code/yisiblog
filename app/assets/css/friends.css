@@ -3,7 +3,7 @@
 }
 
 .friend-card {
-  border-radius: 1.5rem;
+  border-radius: var(--border-radius-normal-600);
   padding: var(--pm-size-normal-150);
 }
 
@@ -12,7 +12,7 @@
 }
 
 .friend-card__glow {
-  background: color-mix(in srgb, var(--color-red-luoxiahong) 50%, transparent);
+  background: var(--color-red-luoxiahong-transparent-37_5);
   filter: blur(28px);
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -38,7 +38,7 @@
 
 .friend-card__name {
   color: var(--color-text-normal);
-  font-size: var(--font-size-normal-1185);
+  font-size: var(--font-size-normal-118_5);
   font-weight: 950;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .friend-apply__code {
-  border: 1px solid var(--color-border-friend-apply-card);
+  border: var(--border-width-normal) solid var(--color-border-friend-apply-card);
   background: var(--color-bg-friend-apply-card);
   box-shadow: 0 20px 55px var(--color-shadow-panel);
   backdrop-filter: blur(18px);

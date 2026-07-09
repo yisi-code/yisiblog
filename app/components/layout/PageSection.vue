@@ -1,5 +1,5 @@
 <template>
-  <section class="page-section" :class="[`page-section--${spacing}`, gridClass]">
+  <section class="page-section" :class="[spacingClass, gridClass]">
     <slot />
   </section>
 </template>
@@ -14,4 +14,5 @@ const props = withDefaults(defineProps<{
 })
 
 const gridClass = computed(() => props.columns > 1 ? `page-section--grid-${props.columns}` : '')
+const spacingClass = computed(() => props.spacing === 'none' ? '' : `page-section--${props.spacing}`)
 </script>

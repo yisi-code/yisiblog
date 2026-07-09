@@ -1,8 +1,8 @@
 <template>
   <Teleport to="body">
-    <div v-if="currentImage" class="album-preview" @click="closePreview">
+    <div v-if="currentImage" class="image-preview" @click="closePreview">
       <BaseIconButton
-        class="album-preview__close"
+        class="image-preview__close"
         aria-label="Close preview"
         title="Close preview"
         variant="soft"
@@ -18,11 +18,11 @@
         </template>
       </BaseIconButton>
 
-      <p v-if="currentImage.description" class="album-preview__caption absolute top-2">
+      <p v-if="currentImage.description" class="image-preview__caption absolute top-2">
         {{ currentImage.description }}
       </p>
 
-      <button v-if="images.length > 1" type="button" class="moment-preview-nav moment-preview-nav--prev" @click.stop="prevImage">
+      <button v-if="images.length > 1" type="button" class="image-preview-nav image-preview-nav--prev" @click.stop="prevImage">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="m15 18-6-6 6-6" />
         </svg>
@@ -35,13 +35,13 @@
         @click.stop
       >
 
-      <button v-if="images.length > 1" type="button" class="moment-preview-nav moment-preview-nav--next" @click.stop="nextImage">
+      <button v-if="images.length > 1" type="button" class="image-preview-nav image-preview-nav--next" @click.stop="nextImage">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="m9 18 6-6-6-6" />
         </svg>
       </button>
 
-      <div class="album-preview__caption bottom-2">{{ currentIndex + 1 }} / {{ images.length }}</div>
+      <div class="image-preview__caption bottom-2">{{ currentIndex + 1 }} / {{ images.length }}</div>
     </div>
   </Teleport>
 </template>

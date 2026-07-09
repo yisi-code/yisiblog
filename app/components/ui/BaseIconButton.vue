@@ -3,12 +3,11 @@
     type="button"
     class="base-icon-button"
     :class="[
-      `base-icon-button--${variant}`,
+      variant === 'plain' ? '' : `base-icon-button--${variant}`,
       `base-icon-button--${size}`,
       `base-icon-button--${shape}`,
       {
-        'base-icon-button--active': active,
-        'base-icon-button--icon-only': !$slots.default
+        'base-icon-button--active': active
       }
     ]"
     :aria-label="ariaLabel || title"

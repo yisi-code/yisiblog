@@ -4,7 +4,7 @@
     <div class="relative z-10 flex flex-1 flex-col items-center justify-center overflow-hidden py-0 p-card-inset">
       <div class="relative mb-section-offset grid h-64 w-64 shrink-0 place-items-center">
         <div
-            class="music-player-orb absolute inset-[7%] rounded-full blur-[35px] transition duration-300"
+            class="music-player-orb absolute inset-[7%] rounded-full blur-[35px] transition duration-150"
             :class="music.isPlaying ? 'scale-105 opacity-90' : 'opacity-20'"
         />
         <div

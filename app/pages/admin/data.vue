@@ -214,7 +214,7 @@
                     <button
                         v-for="folder in filteredUploadFolders(target.key)"
                         :key="folder"
-                        class="admin-data-select__option admin-data-folder-select__option"
+                        class="admin-data-select__option"
                         type="button"
                         @mousedown.prevent="selectUploadFolder(target.key, folder)">
                       <span class="admin-data-select__option-title">

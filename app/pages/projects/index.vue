@@ -17,8 +17,10 @@
             class="project-card content-card-surface relative flex flex-col overflow-hidden no-underline hover:-translate-y-2"
         >
 
-          <img v-if="project.cover" :src="project.cover" :alt="project.title" class="left-0 top-0 absolute media-fill-cover">
-          <div v-if="project.cover" class="left-0 top-0 absolute size-full backdrop-blur-xs" style="background-color: var(--color-text-card-overlay-strong)" />
+          <img v-if="project.cover" :src="project.cover" :alt="project.title"
+               class="left-0 top-0 absolute media-fill-cover">
+          <div v-if="project.cover" class="left-0 top-0 absolute size-full backdrop-blur-xs"
+               style="background-color: var(--color-text-card-overlay-strong)"/>
 
           <div
               class="project-card__glow pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full"
@@ -35,8 +37,9 @@
                 />
               </span>
               <h2>
-                <template v-for="(part, partIndex) in highlightParts(project.title)"
-                          :key="`${project.id}-title-${partIndex}`">
+                <template
+                    v-for="(part, partIndex) in highlightParts(project.title)"
+                    :key="`${project.id}-title-${partIndex}`">
                   <mark v-if="part.match" class="search-highlight">{{ part.text }}</mark>
                   <span v-else>{{ part.text }}</span>
                 </template>
@@ -48,8 +51,9 @@
           </div>
 
           <p class="project-card__description relative z-1 mt-stack-lg overflow-hidden">
-            <template v-for="(part, partIndex) in highlightParts(project.description)"
-                      :key="`${project.id}-description-${partIndex}`">
+            <template
+                v-for="(part, partIndex) in highlightParts(project.description)"
+                :key="`${project.id}-description-${partIndex}`">
               <mark v-if="part.match" class="search-highlight">{{ part.text }}</mark>
               <span v-else>{{ part.text }}</span>
             </template>

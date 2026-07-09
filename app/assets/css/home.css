@@ -1,0 +1,99 @@
+.carousel-arrow {
+  background: var(--color-white-transparent-12_5);
+}
+
+.carousel-arrow:hover {
+  transform: translateY(-1px);
+  background: var(--color-white-transparent-37_5);
+}
+
+.carousel-arrow__icon {
+  height: 0.55rem;
+  width: 0.55rem;
+  transform: rotate(45deg);
+  border-right: var(--border-width-normal-200) solid var(--color-white);
+  border-top: var(--border-width-normal-200) solid var(--color-white);
+}
+
+.carousel-arrow__icon--left {
+  transform: rotate(-135deg);
+}
+
+.home-card-eyebrow {
+  color: var(--color-text-hover);
+  font-size: var(--font-size-normal-75);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.home-card-date {
+  color: var(--color-text-card-desc);
+  font-size: var(--font-size-normal-75);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.home-card-date.home-card--plain {
+  color: var(--color-text-second);
+}
+
+.home-card-title {
+  color: var(--color-text-card-title);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.home-card-title.home-card--plain {
+  color: var(--color-text-normal);
+}
+
+.home-card-description {
+  color: var(--color-text-card-desc);
+  font-size: var(--font-size-normal);
+  font-weight: 700;
+  line-height: 1.75;
+}
+
+.home-card-description.home-card--plain {
+  color: var(--color-text-second);
+}
+
+.content-media-overlay {
+  background: linear-gradient(0deg, var(--color-text-card-overlay-strong), var(--color-text-card-overlay-soft), transparent);
+}
+
+.avatar-ring {
+  background: linear-gradient(45deg, var(--color-accent-gradient-start), var(--color-accent-gradient-end));
+}
+
+.avatar-surface {
+  background: var(--color-bg-inverse);
+}
+
+.divider-line {
+  background: var(--color-border-disc);
+}
+
+.status-dot-success {
+  background: var(--color-status-success);
+}
+
+.status-dot-emerald {
+  background: var(--color-status-emerald);
+}
+
+.status-dot-cyan {
+  background: var(--color-status-cyan);
+}
+
+.carousel-dot-active {
+  background: var(--color-white);
+}
+
+.carousel-dot {
+  background: var(--color-white-transparent-37_5);
+}
+
+.carousel-dot:hover {
+  background: var(--color-white-transparent-62_5);
+}

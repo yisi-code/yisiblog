@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { clientLocalSettings } from '~~/shared/clientLocalSettings'
 import { usePostsData, type SiteContentItem } from '~/data'
 import { formatDisplayDate } from '~/utils/dateFormat'
 
@@ -48,15 +49,7 @@ const { items: data, pending: isLoadingPosts } = await usePostsData('posts-page'
 const allTag = '全部'
 const searchQuery = ref('')
 const selectedTag = ref(allTag)
-const viewModeCookie = useCookie<'timeline' | 'card'>('xhblogs-posts-view-mode', {
-  default: () => 'timeline'
-})
-const viewMode = computed<'timeline' | 'card'>({
-  get: () => viewModeCookie.value === 'card' ? 'card' : 'timeline',
-  set: (value) => {
-    viewModeCookie.value = value
-  }
-})
+const viewMode = useClientLocalSetting(clientLocalSettings.postsViewMode)
 
 const posts = computed(() => data.value.map((item: SiteContentItem) => ({
   ...item,

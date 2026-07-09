@@ -6,7 +6,7 @@
 }
 
 .article-shell {
-  border-radius: 1.5rem;
+  border-radius: var(--border-radius-normal-600);
   overflow: hidden;
 }
 
@@ -34,13 +34,13 @@
   height: fit-content;
   justify-content: center;
   align-items: center;
-  border-radius: 0.65rem;
+  border-radius: var(--border-radius-normal-200);
   padding: var(--pm-size-normal-25) var(--pm-size-normal-75) var(--pm-size-normal-25) var(--pm-size-normal-25);
   background: var(--color-bg-soft);
   color: var(--color-text-normal);
-  border: 1px solid var(--color-border-panel);
+  border: var(--border-width-normal) solid var(--color-border-panel);
   backdrop-filter: blur(4px);
-  box-shadow: 0 14px 35px rgb(0 0 0 / 0.22);
+  box-shadow: 0 14px 35px var(--color-black-transparent-12_5);
 }
 
 .article-back-button__icon-wrap:hover {
@@ -70,7 +70,7 @@
 
 .article-sidebar-card,
 .article-toc {
-  border-radius: 1.5rem;
+  border-radius: var(--border-radius-normal-600);
   padding: var(--pm-size-normal-150);
 }
 
@@ -83,7 +83,7 @@
   height: 5rem;
   width: 5rem;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: linear-gradient(45deg, var(--color-accent-gradient-start), var(--color-accent-gradient-end));
   padding: var(--pm-size-normal-50);
 }
@@ -115,7 +115,7 @@
 
 .article-sidebar-title {
   margin-bottom: var(--pm-size-normal);
-  border-left: 4px solid var(--color-control-hover-bg);
+  border-left: var(--border-width-normal-400) solid var(--color-control-hover-bg);
   padding-left: var(--pm-size-normal-50);
   font-size: var(--font-size-normal);
   letter-spacing: 0;
@@ -166,8 +166,8 @@
   bottom: 0;
   left: 0;
   top: 0;
-  width: 2px;
-  border-radius: 999px;
+  width: var(--border-width-normal-200);
+  border-radius: var(--border-radius-pill);
   background: var(--color-border-light);
 }
 
@@ -215,7 +215,7 @@
   height: 0.4rem;
   width: 0.4rem;
   transform: translateY(-50%);
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: var(--color-control-hover-bg);
   box-shadow: 0 0 12px var(--color-shadow-accent);
 }

@@ -3,7 +3,7 @@
     <ClientOnly>
       <div v-if="currentSong" class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div
-          class="absolute inset-[-10%] bg-cover bg-center opacity-40 blur-[50px] saturate-150 transition-all duration-300 dark:opacity-20"
+          class="absolute inset-[-10%] bg-cover bg-center opacity-40 blur-[50px] saturate-150 transition-all duration-150 dark:opacity-20"
           :style="{ backgroundImage: `url(${cover})` }"
         />
         <div class="music-page-backdrop absolute inset-0 backdrop-blur-sm" />
@@ -20,19 +20,19 @@
       <div class="grid w-full grid-cols-12 items-stretch gap-8">
         <ClientOnly>
           <template v-if="!music.loaded">
-            <section class="glass-panel col-span-5 flex min-h-105 flex-col items-center justify-center gap-4 rounded-[32px] p-panel-inset-loose">
+            <section class="glass-panel col-span-5 flex min-h-105 flex-col items-center justify-center gap-4 rounded-4xl p-panel-inset-loose">
               <div class="loading-spinner h-12 w-12 animate-spin rounded-full border-4" />
               <span class="text-secondary text-size-content-body font-black tracking-widest">正在加载音乐...</span>
             </section>
           </template>
           <template v-else-if="!currentSong">
-            <section class="glass-panel col-span-5 rounded-[32px] p-panel-inset-loose text-center">
+            <section class="glass-panel col-span-5 rounded-4xl p-panel-inset-loose text-center">
               <p class="text-secondary text-size-content-body font-black">暂无可播放的本地音乐。</p>
             </section>
           </template>
           <MusicPlayerPanel v-else :cover="cover" />
           <template #fallback>
-            <section class="glass-panel col-span-5 flex min-h-105 flex-col items-center justify-center gap-4 rounded-[32px] p-panel-inset-loose">
+            <section class="glass-panel col-span-5 flex min-h-105 flex-col items-center justify-center gap-4 rounded-4xl p-panel-inset-loose">
               <div class="loading-spinner h-12 w-12 animate-spin rounded-full border-4" />
               <span class="text-secondary text-size-content-body font-black tracking-widest">正在连接播放器...</span>
             </section>

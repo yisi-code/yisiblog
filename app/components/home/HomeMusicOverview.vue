@@ -8,7 +8,7 @@
         <CloudPlayer/>
         <template #fallback>
           <section
-              class="glass-panel interactive-card group relative flex h-full origin-center items-center justify-center overflow-hidden rounded-3xl p-card-inset transition duration-300 will-change-transform hover:scale-[1.02]">
+              class="glass-panel interactive-card group relative flex h-full origin-center items-center justify-center overflow-hidden rounded-3xl p-card-inset transition duration-150 hover:scale-[1.02]">
             <NuxtLink
                 to="/music"
                 class="music-page-entry"
@@ -20,7 +20,8 @@
               </span>
             </NuxtLink>
             <span
-                class="text-secondary animate-pulse text-size-content-body font-black tracking-widest">连接中...</span>
+                class="text-secondary animate-pulse text-size-content-body font-black tracking-widest">连接中...
+            </span>
           </section>
         </template>
       </ClientOnly>

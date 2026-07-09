@@ -3,7 +3,7 @@
 }
 
 .chatter-detail-shell {
-  border-radius: 2.25rem;
+  border-radius: var(--border-radius-normal-800);
 }
 
 
@@ -13,7 +13,7 @@
 
 .chatter-calendar__head h3 {
   color: var(--color-text-normal);
-  font-size: var(--font-size-normal-1125);
+  font-size: var(--font-size-normal-112_5);
   font-weight: 950;
 }
 
@@ -44,7 +44,7 @@
   display: grid;
   min-height: 2rem;
   place-items: center;
-  border-radius: 0.75rem;
+  border-radius: var(--border-radius-normal-200);
   color: var(--color-text-second);
   font-size: var(--font-size-normal-75);
   font-weight: 900;

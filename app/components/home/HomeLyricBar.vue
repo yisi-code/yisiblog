@@ -1,10 +1,10 @@
 <template>
-  <section v-if="currentSong" class="glass-panel surface-soft shadow-primary-hover group flex h-20 w-full items-center justify-between rounded-3xl p-card-inset shadow-2xl transition duration-300">
-    <div class="flex h-8 w-16 items-end justify-center gap-[4px]">
+  <section v-if="currentSong" class="glass-panel surface-soft shadow-primary-hover group flex h-20 w-full items-center justify-between rounded-3xl p-card-inset shadow-2xl transition duration-150">
+    <div class="flex h-8 w-16 items-end justify-center gap-1">
       <div
         v-for="wave in waves"
         :key="wave.delay"
-        class="w-1.5 rounded-t-sm transition-all duration-300 ease-out"
+        class="w-1.5 rounded-t-sm transition-all duration-150 ease-out"
         :class="music.isPlaying ? `${wave.color} safe-wave-active` : 'audio-wave-idle h-1'"
         :style="{ animationDelay: wave.delay, height: music.isPlaying ? undefined : '4px' }"
       />
@@ -13,12 +13,12 @@
     <div class="flex flex-1 items-center justify-center overflow-hidden px-panel-inline-loose">
       <p class="text-inverse truncate text-size-content-lead font-black tracking-widest">
         {{ displayedLyric }}
-        <span class="ml-inline-gap-2xs inline-block h-5 w-[3px] animate-cursor align-middle bg-current" />
+        <span class="ml-inline-gap-2xs inline-block h-5 w-0.75 animate-cursor align-middle bg-current" />
       </p>
     </div>
 
     <div class="flex w-16 justify-end">
-      <svg class="music-note-icon h-6 w-6 transition duration-300" :class="music.isPlaying ? 'animate-bounce' : 'opacity-30'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="music-note-icon h-6 w-6 transition duration-150" :class="music.isPlaying ? 'animate-bounce' : 'opacity-30'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
       </svg>
     </div>

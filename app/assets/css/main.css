@@ -6,6 +6,7 @@
 @import "./ui.css";
 @import "./music.css";
 @import "./widgets.css";
+@import "./home.css";
 @import "./article.css";
 @import "./comments.css";
 @import "./prose.css";
@@ -18,5 +19,4 @@
 @import "./projects.css";
 @import "./friends.css";
 @import "./about.css";
-@import "./layout-components.css";
 @import "./admin-data.css";

@@ -2,8 +2,8 @@
   <NuxtLink
       :to="to"
       class="glass-panel interactive-card group relative flex h-fit origin-center flex-col
-       justify-center overflow-hidden rounded-3xl p-card-inset shadow-xl transition duration-300
-        will-change-transform hover:scale-[1.02]"
+       justify-center overflow-hidden rounded-3xl p-card-inset shadow-xl transition duration-150
+        hover:scale-[1.02]"
       :title="description"
   >
     <div class="size-fit flex items-end gap-3">

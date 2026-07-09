@@ -3,7 +3,7 @@
       ref="trackRef"
       class="music-slider"
       :class="[
-      `music-slider--${orientation}`,
+      orientation === 'vertical' ? 'music-slider--vertical' : '',
       { 'music-slider--active': isActive || isDragging }
     ]"
       role="slider"

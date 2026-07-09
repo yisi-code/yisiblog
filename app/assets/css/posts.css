@@ -15,14 +15,18 @@
   height: 0.9rem;
   width: 0.9rem;
   transform: translateY(-50%);
-  border: 2px solid var(--color-control-hover-bg);
-  border-radius: 999px;
+  border: var(--border-width-normal-200) solid var(--color-control-hover-bg);
+  border-radius: var(--border-radius-pill);
   background: var(--color-bg-panel-strong);
   transition: transform 0.15s ease;
 }
 
+.timeline-line {
+  background: var(--color-bg-tag-placeholder);
+}
+
 .post-timeline__content {
-  border: 1px solid var(--color-border-panel);
+  border: var(--border-width-normal) solid var(--color-border-panel);
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 

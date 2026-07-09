@@ -42,7 +42,7 @@
   position: absolute;
   width: min(28rem, 48vw);
   height: min(28rem, 48vw);
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   filter: blur(80px);
   opacity: 0.72;
   transform: translateZ(0);
@@ -78,7 +78,7 @@
   z-index: 1;
   width: clamp(4rem, 9vw, 7.5rem);
   height: clamp(4rem, 9vw, 7.5rem);
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: var(--color-background-moon);
   box-shadow:
     0 0 24px var(--color-background-moon-glow),
@@ -100,7 +100,7 @@
 .background-canvas__static-star {
   position: absolute;
   z-index: 1;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: var(--color-background-static-star);
   animation: background-static-star-twinkle var(--background-static-star-duration) ease-in-out var(--background-static-star-delay) infinite;
   box-shadow: 0 0 10px var(--color-background-static-star-glow);
@@ -120,7 +120,7 @@
 
 .background-canvas__stardust-core {
   display: block;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: var(--color-background-stardust-core);
   animation: background-stardust-breathe var(--background-stardust-breathe-duration) ease-in-out var(--background-stardust-breathe-delay) infinite;
   box-shadow:

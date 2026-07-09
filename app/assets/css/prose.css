@@ -25,7 +25,7 @@
 }
 
 .content-prose h2 {
-  font-size: clamp(var(--font-size-normal-175), 4vw, var(--font-size-normal-2125));
+  font-size: clamp(var(--font-size-normal-175), 4vw, var(--font-size-normal-212_5));
 }
 
 .content-prose h3 {
@@ -76,7 +76,7 @@
   color: var(--color-text-link);
   font-weight: 700;
   text-decoration: none;
-  border-bottom: 1px dashed currentColor;
+  border-bottom: var(--border-width-normal) dashed currentColor;
 }
 
 .dark .content-prose a {
@@ -128,8 +128,8 @@
 }
 
 .content-prose blockquote {
-  border-left: 4px solid var(--color-control-hover-bg);
-  border-radius: 0 1.25rem 1.25rem 0;
+  border-left: var(--border-width-normal-400) solid var(--color-control-hover-bg);
+  border-radius: 0 var(--border-radius-normal-400) var(--border-radius-normal-400) 0;
   background: var(--color-bg-article-quote);
   color: var(--color-text-article-quote);
   padding: var(--pm-size-normal) var(--pm-size-normal-150);
@@ -143,7 +143,7 @@
 
 .content-prose pre {
   overflow: auto;
-  border-radius: 0.75rem;
+  border-radius: var(--border-radius-normal-200);
   background: var(--color-bg-article-code);
   color: var(--color-text-article-code);
   padding: var(--pm-size-normal);
@@ -169,7 +169,7 @@
 
 .content-prose p code,
 .content-prose li code {
-  border-radius: 0.25rem;
+  border-radius: var(--border-radius-normal);
   background: var(--color-bg-article-inline-code);
   color: var(--color-text-article-inline-code);
   font-size: var(--font-size-inline-code);
@@ -182,7 +182,7 @@
   max-width: 100%;
   height: auto;
   margin-inline: auto;
-  border-radius: 1rem;
+  border-radius: var(--border-radius-normal-400);
   box-shadow: 0 10px 30px var(--color-shadow-article-image);
 }
 
@@ -195,7 +195,7 @@
 
 .content-prose th,
 .content-prose td {
-  border: 1px solid var(--color-border-light);
+  border: var(--border-width-normal) solid var(--color-border-light);
   padding: var(--pm-size-normal-50) var(--pm-size-normal-75);
 }
 
