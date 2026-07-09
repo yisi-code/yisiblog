@@ -671,7 +671,6 @@
 .page-loading-overlay__spinner {
   width: 1.45rem;
   height: 1.45rem;
-  border: var(--border-width-normal-300) solid var(--color-control-hover-bg);
   border-top-color: transparent;
   border-radius: var(--border-radius-pill);
   animation: page-loading-spin 0.75s linear infinite;
