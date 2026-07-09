@@ -48,11 +48,11 @@ export function buildLatestPosts(posts: HomeContentItem[]) {
   })).slice(0, 5)
 }
 
-export function buildLatestChatters(chatters: HomeContentItem[], defaultChatterCover: string) {
+export function buildLatestChatters(chatters: HomeContentItem[]) {
   return chatters.map((item) => ({
     ...item,
     path: item.path || '',
-    cover: item.cover || defaultChatterCover
+    cover: item.cover || ''
   })).slice(0, 1)
 }
 

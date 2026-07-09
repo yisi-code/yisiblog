@@ -28,8 +28,6 @@ import {
 
 const {data: homeData} = await useHomePageData()
 
-const defaultChatterCover = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
-
 const safePostItems = computed(() => homeData.value?.posts || [])
 const safeChatterItems = computed(() => homeData.value?.chatters || [])
 const safeMomentItems = computed(() => homeData.value?.moments || [])
@@ -39,7 +37,7 @@ const safeProjectItems = computed(() => homeData.value?.projects || [])
 const safeSongItems = computed(() => homeData.value?.songs || [])
 
 const latestPosts = computed(() => buildLatestPosts(safePostItems.value))
-const latestChatters = computed(() => buildLatestChatters(safeChatterItems.value, defaultChatterCover))
+const latestChatters = computed(() => buildLatestChatters(safeChatterItems.value))
 
 const homeSearchItems = computed(() => buildHomeSearchItems({
   posts: safePostItems.value,
