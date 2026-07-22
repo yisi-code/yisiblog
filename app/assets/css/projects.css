@@ -10,7 +10,7 @@
 }
 
 .project-card:hover .project-card__glow {
-  transform: scale(1.12);
+  transform: scale(2);
   background: var(--color-bg-project-glow-hover);
 }
 
@@ -30,7 +30,7 @@
 .project-card__identity h2 {
   display: -webkit-box;
   overflow: hidden;
-  color: var(--color-white);
+  color: var(--color-text-normal);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   font-size: clamp(var(--font-size-normal-125), 3vw, var(--font-size-normal-162_5));
@@ -59,7 +59,7 @@
 
 .project-card__description {
   display: -webkit-box;
-  color: var(--color-white);
+  color: var(--color-text-normal);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   font-size: var(--font-size-normal);

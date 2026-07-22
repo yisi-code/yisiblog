@@ -11,10 +11,10 @@
         >
           <NuxtLink
               :to="post.path"
-              class="post-timeline__content glass-panel group inline-grid w-fit max-w-[min(100%,28rem)] grid-cols-[minmax(0,max-content)] rounded-2xl"
+              class="post-timeline__content glass-panel group inline-grid w-fit max-w-[min(100%,28rem)] grid-cols-[minmax(0,max-content)] rounded-2xl overflow-hidden"
               :class="columnIndex === 0 ? 'text-right' : ''"
           >
-            <div class="relative aspect-video w-full min-w-0 overflow-hidden">
+            <div class="relative aspect-video w-full min-w-0">
               <img
                   :src="post.cover || ''"
                   referrerpolicy="no-referrer"

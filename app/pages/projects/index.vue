@@ -16,17 +16,21 @@
             rel="noreferrer"
             class="project-card content-card-surface relative flex flex-col overflow-hidden no-underline hover:-translate-y-2"
         >
-
-          <img v-if="project.cover" :src="project.cover" :alt="project.title"
-               class="left-0 top-0 absolute media-fill-cover">
-          <div v-if="project.cover" class="left-0 top-0 absolute size-full backdrop-blur-xs"
-               style="background-color: var(--color-text-card-overlay-strong)"/>
+          <img
+              v-if="project.cover"
+              :src="project.cover"
+              :alt="project.title"
+              class="z-0 absolute inset-0 media-fill-cover scale-105 blur-xs">
+          <div
+              v-if="project.cover"
+              class="z-1 left-0 top-0 absolute size-full"
+              style="background-color: var(--color-bg-panel);"/>
 
           <div
-              class="project-card__glow pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full"
+              class="z-2 project-card__glow pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full"
               aria-hidden="true"/>
 
-          <div class="relative z-1 flex items-start justify-between gap-4">
+          <div class="relative z-3 flex items-start justify-between gap-4">
             <div class="project-card__identity flex min-w-0 items-center gap-4">
               <span class="project-card__icon grid h-12 min-w-12 place-items-center" title="Code2">
                 <Code2
