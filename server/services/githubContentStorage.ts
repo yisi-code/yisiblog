@@ -13,11 +13,14 @@ type GitHubTreeItem = {
   mode?: '100644'
   type?: 'blob'
   content?: string
-  encoding?: 'base64'
-  sha?: null
+  sha?: string | null
 }
 
 type GitHubTreeResponse = {
+  sha: string
+}
+
+type GitHubBlobResponse = {
   sha: string
 }
 
@@ -113,14 +116,23 @@ function textTreeItem(path: string, content: string): GitHubTreeItem {
   }
 }
 
-function binaryTreeItem(path: string, content: Buffer): GitHubTreeItem {
+function binaryTreeItem(path: string, sha: string): GitHubTreeItem {
   return {
     path,
     mode: '100644',
     type: 'blob',
-    content: content.toString('base64'),
-    encoding: 'base64'
+    sha
   }
+}
+
+async function createGitHubBinaryBlob(config: GitHubContentConfig, content: Buffer) {
+  return githubRequest<GitHubBlobResponse>(config, '/git/blobs', {
+    method: 'POST',
+    body: {
+      content: content.toString('base64'),
+      encoding: 'base64'
+    }
+  })
 }
 
 export function githubDataBasePath() {
@@ -138,14 +150,18 @@ export async function commitGitHubContent(params: {
   const baseCommitSha = ref.object.sha
   const baseCommit = await githubRequest<GitHubCommitResponse>(config, `/git/commits/${baseCommitSha}`)
 
-  const tree = [
+  const tree: GitHubTreeItem[] = [
     ...Object.entries(params.textFiles).map(([path, content]) => textTreeItem(path, content)),
-    ...Object.entries(params.binaryFiles || {}).map(([path, content]) => binaryTreeItem(path, content)),
     ...(params.deleteFiles || []).map((path) => ({
       path,
       sha: null
     }))
   ]
+
+  for (const [path, content] of Object.entries(params.binaryFiles || {})) {
+    const blob = await createGitHubBinaryBlob(config, content)
+    tree.push(binaryTreeItem(path, blob.sha))
+  }
 
   const nextTree = await githubRequest<GitHubTreeResponse>(config, '/git/trees', {
     method: 'POST',
