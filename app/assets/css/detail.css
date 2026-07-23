@@ -4,7 +4,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   margin-bottom: var(--pm-size-normal-200);
-  border: var(--border-width-normal) solid var(--color-border-panel);
+  border-bottom: var(--border-width-normal) solid var(--color-border-panel);
   background: var(--color-bg-muted);
   box-shadow: 0 24px 70px var(--color-shadow-panel);
   isolation: isolate;
