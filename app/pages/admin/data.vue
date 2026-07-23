@@ -20,7 +20,7 @@
         class="admin-data-workspace"
         :class="{ 'admin-data-workspace--locked': !isAuthenticated }">
       <div v-if="hasEditorDraft" ref="adminDataActionsRef" class="admin-data-actions" aria-label="编辑操作">
-        <button class="admin-data-button" type="button" @click="resetDraft">
+        <button class="admin-data-button" type="button" :disabled="isBusy" @click="resetDraft">
           <RotateCcw :size="17" aria-hidden="true"/>
           重置
         </button>
@@ -28,6 +28,7 @@
             v-if="canDeleteDraft"
             class="admin-data-button admin-data-button--danger"
             type="button"
+            :disabled="isBusy"
             @click="deleteRecord(false)"
         >
           <Trash2 :size="17" aria-hidden="true"/>
@@ -218,8 +219,9 @@
                         type="button"
                         @mousedown.prevent="selectUploadFolder(target.key, folder)">
                       <span class="admin-data-select__option-title">
-                        <template v-for="(part, index) in highlightFolderParts(folder, uploadFolders[target.key])"
-                                  :key="`${folder}-${index}`">
+                        <template
+                            v-for="(part, index) in highlightFolderParts(folder, uploadFolders[target.key])"
+                            :key="`${folder}-${index}`">
                           <mark v-if="part.match" class="search-highlight">{{ part.text }}</mark>
                           <span v-else>{{ part.text }}</span>
                         </template>
@@ -284,8 +286,11 @@
             <label v-if="showCoverField" class="admin-data-field admin-data-field--wide">
               <span>封面</span>
               <input v-model="draft.cover" class="admin-data-input" placeholder="输入图片链接">
-              <img v-if="draft.cover" class="admin-data-preview-image" :src="previewAssetUrl(draft.cover)"
-                   alt="封面预览">
+              <img
+                  v-if="draft.cover"
+                  class="admin-data-preview-image"
+                  :src="previewAssetUrl(draft.cover)"
+                  alt="封面预览">
             </label>
 
             <label v-if="showUrlField" class="admin-data-field admin-data-field--wide">
@@ -295,8 +300,11 @@
                     v-model="draft.url"
                     class="admin-data-input"
                     :placeholder="draft.type === 'music' ? '选择音乐后自动填入远程地址' : 'https://...'">
-                <AdminFilePicker v-if="draft.type === 'music'" label="选择音乐" accept="audio/*"
-                                 @change="handleMusicSelected"/>
+                <AdminFilePicker
+                    v-if="draft.type === 'music'"
+                    label="选择音乐"
+                    accept="audio/*"
+                    @change="handleMusicSelected"/>
               </div>
               <div v-if="musicFile" class="admin-data-file-pill">
                 <Music :size="16" aria-hidden="true"/>
@@ -304,8 +312,10 @@
                 <small v-if="musicFile.size">{{ formatBytes(musicFile.size) }}</small>
                 <button type="button" @click="clearMusicFile">移除</button>
               </div>
-              <audio v-if="draft.type === 'music' && draft.url" class="admin-data-audio"
-                     :src="previewAssetUrl(draft.url)" controls/>
+              <audio
+                  v-if="draft.type === 'music' && draft.url"
+                  class="admin-data-audio"
+                  :src="previewAssetUrl(draft.url)" controls/>
             </label>
 
             <label v-if="showTagsField" class="admin-data-field admin-data-field--wide">
@@ -547,12 +557,12 @@ let hasTriedLoadingFolders = false
 const isLoadingFolders = ref(false)
 const folderLoadError = ref('')
 
-const isBusy = computed(() => isVerifying.value || isLoading.value || isSyncing.value || isSavingCloudDraft.value)
+const isBusy = computed(() => taskOverlay.active || isVerifying.value || isLoading.value || isSyncing.value || isSavingCloudDraft.value)
 const isAuthenticated = computed(() => Boolean(adminSession.value && adminSession.value.expiresAt > Date.now()))
 const isCreating = computed(() => editorMode.value === 'create')
 const hasEditorDraft = computed(() => editorMode.value !== 'idle')
 const needsMarkdown = computed(() => adminRecordNeedsMarkdown(draft.type))
-const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type))
+const canSave = computed(() => Boolean(hasEditorDraft.value && isAuthenticated.value && draft.id.trim() && draft.type && !isBusy.value))
 const canDeleteDraft = computed(() => !isCreating.value && draft.type !== 'about')
 const canCreateSelectedType = computed(() => selectedType.value !== 'about')
 const canSyncDataCapsule = computed(() => !isBusy.value && Boolean(pendingChanges.value.length))
@@ -1265,14 +1275,24 @@ async function ensureCurrentRecordDetailLoaded() {
 }
 
 async function resetDraft() {
-  if (!hasEditorDraft.value) return
+  if (!hasEditorDraft.value || isBusy.value) return
 
-  if (isCreating.value) {
-    startCreateRecord(selectedType.value)
-    return
+  const isResettingNewRecord = isCreating.value
+  showTask(
+      isResettingNewRecord ? '正在重置新建内容' : '正在重置内容',
+      isResettingNewRecord ? '正在清空当前未保存的编辑内容。' : '正在恢复原始内容并更新云端草稿。'
+  )
+  try {
+    if (isResettingNewRecord) {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+      startCreateRecord(selectedType.value)
+      return
+    }
+
+    await restoreOriginalRecord(selectedRecordKey.value || editorDraftKey.value, '内容已重置，并已退出待同步区')
+  } finally {
+    hideTask()
   }
-
-  await restoreOriginalRecord(selectedRecordKey.value || editorDraftKey.value, '内容已重置，并已退出待同步区')
 }
 
 function applyPendingChanges(baseRecords: AdminManagedRecord[], changes = pendingChanges.value) {
@@ -1299,12 +1319,6 @@ function applyPendingChanges(baseRecords: AdminManagedRecord[], changes = pendin
   })
 
   records.value = nextRecords
-}
-
-function upsertPendingChange(change: AdminPendingChange) {
-  const index = pendingChanges.value.findIndex((item) => item.key === change.key)
-  if (index >= 0) pendingChanges.value[index] = change
-  else pendingChanges.value.push(change)
 }
 
 function resolveDraftSourceKey(record: AdminDataRecord) {
@@ -1381,12 +1395,13 @@ async function persistCloudPendingChanges(changes = pendingChanges.value) {
 }
 
 async function saveDraftChange(): Promise<DraftSaveResult> {
-  if (!hasEditorDraft.value || !isAuthenticated.value || !draft.type) return 'invalid'
+  if (!hasEditorDraft.value || !isAuthenticated.value || !draft.type || isBusy.value) return 'invalid'
   if (!draft.id.trim()) {
     setStatus('请先填写 ID 后再保存草稿', 'error')
     return 'invalid'
   }
 
+  showTask('正在保存草稿', '正在将当前变更保存到云端草稿。')
   isSavingCloudDraft.value = true
   try {
     await ensureCurrentRecordDetailLoaded()
@@ -1447,40 +1462,64 @@ async function saveDraftChange(): Promise<DraftSaveResult> {
     return 'error'
   } finally {
     isSavingCloudDraft.value = false
+    hideTask()
   }
 }
 
-function deleteRecord(deleteAssociatedFiles: boolean) {
-  if (!selectedRecordKey.value || draft.type === 'about') return
-  const target = records.value.find((record) => recordKey(record) === selectedRecordKey.value)
+async function deleteRecord(deleteAssociatedFiles: boolean) {
+  if (!selectedRecordKey.value || draft.type === 'about' || isBusy.value) return
+  const targetKey = selectedRecordKey.value
+  const target = records.value.find((record) => recordKey(record) === targetKey)
   if (!target) return
 
-  const existingPending = pendingChanges.value.find((item) => item.key === selectedRecordKey.value)
-  if (existingPending?.action === 'save' && !existingPending.snapshot) {
-    pendingChanges.value = pendingChanges.value.filter((item) => item.key !== selectedRecordKey.value)
-    sourceRecords.value = sourceRecords.value.filter((record) => recordKey(record) !== selectedRecordKey.value)
-    applyPendingChanges(sourceRecords.value)
-    clearEditorDraft(selectedType.value)
-    setStatus('已撤销尚未同步的新建记录', 'success')
-    return
-  }
+  showTask('正在保存删除草稿', '正在将删除操作写入云端草稿。')
+  isSavingCloudDraft.value = true
+  try {
+    const existingPending = pendingChanges.value.find((item) => item.key === targetKey)
+    const isUnsyncedNewRecord = existingPending?.action === 'save' && !existingPending.snapshot
+    const nextChanges = pendingChanges.value.filter((item) => item.key !== targetKey)
 
-  upsertPendingChange({
-    action: 'delete',
-    key: selectedRecordKey.value,
-    id: existingPending?.originalId || target.id,
-    type: target.type,
-    deleteAssociatedFiles,
-    snapshot: existingPending?.snapshot || target,
-    updatedAt: new Date().toISOString()
-  })
-  applyPendingChanges(sourceRecords.value)
-  clearEditorDraft(target.type)
-  setStatus('删除操作已加入待同步区', 'success')
+    if (!isUnsyncedNewRecord) {
+      nextChanges.push({
+        action: 'delete',
+        key: targetKey,
+        id: existingPending?.originalId || target.id,
+        type: target.type,
+        deleteAssociatedFiles,
+        snapshot: existingPending?.snapshot || target,
+        updatedAt: new Date().toISOString()
+      })
+    }
+
+    await persistCloudPendingChanges(nextChanges)
+    pendingChanges.value = nextChanges
+
+    if (isUnsyncedNewRecord) {
+      sourceRecords.value = sourceRecords.value.filter((record) => recordKey(record) !== targetKey)
+      setStatus('已撤销尚未同步的新建记录，并更新云端草稿', 'success')
+    } else {
+      setStatus('删除操作已加入待同步区并保存至云端', 'success')
+    }
+
+    applyPendingChanges(sourceRecords.value)
+    clearEditorDraft(target.type)
+  } catch (error) {
+    setStatus(errorMessage(error), 'error')
+  } finally {
+    isSavingCloudDraft.value = false
+    hideTask()
+  }
 }
 
 async function undoChange(key: string) {
-  await restoreOriginalRecord(key, '已撤销变更')
+  if (isBusy.value) return
+
+  showTask('正在撤销变更', '正在恢复原始内容并更新云端草稿。')
+  try {
+    await restoreOriginalRecord(key, '已撤销变更')
+  } finally {
+    hideTask()
+  }
 }
 
 function openPendingChange(change: AdminPendingChange) {
