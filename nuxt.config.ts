@@ -3,6 +3,19 @@ import { clientLocalSettings } from './shared/clientLocalSettings'
 
 export default defineNuxtConfig({
     compatibilityDate: '2026-06-22',
+    nitro: {
+        bodySizeLimit: 50 * 1024 * 1024,  // 50MB
+        prerender: {
+            crawlLinks: false,
+            failOnError: false
+        },
+        publicAssets: [
+            {
+                dir: 'public',
+                baseURL: '/'
+            }
+        ]
+    },
     devtools: {enabled: process.env.NODE_ENV !== 'production'},
     modules: ['@nuxtjs/mdc', '@pinia/nuxt', '@nuxtjs/color-mode', '@nuxt/eslint'],
     components: [
@@ -67,16 +80,4 @@ export default defineNuxtConfig({
     routeRules: {
         '/timeline': {redirect: '/posts'}
     },
-    nitro: {
-        prerender: {
-            crawlLinks: false,
-            failOnError: false
-        },
-        publicAssets: [
-            {
-                dir: 'public',
-                baseURL: '/'
-            }
-        ]
-    }
 })
